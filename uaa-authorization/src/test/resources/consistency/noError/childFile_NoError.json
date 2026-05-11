@@ -1,0 +1,14 @@
+{
+  "name": "childFile",
+  "permissions": [
+    {
+      "name": "Child Permission 1",
+      "policy-refs": [
+        "Policy 1"
+      ],
+      "scopes": [
+        "Child Scope"
+      ]
+    }
+  ]
+}

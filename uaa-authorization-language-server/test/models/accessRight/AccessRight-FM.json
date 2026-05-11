@@ -1,0 +1,195 @@
+{
+  "header": {
+    "id": "AccessRight-FM",
+    "modelType": "form",
+    "modelVersion": "37.1.1",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "savedAt",
+        "value": "2022-09-12T17:27:01.802694"
+      },
+      {
+        "name": "roles",
+        "value": "userManagementAdmin"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "AccessRight-DM",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "AccessRight-DM"
+      }
+    ]
+  },
+  "content": {
+    "subHeaderBox": {
+      "id": "subHeaderBox1"
+    },
+    "footerBox": {
+      "id": "footerBox1",
+      "majorButtons": {
+        "button": [
+          {
+            "type": "EVENT",
+            "id": "button-e96c3",
+            "name": "Cancel",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Cancel"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Abbrechen"
+                    }
+                  ]
+                }
+              },
+              "priority": "SECONDARY",
+              "destructive": true
+            },
+            "event": "event_cancel",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "EVENT",
+            "id": "button-7cb63",
+            "name": "Submit",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Save"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Speichern"
+                    }
+                  ]
+                }
+              },
+              "priority": "PRIMARY"
+            },
+            "event": "event_save",
+            "validation": "full",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "screens": [
+      {
+        "id": "screen-fb31a",
+        "name": "AccessRight_Screen",
+        "screenElements": [
+          {
+            "type": "Section",
+            "id": "section-dea42",
+            "name": "AccessRight",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Access Right"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Berechtigung"
+                  }
+                ]
+              }
+            },
+            "screenElements": [
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid-2141d",
+                "name": "ControlGrid",
+                "layout": {
+                  "lg": "12"
+                },
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row-00e6b",
+                    "name": "row-00e6b",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control-bfef5",
+                        "label": {
+                          "type": "Multilingual",
+                          "multilingualText": {
+                            "text": [
+                              {
+                                "locale": "en",
+                                "text": "Name"
+                              },
+                              {
+                                "locale": "de",
+                                "text": "Name"
+                              }
+                            ]
+                          }
+                        },
+                        "elementRef": "field_e7eb8"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "id": "row-ffcde",
+                    "name": "row-ffcde",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control-f2985",
+                        "label": {
+                          "type": "Multilingual",
+                          "multilingualText": {
+                            "text": [
+                              {
+                                "locale": "en",
+                                "text": "Description"
+                              },
+                              {
+                                "locale": "de",
+                                "text": "Beschreibung"
+                              }
+                            ]
+                          }
+                        },
+                        "elementRef": "field_0886e"
+                      }
+                    ]
+                  }
+                ],
+                "verticalAlignment": "TOP"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {},
+    "groupConfiguration": {},
+    "defaults": {}
+  }
+}

@@ -1,0 +1,192 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+[[backend-authentication]]
+== Backend Authentication
+An application might have back-end job(s) which are started by a scheduler without user interaction. 
+The code which is called from those jobs applies authorization and requires a user set-up in a Spring `SecurityContext`.
+For this purpose UAA offers the `uaa-authentication-backend` module. It's rather simple with few configuration options.
+The module creates a user and set-up Spring `SecurityContext. It also provides an extension point for custom user creation implementation.
+
+[NOTE]
+====
+The module is dependent on `uaa-authorization` in order to be able to give super user privileges to created user. 
+==== 
+
+
+[[user-getting-started]]
+=== Getting Started
+Backend authentication can be uses as plain spring application or full-featured Spring Boot application.
+
+==== Spring Application 
+
+In a Spring application the following dependency needs to be added:
+
+Maven:
+[source, xml,subs="verbatim,attributes"]
+----
+<dependency>
+	<groupId>com.mgmtp.a12.uaa</groupId>
+	<artifactId>uaa-authentication-backend</artifactId>
+	<version>{version}</version>
+</dependency>
+----
+
+Gradle:
+[source,css,options="nowrap"]
+----
+dependencies {
+    implementation "com.mgmtp.a12.uaa:uaa-authentication-backend:{version}"
+}
+----
+
+Next step is to create a configuration class which loads proper authentication type and instantiates required beans.
+[source, java]
+----
+@Configuration
+public class BackendAuthenticationConfiguration {
+
+
+	@Bean
+	public BackendAuthenticationService createBackendAuthenticationService() {
+		return new BackendAuthenticationService(true);
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public AuthenticatedUserLoader createBackendUserLoader() {
+		return new BackendUserLoader(<true/false>);
+	}
+}
+----
+
+==== Spring Boot Application
+
+With Spring Boot all configuration is handled by properties and the following dependencies needs to be added:
+
+Maven:
+[source, xml,subs="verbatim,attributes"]
+----
+<dependency>
+	<groupId>com.mgmtp.a12.uaa</groupId>
+	<artifactId>uaa-authentication-backend-spring-boot-autoconfigure</artifactId>
+	<version>{version}</version>
+</dependency>
+----
+
+Gradle:
+[source,css,options="nowrap"]
+----
+dependencies {
+    implementation "com.mgmtp.a12.uaa:uaa-authentication-backend-spring-boot-autoconfigure:{version}"
+}
+----
+
+=== Setting up a backend user
+A backend user is set by annotating respective job method with annotation `@Authenticated`. Annotation parameter user name is required.
+A code which is called within the annotation (method)  has given user in the `SecurityContext`. After the method is finished the `SecurityContext` is cleaned-up. 
+
+Based on the configuration the module will create a use with given username with regular privileges or all privileges.
+
+See scheduled job example:
+
+[source, java,subs="verbatim,attributes"]
+----
+@Component
+public class BackendJob {
+
+	@Inject
+	private BackendTask backendTask;
+
+	@Scheduled(cron = "*/10 * * * * *")
+	@Authenticated(username = "superUser")
+	public void backendJob() {
+		backendTask.executeTask();
+	}
+
+}
+----
+
+Optionally it's possible to use JAVA API to set backend user.
+[source, java,subs="verbatim,attributes"]
+----
+@Component
+public class BackendJob {
+
+	@Inject
+	private BackendTask backendTask;
+	
+	@Inject
+	private BackendAuthenticationService backendAuthenticationService;
+
+	@Scheduled(cron = "*/10 * * * * *")
+	public void backendJob() {
+		backendAuthenticationService.executeWithBackendAuthentication("superUser", () -> {
+			backendTask.executeTask();
+			return null;
+		});
+		
+	}
+
+}
+----
+
+[NOTE]
+====
+Preferred approach is annotation based.
+====
+
+=== Custom user loader implementation
+It's possible to provide custom implementation for user used for backend authentication. It's necessary to create a class which implements the `AuthenticatedUserLoader` interface.
+
+
+In case that an application uses the `uaa-authentication-principal-extension` it's possible to use the module and load users from <<uaa-principal-extension, YAML files>> 
+
+See following example which loads a user from YAML file(s)
+
+[source, java,subs="verbatim,attributes"]
+----
+@Component
+public class YamlBackendUserLoader implements AuthenticatedUserLoader {
+
+	@Inject
+	private LocalUserManager localUserManager;
+
+	@Override
+	public UserDetails loadUser(String username) {
+		return localUserManager.createUser(username);
+	}
+
+}
+----  
+
+[NOTE]
+====
+When custom implementation is used the module configuration `mgmtp.a12.uaa.authentication.backend.grant-super-user-privileges.enabled` is ignored.
+====
+ 
+
+==== Configuration:
+[%autowidth.stretch,options="header"]
+|================================================================================
+|Configuration property |Default value |Usage |Remark
+|`mgmtp.a12.uaa.authentication.backend.enabled` |`false` |Enable backend authentication handling |
+|`mgmtp.a12.uaa.authentication.backend.grant-super-user-privileges.enabled` |`false` | Create a user which has all privileges in the system|
+
+|================================================================================
+
+ 

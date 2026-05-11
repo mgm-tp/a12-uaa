@@ -1,0 +1,9 @@
+username: "testUser"
+password: "testPassword"
+authorities:
+- "guest"
+- "admin"
+- "unknown"
+email: a@a.com
+firstname: First
+lastname: Last

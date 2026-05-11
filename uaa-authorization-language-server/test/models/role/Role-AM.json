@@ -1,0 +1,137 @@
+{
+  "header": {
+    "modelVersion": "5.0.0",
+    "modelType": "application",
+    "id": "Role-AM",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "userManagementAdmin"
+      }
+    ]
+  },
+  "content": {
+    "region": {
+      "name": "Role Management",
+      "layout": {
+        "name": "ApplicationFrame"
+      },
+      "subRegions": [
+        {
+          "layout": {
+            "name": "MasterDetail"
+          },
+          "name": "CONTENT"
+        },
+        {
+          "layout": {
+            "name": "Null"
+          },
+          "name": "SIDEBAR"
+        },
+        {
+          "layout": {
+            "name": "Stack"
+          },
+          "name": "MODAL"
+        }
+      ]
+    },
+    "modules": [
+      {
+        "name": "Role Management",
+        "menu": {
+          "name": "Role Management",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Role Management"
+            }
+          ]
+        },
+        "flows": [
+          {
+            "name": "default",
+            "scenes": [
+              {
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "OverviewCRUD",
+                      "models": [
+                        {
+                          "modelType": "overview",
+                          "name": "Role-OM"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "name": "Role Overview",
+                "matchConditions": [
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  },
+                  {
+                    "key": "view",
+                    "mustEqual": "role-overview"
+                  }
+                ]
+              },
+              {
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "FormCRUD",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 8
+                      },
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "Role-FM",
+                          "dataModel": "Role-DM"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "name": "Role Form",
+                "matchConditions": [
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "model",
+                    "mustEqual": "Role-DM"
+                  },
+                  {
+                    "key": "view",
+                    "mustEqual": "role-overview"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "defaultRegion": ["CONTENT"]
+  }
+}

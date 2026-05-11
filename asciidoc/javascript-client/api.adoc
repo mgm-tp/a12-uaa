@@ -1,0 +1,544 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+=== API
+
+[[uaa-client]]
+==== UaaClient
+
+For integration with UAA, following API is used to init client for all authentication types
+
+- *init*: This method used to initialize *UaaClient*. +
+
+[source,javascript]
+----
+const uaaClientconfigure: UaaClientConfiguration = {
+    serverURL: `YOUR_SERVER_URL`,
+    offlineSelfConfigure?: selfConfigure;
+    overrideClientConfigures: {
+        local?: localConfigure,
+        ldap?: ldapConfigure,
+        saml?: samlConfigure,
+        oidc?: oidcConfigure
+    },
+    automaticallyLogin?: true,
+    store?: store
+}
+
+UaaClient.init(uaaClientConfigure);
+----
+
+- *fetchSelfConfigure*: Manual fetching *SelfConfigure* from serverURL
+
+- *getLocalClient*: Return an instance of UaaLocalClient.
+
+[source,javascript]
+const uaaLocalClient = UaaClient.getLocalClient();
+
+- *getLdapClient*: Return an instance of UaaLdapClient.
+
+[source,javascript]
+const uaaLdapClient = UaaClient.getLdapClient();
+
+- *getOidcClient*: Return an instance of UaaOidcClient.
+
+[source,javascript]
+const uaaOidcClient = UaaClient.getOidcClient();
+
+- *getSamlClient*: Return an instance of UaaSamlClient.
+
+[source,javascript]
+----
+const uaaSamlClient = UaaClient.getSamlClient();
+----
+
+- *getLocalConfiguration*: Return Local configuration
+
+[source,javascript]
+----
+const localConfiguration = UaaClient.getLocalConfiguration();
+----
+
+- *getLdapConfiguration*: Return Ldap configuration
+
+[source,javascript]
+----
+const ldapConfiguration = UaaClient.getLdapConfiguration();
+----
+
+- *getSamlConfiguration*: Return Saml configuration
+
+[source,javascript]
+----
+const samlConfiguration = UaaClient.getSamlConfiguration();
+----
+
+- *getOidcConfiguration*: Return Oidc configuration
+
+[source,javascript]
+----
+const oidcConfiguration = UaaClient.getOidcConfiguration();
+----
+
+==== UaaActions
+
+[options="header",width="90%"]
+|=======================
+|Properties|Payload|Action
+
+|loggingInSAML
+|
+| *_UAA/SAML/LOGGING_IN_*
+|loggingInOIDC
+a|
+[source,javascript]
+----
+signinArgs?: SigninRedirectArgs \| SigninPopupArgs
+----
+| *_UAA/OIDC/LOGGING_IN_*
+
+|loggingInLDAP
+a|
+[source,javascript]
+----
+{
+ username: string;
+ password: string;
+ loginRelativeUrl?: string;
+}
+----
+| *_UAA/LDAP/LOGGING_IN_*
+
+|loggingInLocal
+a|
+[source,javascript]
+----
+{
+ username: string;
+ password: string;
+ loginRelativeUrl?: string;
+}
+----
+| *_UAA/LOCAL/LOGGING_IN_*
+
+|restoreProcessing
+a|
+[source,javascript]
+----
+{
+ authenticationType: AuthenticationType;
+ error?: Error;
+}
+----
+| *_UAA/RESTORE_PROCESSING_*
+
+|restoreFailed
+a|
+[source,javascript]
+----
+{
+ authenticationType: AuthenticationType;
+ error?: Error;
+}
+----
+| *_UAA/RESTORE_FAILED_*
+
+|restoreSuccess
+a|
+[source,javascript]
+----
+{
+ authenticationType: AuthenticationType;
+ error?: Error;
+}
+----
+| *_UAA/RESTORE_SUCCESS_*
+
+|loggedIn
+a|
+[source,javascript]
+----
+{
+ user: UaaOidcUser \| UaaUser \| UaaExtendedUser \| UaaOidcModifiedUser;
+ type: AuthenticationType;
+ access_token?: string;
+}
+----
+| *_UAA/LOGGED_IN_*
+
+|loggingOut
+|
+| *_UAA/LOGGING_OUT_*
+
+|loggedOut
+|
+| *_UAA/LOGGED_OUT_*
+
+|loginFailed
+a|
+[source,javascript]
+----
+{
+ errorCode: string;
+ statusText?: string;
+ status?: number;
+}
+----
+| *_UAA/LOGIN_FAILED_*
+
+|logoutRequested
+|
+| *_UAA/LOGOUT_REQUESTED_*
+
+|logoutIdp
+|
+| *_UAA/LOGOUT_IDP_*
+
+|logoutFailed
+a|
+[source,javascript]
+----
+{
+ errorCode: string;
+ statusText?: string;
+ status?: number;
+}
+----
+| *_UAA/LOGOUT_FAILED_*˝
+
+|silentRenewError
+|
+| *_redux-oidc/SILENT_RENEW_ERROR_*
+|oidc_userFound
+|
+| *_redux-oidc/USER_FOUND_*
+
+|updateAccessToken
+a|
+[source,javascript]
+----
+{
+ access_token: string;
+ authenticationType?: AuthenticationType;
+}
+----
+| *_UAA/UPDATE_ACCESS_TOKEN_*
+
+|updateUserInfo
+a|
+[source,javascript]
+----
+{
+ user: UaaOidcUser \| UaaUser \| UaaExtendedUser \| UaaOidcModifiedUser;
+}
+----
+| *_UAA/UPDATE_USER_INFO_*
+
+|unauthorized
+a|
+[source,javascript]
+----
+{
+ url: string;
+}
+----
+| *_UAA/UNAUTHORIZED_*
+
+|modifyingOidcUser
+a|
+[source,javascript]
+----
+UaaOidcUser
+----
+| *_UAA/MODIFYING_OIDC_USER_*
+
+|modifiedOidcUser
+a|
+[source,javascript]
+----
+UaaOidcModifiedUser
+----
+| *_UAA/MODIFIED_OIDC_USER_*
+
+|modifyOidcUserFailed
+a|
+[source,javascript]
+----
+{
+ statusText?: string;
+ status?: number;
+}
+----
+| *_UAA/MODIFY_OIDC_USER_FAILED_*
+|=======================
+
+* *Login Redux Actions*
+
+[cols="a,a"]
+|===
+| Type: LOCAL, SAML, ACTIVE_DIRECTORY_LDAP image:assets/images/javascript-client/uaa_login_actions.png[Login flowchart,500,500]
+| Type: OAUTH2 image:assets/images/javascript-client/oidc_login_actions.png[Login flowchart,500,500]
+|===
+
+* *Restore Redux Actions*
+
+[cols="a,a"]
+|===
+| Type: LOCAL, SAML, ACTIVE_DIRECTORY_LDAP image:assets/images/javascript-client/uaa_restore_actions.png[Restore flowchart,500,500]
+| Type: OAUTH2 image:assets/images/javascript-client/oidc_restore_actions.png[Restore flowchart,500,500]
+|===
+
+* *Silent Renew Redux Actions*
+
+[cols="a,a"]
+|===
+| Type: LOCAL, SAML, ACTIVE_DIRECTORY_LDAP image:assets/images/javascript-client/uaa_silent_renew_actions.png[Silent renew flowchart,500,500]
+| Type: OAUTH2 image:assets/images/javascript-client/oidc_silent_renew_actions.png[Silent renew flowchart,500,500]
+|===
+
+* *Logout Redux Actions*
+
+[cols="a,a"]
+|===
+| Type: LOCAL, SAML, ACTIVE_DIRECTORY_LDAP image:assets/images/javascript-client/uaa_logout_actions.png[Logout flowchart,500,500]
+| Type: OAUTH2 image:assets/images/javascript-client/oidc_logout_actions.png[Logout flowchart,500,500]
+|===
+
+==== UaaSelectors
+
+The UaaSelectors can be used by 2 ways:
+
+* With UseSelector from Redux
+
+[source,javascript]
+----
+const authenticatedState = useSelector(UaaSelectors.state);
+----
+
+* Get state from Slide
+
+[source,javascript]
+----
+const state = useSelector(slide => {
+  return UaaSelectors.state(slide);
+});
+----
+
+List API:
+
+* *_state_*: current authenticate state.
+* *_user_*: user logged in (UaaUser | UaaOidcUser).
+* *_username_*: username logged in.
+* *_error_*: the error message.
+* *_authenticationType_*: the type of authenticating which be used.
+* *_accessToken_*: accessToken.
+* *_roles_*: List the roles of the currently logged-in user.
+If you want to obtain access rights based on a role, use this API to retrieve the roles.
+Then, use the retrieved roles to determine the appropriate access rights.
+* *_accessRights_*: List all access rights of the currently logged-in user, and this list is merged.
+
+UAA also provides selectors with a default value, which can be further configured using `withConfig`.
+
+[source,javascript]
+----
+const authenticationSTate = useSelector(UaaSelectors.state.withConfig({
+    defaultValue: AuthenticationState.NOT_AUTHENTICATED
+  }))
+----
+
+==== UaaFilter
+
+UAA provides some default request/response filters to use with ServerConnector.
+
+- Request filters:
+* *_AuthorizationHeaderFilter_*: Get token from sessionStorage or redux store and push it to request Headers
+* *_CredentialsFilter_*: This will help uaa server to response with cookie enable to be carried on cross-origin requests (Needed for SAML IDP logout request)
+- Response filters:
+* *_ResponseFilter401_*: return new NotAuthorizedError() if the status is 401.
+* *_TokenResponseFilter_*: If the response header has access_token then it will be saved to sessionStorage and dispatch an action to update token to redux store.
+
+===== Example:
+
+This is example for user can configure filters like default filters UAA with ServerConnector login with type Local
+
+----
+import {
+  AuthenticationType,
+  TokenManagement,
+  UaaLocalConfiguration,
+  UaaSelectors,
+  UaaFilters,
+} from "@com.mgmtp.a12.uaa/uaa-authentication-client";
+
+const tokenConfigure = TokenManagement.getInstance().getTokenConfiguration(AuthenticationType.LOCAL);
+
+// AuthorizationHeaderFilter is required
+const requestFilter = [
+  new UaaFilters.AuthorizationHeaderFilter(
+    () => store.getState() as { uaa: UaaSelectors.UaaSlice },
+    tokenConfigure
+  ),
+];
+const responseFilters = [
+  new UaaFilters.TokenResponseFilter(tokenConfigure),
+  new UaaFilters.ResponseFilter401(),
+];
+const newServerConnector = new RestServerConnector(
+  `${process.env.SERVER_URL || window.uaaConfiguration.serverURL}`,
+  requestFilter,
+  responseFilters
+);
+----
+
+----
+const localConfiguration: UaaLocalConfiguration = {
+  .....
+  serverConnector: newServerConnector
+  .....
+};
+----
+
+==== UaaProvider
+
+UaaProvider is a React component.
+The application needs to wrap the main component by 2 steps:
+
+_1. Create redux store_
+
+[source,javascript]
+----
+const createRootReducer = (history: History) =>
+  combineReducers({
+    router: connectRouter(history),
+    appReducer,
+    uaa: UaaReducer,
+  });
+
+const store = createStore(
+  createRootReducer(history),
+  compose(
+    applyMiddleware(
+      routerMiddleware(history),
+      ...UaaMiddlewares([logoutIDP()]),
+      clientMiddleware()
+    )
+  )
+);
+----
+
+_2. Wrap the main component by UaaProvider_
+
+[source,javascript]
+----
+<UaaProvider store={store}>
+    <ConnectedRouter history={history}>
+        <Switch>
+            <Route exact path="/" component={App} />
+        </Switch>
+    </ConnectedRouter>
+</UaaProvider>
+----
+
+==== UaaReducer
+
+It's a redux reducers of all authentication types.
+
+[source,javascript]
+----
+const createRootReducer = (history: History<unknown>) => combineReducers({
+  // Key must is uaa
+  uaa: UaaReducer
+})
+----
+
+==== UaaMiddlewares
+
+It's a redux middlewares of all authenticate types.
+
+[source,javascript]
+----
+export function UaaMiddlewares(
+  overrideSagas?: UaaSagaDescriptor[]
+): Middleware[]
+----
+
+*overrideSagas*: Array of UaaSagaDescriptor.
+It's used to override the default middleware.
+When one action is processed in one saga middleware then the other next middleware is skipped.
+
+Example:
+
+[source,javascript]
+----
+function logoutIDP(): UaaSagaDescriptor {
+  return {
+    canHandle(action: AnyAction) {
+      return UaaActions.logoutRequested.match(action);
+    },
+    *handle() {
+      yield putResolve(UaaActions.loggingOut());
+    }
+  };
+}
+
+const store = createStore(
+  createRootReducer(history),
+  compose(
+     applyMiddleware(
+       ...UaaMiddlewares[logoutIDP()]
+     ),
+  ),
+)
+----
+
+==== UaaSecureStorage
+
+UAA use sessionStorage to store information so if you want transfer information between tabs you can use this API: `UaaSecureStorage.getInstance().initShareSecuredData(keys: string[], isSharingAllowed?: () => boolean);` This API includes event registration and start sharing actions.
+
+- *keys*: The key to the information stored in sessionStorage. +
+- *isSharingAllowed*: The condition for starting sharing.
+
+[source,javascript]
+----
+UaaSecureStorage.getInstance().initShareSecuredData([
+	"access_token",
+	"token_renew_in_seconds",
+	"authenticationType"
+], () => !sessionStorage.getItem("access_token"));
+----
+
+While sharing tokens between other tabs, UAA dispatches an action `UaaActions.sessionStorageSharingData()` and, upon completion, UAA dispatches an action `UaaActions.sessionStorageSharedData()`
+
+[WARNING]
+====
+The process can only finish once the DOM is rendered.
+====
+
+==== AUTH_KEYS
+
+It's an interface that supports custom default language.
+
+[source,javascript]
+----
+import { AUTH_KEYS } from "@com.mgmtp.a12.uaa/uaa-authentication-client"
+
+const de: typeof AUTH_KEYS = { /* German translations */ };
+const en: typeof AUTH_KEYS = { /* English translations */ };
+const vi: typeof AUTH_KEYS = { /* Vietnam translations */ };
+
+export const YOUR_CUSTOM_TRANSLATIONS: LocalizationTreeMap = { de, en, vi };
+----

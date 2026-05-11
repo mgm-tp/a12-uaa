@@ -1,0 +1,295 @@
+{
+	"name": "Policy Authorization Object",
+	"authorizationData": [
+		{
+			"name": "Test Controller",
+			"dataTypes": [
+				{
+					"name": "Insurance Policy Manager",
+					"rules": [
+						"hasRole('Policy Manager')"
+					],
+					"rights": [
+						"READX",
+						"DELETE"
+					]
+				}
+			]
+		},
+		{
+			"name": "Insurance policy",
+			"dataTypes": [
+				{
+					"name": "Insurance Policy Manager",
+					"rules": [
+						"hasRole('Policy Manager')"
+					],
+					"rights": [
+						"READ",
+						"DELETE"
+					],
+					"filterQuery": "policy.country=env.country AND policy.department=#user.dept",
+					"properties": [
+						{
+							"name": "Policy Tax Verification",
+							"rules": [
+								"#policy.tax>1000 && #user.department contains ('CARGO')"
+							],
+							"rights": {
+								"READ": [
+									"#policy.contract.type",
+									"#policy.type",
+									"#policy.period"
+								],
+								"WRITE": [
+								]
+							}
+						},
+						{
+							"name": "Policy Period Verification",
+							"rules": [
+								"#policy.period>1000 && #user.department contains ('CAR')"
+							],
+							"rights": {
+								"READ": [
+									"#policy.period"
+								],
+								"WRITE": [
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Insurance Policy Reviewer",
+					"rules": [
+						"#policy.period > 1year",
+						"#policy.timeline inrange (2010, 2020)"
+					],
+					"rights": [
+						"READ",
+						"READ-ONLY"
+					],
+					"filterQuery": "policy.period < 1year AND policy.timeline IN (2010, 2020)",
+					"properties": [
+						{
+							"name": "Policy Tax Verification",
+							"rules": [
+								"#policy.tax>1000 && #user.department contains ('CARGO')"
+							],
+							"rights": {
+								"READ": [
+									"#policy.contract.type",
+									"#policy.type",
+									"#policy.period"
+								],
+								"WRITE": [
+								]
+							}
+						},
+						{
+							"name": "Policy Period Verification",
+							"rules": [
+								"#policy.period>1000 && #user.department contains ('CAR')"
+							],
+							"rights": {
+								"READ": [
+									"#policy.period"
+								],
+								"WRITE": [
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Insurance Policy Contract",
+					"rules": [
+						"#policy.contract != null & #policy.contract.period == '30days'",
+						"#contract.type == '2 years' & #contract.timeline in (2010,2015)"
+					],
+					"rights": [
+						"ACCESS",
+						"VIEW"
+					],
+					"filterQuery": "policy.contract IS NOT EMPTY AND policy.contract in (SELECT contract_id FROM Contract where contract.employee = #user.username)",
+					"properties": [
+						{
+							"name": "Policy Tax Verification",
+							"rules": [
+								"#policy.tax>1000 && #user.department contains ('CARGO')"
+							],
+							"rights": {
+								"READ": [
+									"#policy.type",
+									"#policy.period"
+								],
+								"WRITE": [
+								]
+							}
+						},
+						{
+							"name": "Policy Period Verification",
+							"rules": [
+								"#policy.period>1000 && #user.department contains ('CAR')"
+							],
+							"rights": {
+								"READ": [
+									"#policy.period"
+								],
+								"WRITE": [
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Insurance policy Children",
+			"parent": "Insurance policy",
+			"dataTypes": [
+				{
+					"name": "Insurance Policy Type",
+					"rules": [
+						"#user.role='Policy Manager'",
+						"#policy.type != null"
+					],
+					"rights": [
+						"READ",
+						"DELETE"
+					],
+					"filterQuery": "policy.country=#env.country AND policy.department=#user.dept",
+					"properties": [
+						{
+							"name": "POLICY",
+							"rules": [
+								"#object.tax>1000 && #user.department contains ('CARGO')"
+							],
+							"rights": {
+								"READ": [
+									"#policy.contract.type",
+									"#policy.type",
+									"#policy.period"
+								],
+								"WRITE": [
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Insurance Policy Manager DEMO",
+					"rules": [
+						"hasRole('Policy Manager')",
+						"#xyz == 2",
+						"#theRest.contract.type == one_month",
+						"#contract.year == 2019"
+					],
+					"rights": [
+						"READ",
+						"DELETE"
+					]
+				}
+			]
+		},
+		{
+			"name": "Organization",
+			"dataTypes": [
+				{
+					"name": "Organization Manager",
+					"rules": [
+						"hasRole('Policy Manager')",
+						"#domainObject.name == 'FirstOrg'",
+						"hasRole('Policy Manager') && #user.user.organization.name == 'FirstOrg'"
+					],
+					"rights": [
+						"READ",
+						"DELETE"
+					],
+					"filterQuery": "policy.country=env.country AND policy.department=#user.dept",
+					"properties": [
+						{
+							"name": "Policy Tax Verification",
+							"rules": [
+								"#policy.tax>1000 && #user.department contains ('CARGO')"
+							],
+							"rights": {
+								"READ": [
+									"#policy.contract.type",
+									"#policy.type",
+									"#policy.period"
+								],
+								"WRITE": [
+								]
+							}
+						},
+						{
+							"name": "Policy Period Verification",
+							"rules": [
+								"#policy.period>1000 && #user.department contains ('CAR')"
+							],
+							"rights": {
+								"READ": [
+								],
+								"WRITE": [
+									"#policy.period"
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Policy Manager",
+			"dataTypes": [
+				{
+					"name": "Organization Manager",
+					"rules": [
+						"hasRole('Policy Manager') && principal.user.organization.name == 'FirstOrg'"
+					],
+					"rights": [
+						"READ",
+						"DELETE"
+					],
+					"properties": [
+						{
+							"name": "Family Property Authorize",
+							"rules": [
+								"principal.user.organization.name == 'FirstOrg'"
+							],
+							"rights": {
+								"READ": [
+									"addressObjects/2.streetName",
+									"childrenAndAge/Vi.age",
+									"addressObjects",
+									"childrenAndAge",
+									"primaryAddress.streetName"
+								],
+								"WRITE": [
+									"childrenAndAge/Hung",
+									"addressObjects/1.number",
+									"primaryAddress.streetName"
+								]
+							}
+						},
+						{
+							"name": "Country Properties",
+							"rules": [
+								"principal.user.organization.name == 'FirstOrg'"
+							],
+							"rights": {
+								"READ": [
+								],
+								"WRITE": [
+									"name"
+								]
+							}
+						}
+					]
+				}
+			]
+		}
+	]
+}

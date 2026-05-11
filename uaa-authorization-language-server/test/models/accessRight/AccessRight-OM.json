@@ -1,0 +1,160 @@
+{
+  "header": {
+    "id": "AccessRight-OM",
+    "modelType": "overview",
+    "modelVersion": "37.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Access Right Overview"
+      },
+      {
+        "locale": "de",
+        "text": "Liste der Berechtigungen"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "userManagementAdmin"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "AccessRight-DM"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "enableFilter": true,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "all_columns"
+      },
+      "showFullTextSearch": true,
+      "rowHeight": 49,
+      "pagingSize": 50
+    },
+    "subHeaderBox": {
+      "majorElements": [
+        {
+          "type": "search"
+        },
+        {
+          "type": "filter"
+        }
+      ],
+      "minorElements": [
+        {
+          "type": "button",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Create"
+            },
+            {
+              "locale": "de",
+              "text": "Erstellen"
+            }
+          ],
+          "icon": {
+            "name": "add_box",
+            "theme": "outlined"
+          },
+          "event": "add",
+          "destructive": false,
+          "primary": true
+        }
+      ]
+    },
+    "columns": [
+      {
+        "id": "column-1f820",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Name"
+          },
+          {
+            "locale": "de",
+            "text": "Name"
+          }
+        ],
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_e7eb8",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-7685b",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Description"
+          },
+          {
+            "locale": "de",
+            "text": "Beschreibung"
+          }
+        ],
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_0886e",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      }
+    ],
+    "footerBox": {
+      "majorElements": [],
+      "minorElements": []
+    },
+    "rowActionGroup": {
+      "actions": [
+        {
+          "confirmation": {
+            "title": [
+              {
+                "locale": "en",
+                "text": "Delete access right!"
+              },
+              {
+                "locale": "de",
+                "text": "Benutzer löschen!"
+              }
+            ],
+            "message": [
+              {
+                "locale": "en",
+                "text": "Do you really want to delete this access right?"
+              },
+              {
+                "locale": "de",
+                "text": "Soll der Benutzer gelöscht werden?"
+              }
+            ]
+          },
+          "icon": {
+            "name": "delete"
+          },
+          "event": "delete",
+          "destructive": false,
+          "primary": false
+        }
+      ]
+    }
+  }
+}

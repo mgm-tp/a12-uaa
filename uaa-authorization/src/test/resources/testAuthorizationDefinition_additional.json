@@ -1,0 +1,93 @@
+{
+	"name": "Additional 1",
+	"policies": [
+		{
+			"name": "Additional",
+			"description": "Additional Policy",
+			"dataPreload": [
+				"additional"
+			],
+			"rules": [
+				"rules"
+			]
+		}
+	],
+	"permissions": [
+		{
+			"name": "Additional",
+			"description": "Additional permission",
+			"policies": [
+				"#resource.first == 'one'",
+				"#resource.second == 2"
+			],
+			"scopes": [
+				"Additional"
+			]
+		},
+		{
+			"name": "Additional unique",
+			"description": "",
+			"policy-refs": [
+				"Success"
+			],
+			"scopes": [
+				"ref policies sucess and"
+			]
+		},
+		{
+			"name": "Additional Permission 1",
+			"description": "This Permission will be override",
+			"policy-refs": [
+				"!(Failure) && !(Success && Failure)"
+			],
+			"scopes": [
+				"Main Permission (both additional are callParent)"
+			]
+		},
+		{
+			"name": "Additional Permission 3",
+			"description": "This Permission will be override",
+			"policy-refs": [
+				"!(Failure) && !(Success && Failure)"
+			],
+			"scopes": [
+				"Main Permission (2 additional - 1 callParent, another not)"
+			]
+		},
+		{
+			"name": "Additional Permission 5",
+			"description": "This Permission will be override",
+			"policy-refs": [
+				"!(Failure) && !(Success && Failure)"
+			],
+			"scopes": [
+				"Main Permission (both additional are not callParent)"
+			],
+			"call-parent-scope": false
+		}
+	],
+	"propertyPermissions": [
+		{
+			"name": "Property Permission 1",
+			"policy-refs": [
+				"Additional"
+			],
+			"rights-refs": [
+				"Property Right 1"
+			]
+		}
+	],
+	"propertyRights": [
+		{
+			"name": "Property Right 1",
+			"rights": {
+				"READ": [
+					"object.field1"
+				],
+				"WRITE": [
+					"object.field2"
+				]
+			}
+		}
+	]
+}

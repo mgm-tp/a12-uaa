@@ -1,0 +1,278 @@
+{
+	"name": "Test Permission Definition",
+	"description": "",
+	"policies": [
+		{
+			"name": "Admin from Vietnam",
+			"description": "All rules for admin user from Vietnam",
+			"rules": [
+				"hasRole('Manager') && principal.user.organization.countryCode == 'VN'"
+			]
+		},
+		{
+			"name": "com.mgmtp.a12.uaa.authorization.entity.Country",
+			"description": "",
+			"rules": [
+				"#domainObject.name == 'Vietnam' || #domainObject.name == 'Japan'"
+			]
+		},
+		{
+			"name": "Vietnam Country Code",
+			"description": "Country code = VN",
+			"rules": [
+				"print('countryCode = ' +#countryCode)",
+				"#countryCode == 'VN'"
+			]
+		},
+		{
+			"name": "Country Domain Object",
+			"description": "",
+			"rules": [
+				"isResourceName('com.mgmtp.a12.uaa.authorization.entity.Country')"
+			]
+		}
+	],
+	"permissions": [
+		{
+			"name": "Admin from Vietnam",
+			"description": "All rules for admin user from Vietnam",
+			"policy-refs": [
+				"Admin from Vietnam"
+			],
+			"scopes": [
+				"View Output",
+				"Report"
+			]
+		},
+		{
+			"name": "User from Czech",
+			"description": "All rules for admin from Czech",
+			"policies": [
+				"hasRole('Reviewer') && principal.user.organization.country == 'Czech'"
+			],
+			"scopes": [
+				"Report"
+			]
+		},
+		{
+			"name": "Access External Country Data",
+			"description": "Example",
+			"resource": "",
+			"policy-refs": [
+				"Vietnam Country Code"
+			],
+			"policies": [
+				"print('loader context = ' + #extLoaderContext)",
+				"#extLoaderContext.userName == principal.username"
+			],
+			"scopes": [
+				"Access external country"
+			]
+		},
+		{
+			"name": "Country Manager",
+			"description": "Example resource inside",
+			"resource": "#resource == 'MainController.updateCountry'",
+			"policies": [
+				"print('countryCode = ' + #countryCode + ', user country = ' + principal.user.organization.countryCode)",
+				"hasRole('Manager')",
+				"principal.user.organization.countryCode == #countryCode"
+			],
+			"scopes": [
+				"CountryUpdate"
+			]
+		},
+		{
+			"name": "Country Manager 2",
+			"description": "Example resource outside",
+			"resource": "",
+			"policies": [
+				"print(#countryCode)",
+				"print(principal.user.organization.countryCode)",
+				"hasRole('Manager')",
+				"principal.user.organization.countryCode == #countryCode"
+			],
+			"scopes": [
+				"CountryUpdate NO Resource"
+			]
+		},
+		{
+			"name": "Just Admin Name",
+			"description": "",
+			"policies": [
+				"hasRole('Admin') principal.roles.size == 1 && #resource == 'OfferService.getInactivePolicy'"
+			],
+			"scopes": [
+				"READ_POLICY"
+			]
+		},
+		{
+			"name": "Admin & BusinessAdmin Name",
+			"description": "",
+			"policies": [
+				"hasRole('Admin', 'BusinessAdmin') && #resource == 'OfferService2.getActivePolicy'"
+			],
+			"scopes": [
+				"READ_POLICY"
+			]
+		},
+		{
+			"name": "Country Domain Vietnam",
+			"description": "All rules for admin user from Vietnam",
+			"policy-refs": [
+				"Country Domain Object"
+			],
+			"policies": [
+				"print(#domainObject)",
+				"#domainObject.code == 'VN'"
+			],
+			"scopes": [
+				"DataPermission"
+			]
+		}
+	],
+	"repository": [
+		{
+			"name": "com.mgmtp.a12.uaa.authorization.entity.Country",
+			"query": "name = principal.country"
+		},
+		{
+			"name": "com.mgmtp.a12.uaa.authorization.entity.Offer",
+			"query": "offerCountry = principal.country"
+		}
+	],
+	"dataPermissions": [
+		{
+			"name": "Country Properties Vietnam",
+			"parent": "Country Domain Vietnam",
+			"rights": {
+				"READ": [
+					"id",
+					"nameXX"
+				],
+				"WRITE": [
+					"codeXX"
+				]
+			}
+		}
+	],
+	"propertyPermission": [
+		{
+			"name": "Country Properties Vietnam",
+			"description": "",
+			"policies": [
+				"#domainObject.code == 'VN'"
+			],
+			"scopes": [
+				"com.mgmtp.a12.uaa.authorization.entity.Country"
+			],
+			"rights": {
+				"READ": [
+					"id",
+					"name",
+					"tet holiday"
+				],
+				"WRITE": [
+					"code"
+				]
+			}
+		},
+		{
+			"name": "Country Properties Germany",
+			"description": "",
+			"policies": [
+				"#domainObject.name == 'Germany'"
+			],
+			"scopes": [
+				"com.mgmtp.a12.uaa.authorization.entity.Country"
+			],
+			"rights": {
+				"READ": [
+					"id",
+					"name",
+					"okberfest"
+				],
+				"WRITE": [
+				]
+			}
+		},
+		{
+			"name": "Offer Vietnam japan",
+			"description": "",
+			"policies": [
+				"#domainObject.name = 'Vietnam' || #domainObject.name = 'Japan'",
+				"#right = 'Report'"
+			],
+			"scopes": [
+				"com.mgmtp.uaa.authorization.entity.Offer"
+			],
+			"rights": {
+				"READ": [
+					"type"
+				],
+				"WRITE": [
+					"contract.type",
+					"period"
+				]
+			}
+		},
+		{
+			"name": "Offer Vietnam China",
+			"description": "",
+			"policies": [
+				"#domainObject.name = 'Vietnam' || #domainObject.name = 'China'",
+				"#right = 'View Output'"
+			],
+			"scopes": [
+				"com.mgmtp.uaa.authorization.entity.Offer"
+			],
+			"rights": {
+				"READ": [
+				],
+				"WRITE": [
+					"contract.type",
+					"type",
+					"period"
+				]
+			}
+		},
+		{
+			"name": "Country Czech",
+			"description": "",
+			"policies": [
+				"hasRole('Reviewer')",
+				"#domainObject.name == 'Czech'"
+			],
+			"scopes": [
+				"com.mgmtp.a12.uaa.authorization.entity.Country"
+			],
+			"rights": {
+				"READ": [
+					"id",
+					"name"
+				],
+				"WRITE": [
+				]
+			}
+		},
+		{
+			"name": "Country Austria",
+			"description": "",
+			"policies": [
+				"#domainObject.name == 'Austria'"
+			],
+			"scopes": [
+				"com.mgmtp.a12.uaa.authorization.entity.Country"
+			],
+			"rights": {
+				"READ": [
+					"contract.type",
+					"type",
+					"period"
+				],
+				"WRITE": [
+				]
+			}
+		}
+	]
+}

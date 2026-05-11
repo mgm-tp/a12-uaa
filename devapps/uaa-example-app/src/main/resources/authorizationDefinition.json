@@ -1,0 +1,382 @@
+{
+	"name": "Test Permission Definition",
+	"description": "",
+	"policies": [
+		{
+			"name": "Company reading rule",
+			"description": "",
+			"target": "print('Preload for:' + #resource)",
+			"dataPreload": [
+				"print('principal: ' + principal)"
+			],
+			"rules": [
+				"print('User login ' + principal.username)",
+				"print('Resource: ' + #resource)",
+				"principal.nationality == #resource.countryCode"
+			]
+		},
+		{
+			"name": "Admin from Vietnam",
+			"description": "All rules for admin user from Vietnam",
+			"dataPreload": [
+				"print('Generic: ' + hasNestedObjectWithPropertyValue(principal.authorities, 'accessRights', 'name', 'WRITE'))",
+				"print('Concrete: ' + hasAccessRight('WRITE'))",
+				"print('Has Role: ' + containsAnyRole({'Reviewer', 'none'}))"
+			],
+			"rules": [
+				"hasRole('Manager') && principal.nationality == 'VN'"
+			]
+		},
+		{
+			"name": "User from Czech",
+			"description": "Ordinary user from czech",
+			"rules": [
+				"hasRole('Reviewer') && principal.nationality == 'CZ'"
+			]
+		},
+		{
+			"name": "Load All Companies Endpoint",
+			"description": "",
+			"rules": [
+				"print('resource = ' +#resource)",
+				"#resource == 'CompanyController.loadAllCompanies'"
+			]
+		},
+		{
+			"name": "Save Company Endpoint",
+			"description": "",
+			"rules": [
+				"#resource == 'CompanyController.saveCompany'"
+			]
+		},
+		{
+			"name": "Update Company Endpoint",
+			"description": "",
+			"rules": [
+				"#resource == 'CompanyController.updateCompany'"
+			]
+		},
+		{
+			"name": "Load A12 Doc Endpoint",
+			"description": "",
+			"rules": [
+				"#resource == 'ProductController.loadProductDocuments' || #resource == 'ProductController.loadProductDocument' || #resource == 'ProductController.preAuthorizeProductDocument' || #resource == 'ProductController.preFilterProductDocuments'"
+			]
+		},
+		{
+			"name": "Update A12 Doc Endpoint",
+			"description": "",
+			"rules": [
+				"#resource == 'ProductController.updateProductDocument'"
+			]
+		},
+		{
+			"name": "A12 Product Admin",
+			"description": "",
+			"rules": [
+				"#resource.documentModelId == 'product' ",
+				"principal.nationality == #resource.product.countryCode"
+			]
+		},
+		{
+			"name": "Company Domain Object",
+			"description": "",
+			"rules": [
+				"#resource instanceof T(com.mgmtp.a12.uaa.example.entity.Company)"
+			]
+		},
+		{
+			"name": "Product Document",
+			"description": "",
+			"rules": [
+				"#resource instanceof T(com.mgmtp.a12.kernel.md.document.api.IDocument)",
+				"#resource.documentModelId == 'Product'"
+			]
+		}
+	],
+	"repositoryPolicies": [
+		{
+			"name": "Repo Admin from Vietnam",
+			"description": "All rules for admin user from Vietnam",
+			"templates": [
+				"'country_code = ' +  principal.nationality"
+			]
+		}
+	],
+	"permissions": [
+		{
+			"name": "Load Company",
+			"description": "Demo",
+			"policy-refs": [
+				"Admin from Vietnam || User from Czech"
+			],
+			"repository-refs": [
+				"Repo Admin from Vietnam"
+			],
+			"scopes": [
+				"Load company"
+			]
+		},
+		{
+			"name": "Update Company For Admin",
+			"description": "",
+			"policy-refs": [
+				"Admin from Vietnam || User from Czech",
+				"Update Company Endpoint"
+			],
+			"scopes": [
+				"Company update"
+			]
+		},
+		{
+			"name": "Access External Company Admin",
+			"description": "Example",
+			"policies": [
+				"print('loader context = ' + #companyDataLoaderContext)",
+				"(#companyDataLoaderContext.userName == 'admin' && #companyDataLoaderContext.countryCode == 'VN') || (#companyDataLoaderContext.userName == 'tom' && #companyDataLoaderContext.countryCode == 'CZ')"
+			],
+			"scopes": [
+				"Access external company"
+			]
+		},
+		{
+			"name": "Vietnam Company Manager Save",
+			"description": "",
+			"policy-refs": [
+				"Admin from Vietnam || User from Czech",
+				"Save Company Endpoint"
+			],
+			"scopes": [
+				"Company save"
+			]
+		},
+		{
+			"name": "Access to A12 Doc",
+			"description": "",
+			"policy-refs": [
+				"Load A12 Doc Endpoint || Update A12 Doc Endpoint"
+			],
+			"scopes": [
+				"A12 document"
+			]
+		},
+		{
+			"name": "Access to A12 Doc For Admin",
+			"description": "",
+			"policy-refs": [
+				"A12 Product Admin"
+			],
+			"scopes": [
+				"A12 document service"
+			]
+		},
+		{
+			"name": "Actuator Permission",
+			"description": "",
+			"policies": [
+				"print('Path Permission: ' + #resource)",
+				"#resource.getRequestURI() == '/actuator/beans'"
+			],
+			"policy-refs": [
+				"Admin from Vietnam"
+			],
+			"scopes": [
+				"RelativePath"
+			]
+		},
+		{
+			"name": "Reload Authorization Rules",
+			"description": "",
+			"policies": [
+				"print('Path Permission: ' + #resource)",
+				"print('Principal: ' + principal)"
+			],
+			"policy-refs": [
+				"Admin from Vietnam"
+			],
+			"scopes": [
+				"Reload Rules"
+			]
+		},
+		{
+			"name": "Backend Task",
+			"description": "",
+			"policies": [
+				"print('Backend Task: ' + #resource)",
+				"print('Principal: ' + principal)",
+				"#resource == 'BackendTask.executeTask'",
+				"principal.username == 'admin'"
+			],
+			"scopes": [
+				"Backend Task"
+			]
+		},
+		{
+			"name": "Upload Role Mapping Rules",
+			"description": "",
+			"policies": [
+				"print('Path Permission: ' + #resource)",
+				"print('Principal: ' + principal)"
+			],
+			"policy-refs": [
+				"Admin from Vietnam"
+			],
+			"scopes": [
+				"Upload Role Access Rights Mapping Rule"
+			]
+		},
+		{
+			"name": "Upload Local User Rules",
+			"description": "",
+			"policies": [
+				"print('Path Permission: ' + #resource)",
+				"print('Principal: ' + principal)"
+			],
+			"policy-refs": [
+				"Admin from Vietnam"
+			],
+			"scopes": [
+				"Upload Local User Rule"
+			]
+		},
+		{
+			"name": "Anonymous",
+			"description": "",
+			"policies": [
+				"print('Principal: ' + principal)",
+				"principal.username == 'anonymous'",
+				"containsAnyRole('ANONYMOUS')",
+				"hasRole('ANONYMOUS')",
+				"hasAccessRight('READ')"
+			],
+			"scopes": [
+				"Anonymous"
+			]
+		},
+		{
+			"name": "uri-based authorization",
+			"policies": [
+				"true"
+			],
+			"scopes": [
+				"uri_based_ok_scope"
+			]
+		}
+	],
+	"propertyPermissions": [
+		{
+			"name": "Company Properties Admin",
+			"description": "",
+			"policy-refs": [
+				"Company Domain Object",
+				"Admin from Vietnam"
+			],
+			"rights-refs": [
+				"Company Entity For Admin"
+			]
+		},
+		{
+			"name": "Company Czech",
+			"description": "",
+			"policy-refs": [
+				"Company Domain Object",
+				"User from Czech"
+			],
+			"rights-refs": [
+				"Company Entity For Czech User"
+			]
+		},
+		{
+			"name": "A12 Product Admin",
+			"description": "",
+			"policy-refs": [
+				"Admin from Vietnam"
+			],
+			"policies": [
+				"#resource.documentModelId == 'product' ",
+				"#resource.product.countryCode == 'VN' "
+			],
+			"rights-refs": [
+				"Product Document Admin"
+			]
+		},
+		{
+			"name": "A12 Document For Czech User",
+			"description": "",
+			"policy-refs": [
+				"User from Czech"
+			],
+			"rights-refs": [
+				"Product Document For Czech User"
+			]
+		}
+	],
+	"propertyRights": [
+		{
+			"name": "Product Document Admin",
+			"description": "",
+			"rights": {
+				"READ": [
+					"id",
+					"product.name",
+					"product.countryCode",
+					"product.mediaFiles[].mediaFile.mimeType",
+					"product.mediaFiles[].mediaFile.url",
+					"product.packaging.packagingUnit"
+				],
+				"WRITE": [
+					"product.name"
+				]
+			}
+		},
+		{
+			"name": "Product Document For Czech User",
+			"description": "",
+			"rights": {
+				"READ": [
+					"id",
+					"product.name",
+					"product.countryCode"
+				]
+			}
+		},
+		{
+			"name": "Company Entity For Czech User",
+			"description": "",
+			"rights": {
+				"READ": [
+					"id",
+					"name",
+					"countryCode",
+					"taxNumber",
+					"employees"
+				],
+				"MASK": [
+					"taxNumber::'masked: ' + taxNumber.substring(0,3) + '...'"
+				]
+			}
+		},
+		{
+			"name": "Company Entity For Admin",
+			"description": "",
+			"rights": {
+				"READ": [
+					"id",
+					"name",
+					"taxNumber"
+				],
+				"WRITE": [
+					"id",
+					"name",
+					"countryCode",
+					"taxNumber",
+					"employees",
+					"employees[].id",
+					"employees[].firstName",
+					"employees[].lastName",
+					"employees[].age"
+				]
+			}
+		}
+	]
+}

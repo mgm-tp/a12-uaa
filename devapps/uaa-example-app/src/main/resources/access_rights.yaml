@@ -1,0 +1,20 @@
+roles:
+  - name: Reviewer
+    description: Reviewer role
+    accessRights:
+      - right1
+      - right2
+  - name: Admin
+    description: Admin role
+    accessRights:
+      - READ
+      - WRITE
+  - name: Manager
+    description: Manager role
+    accessRights:
+      - READ
+      - WRITE
+  - name: ANONYMOUS
+    description: Anonymous role
+    accessRights:
+      - READ

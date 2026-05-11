@@ -1,0 +1,39 @@
+{
+	"name": "@com.mgmtp.a12.uaa/uaa-authentication-client-codemod",
+	"version": "9.3.2-SNAPSHOT",
+	"description": "Codemod for Uaa Authentication Client",
+	"author": "mgm technology partners",
+	"license": "(EUPL-1.2 OR LicenseRef-commercial)",
+	"bin": {
+		"uaa-authentication-client-codemod": "lib/cli.js"
+	},
+	"type": "module",
+	"scripts": {
+		"clean": "rimraf lib target build",
+		"compile": "tsc",
+		"start": "tsc --watch",
+		"test": "vitest run",
+		"assemble": "npm run typedoc",
+		"typedoc": "typedoc"
+	},
+	"dependencies": {
+		"@com.mgmtp.a12.devtools/codemod": "^2.1.0"
+	},
+	"devDependencies": {
+		"@cyclonedx/cyclonedx-npm": "^4.1.1",
+		"@types/node": "22.13.5",
+		"rimraf": "^6.1.2",
+		"typedoc": "0.28.18",
+		"typescript": "5.8.2",
+		"vitest": "3.2.4"
+	},
+	"files": [
+		"lib",
+		"src",
+		"cyclonedx.json",
+		"LICENSE",
+		"NOTICE",
+		"THIRD_PARTY_NOTICES",
+		"licenses"
+	]
+}

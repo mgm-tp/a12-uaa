@@ -1,0 +1,7 @@
+openssl genpkey -out rootCA.key -algorithm RSA -pkeyopt rsa_keygen_bits:4096
+openssl req -new -x509 -key rootCA.key -out rootCA.crt -days 4096 -config ./openssl_server.cnf 
+
+openssl req -newkey rsa:4096 -keyout client.key -out client.csr -config ./openssl_client.cnf
+openssl x509 -req -CA rootCA.crt -CAkey rootCA.key -in client.csr -out client.crt -days 4096 -CAcreateserial -extfile ./openssl_client.cnf -extensions uaa_extension
+
+openssl x509 -in rootCA.crt -text -noout

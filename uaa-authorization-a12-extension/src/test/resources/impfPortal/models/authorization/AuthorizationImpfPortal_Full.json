@@ -1,0 +1,347 @@
+{
+  "header": {
+    "id": "AuthorizationImpfPortal_Full",
+    "modelType": "document",
+    "modelVersion": "28.0.2",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [],
+    "modelReferences": [
+      {
+        "alias": "../document/DomainImpfPortal",
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "DomainImpfPortal"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "AuthorizationImpfPortal_Full",
+      "immutable": false
+    },
+    "modelConfig": {
+      "decimalSeparator": ".",
+      "timeZone": "UTC",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "typeDefinitions": [
+      {
+        "id": "typedef_4af79daf-4ea6-4fc0-99b9-cfb8b2d2133e",
+        "name": "Region",
+        "fieldType": {
+          "type": "EnumerationType",
+          "EnumerationType": {
+            "values": [
+              {
+                "value": "BAVARIA"
+              },
+              {
+                "value": "HAMBURG"
+              },
+              {
+                "value": "BERLIN"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "typedef_9d3c082a-1b8f-4fc1-a3c9-71a83cf0bcbd",
+        "name": "Role",
+        "fieldType": {
+          "type": "EnumerationType",
+          "EnumerationType": {
+            "values": [
+              {
+                "value": "REGION_MANAGER"
+              },
+              {
+                "value": "ADMIN"
+              },
+              {
+                "value": "GUEST"
+              }
+            ],
+            "alphabeticalSorting": true
+          }
+        }
+      }
+    ],
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_a4a9a",
+          "name": "Authorization",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Group",
+                "id": "group_7741e",
+                "name": "User",
+                "Group": {
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_9c457",
+                      "name": "username",
+                      "annotations": [
+                        {
+                          "name": "path",
+                          "value": "#user/username"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": ""
+                          }
+                        ],
+                        "requirednessConfig": {
+                          "mode": "absoluteOrRelativeToNextRepAncestor"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_09a6a",
+                      "name": "region",
+                      "annotations": [
+                        {
+                          "name": "path",
+                          "value": "#user/region"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "TypeDefType",
+                          "TypeDefType": {
+                            "typeDefinitionId": "typedef_4af79daf-4ea6-4fc0-99b9-cfb8b2d2133e"
+                          }
+                        },
+                        "requirednessConfig": {
+                          "mode": "absoluteOrRelativeToNextRepAncestor"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Group",
+                      "id": "group_5096f",
+                      "name": "Roles",
+                      "annotations": [
+                        {
+                          "name": "path",
+                          "value": "#user/authorities[]"
+                        }
+                      ],
+                      "Group": {
+                        "repeatability": 5,
+                        "elements": [
+                          {
+                            "type": "Field",
+                            "id": "field_f797e",
+                            "name": "name",
+                            "annotations": [
+                              {
+                                "name": "path",
+                                "value": "#user/authorities[]"
+                              }
+                            ],
+                            "Field": {
+                              "fieldType": {
+                                "type": "TypeDefType",
+                                "TypeDefType": {
+                                  "typeDefinitionId": "typedef_9d3c082a-1b8f-4fc1-a3c9-71a83cf0bcbd"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "include_6b808",
+                "name": "Application",
+                "Group": {
+                  "repeatability": 1,
+                  "modelAlias": "../document/DomainImpfPortal"
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_7399b",
+                "name": "Resource",
+                "annotations": [
+                  {
+                    "name": "path",
+                    "value": "#resource"
+                  }
+                ],
+                "internalDescription": [
+                  {
+                    "locale": "en",
+                    "text": "Resource is convention to mapping to #resource"
+                  }
+                ],
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": ""
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_cf696",
+                "name": "Repository",
+                "Group": {
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_b4d36",
+                      "name": "rulesComputed",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": ""
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Computation",
+                "id": "computation_f4b61",
+                "name": "Computation",
+                "Computation": {
+                  "computedFieldRelPath": "../Repository/rulesComputed",
+                  "computationAlternatives": [
+                    {
+                      "operation": "\"AdminRule,RegionManagerRule\"",
+                      "precondition": "AtLeastOneFieldValueIncludedInValueList(User/Roles*/name IN \"ADMIN\")\nAND\nAtLeastOneFieldValueIncludedInValueList(User/Roles*/name IN \"REGION_MANAGER\")"
+                    },
+                    {
+                      "operation": "\"AdminRule\"",
+                      "precondition": "AtLeastOneFieldValueIncludedInValueList(User/Roles*/name IN \"ADMIN\")"
+                    },
+                    {
+                      "operation": "\"RegionManagerRule\"",
+                      "precondition": "AtLeastOneFieldValueIncludedInValueList(User/Roles*/name IN \"REGION_MANAGER\")"
+                    },
+                    {
+                      "operation": "\"GuestRule\"",
+                      "precondition": "AtLeastOneFieldValueIncludedInValueList(User/Roles*/name IN \"GUEST\")"
+                    }
+                  ],
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "Error text for computation of Computation"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Rule",
+                "id": "rule_45282",
+                "name": "UserValidationRule",
+                "Rule": {
+                  "errorEntityRelPath": "../User/Roles/name",
+                  "errorCode": "Error rule_45282",
+                  "errorCondition": "NoFieldValueIncludedInValueList(User/Roles*/name IN \"ADMIN\", \"GUEST\", \"REGION_MANAGER\")",
+                  "severity": "ERROR",
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "UserValidationRule failed"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Rule",
+                "id": "rule_78ae6",
+                "name": "AdminRule",
+                "Rule": {
+                  "errorEntityRelPath": "../Application/id",
+                  "errorCode": "Error rule_4c400",
+                  "errorCondition": "[Application/id]!=\"*\"",
+                  "severity": "WARNING",
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "AdminRule failed"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Rule",
+                "id": "rule_703ce",
+                "name": "GuestRule",
+                "Rule": {
+                  "errorEntityRelPath": "../User/username",
+                  "errorCode": "Error rule_4c400",
+                  "errorCondition": "[Application/createdBy]!=[User/username]",
+                  "severity": "WARNING",
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "GuestRule failed"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Rule",
+                "id": "rule_a1b15",
+                "name": "RegionManagerRule",
+                "Rule": {
+                  "errorEntityRelPath": "../User/username",
+                  "errorCode": "Error rule_4c400",
+                  "errorCondition": "[Application/region]!=[User/region] AND [Application/createdBy]!=[User/username]",
+                  "severity": "WARNING",
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "RegionManagerRule failed"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

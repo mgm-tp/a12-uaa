@@ -1,0 +1,38 @@
+plugins {
+	id 'org.springframework.boot'
+    id 'java-library'
+}
+
+ext {
+    DEFAULT_JVM_ARGS = ["-Djava.net.preferIPv6Addresses=true"]
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding 'UTF-8'
+    options.compilerArgs.add("-parameters")
+}
+
+dependencies {
+	api project(':uaa-rest-client-spring-boot-autoconfigure')
+
+	api libs.springBootStarterSecurity
+	api libs.springBootStarterCache
+	api libs.springBootStarterActuator
+	api libs.springBootStarterWeb
+	api libs.springBootStarterThymeleaf
+	api libs.springSecurityThymeleafExtra
+	api libs.springBootStarterDataJpa
+	api libs.springSecurityData
+	api libs.cacheApi
+	api libs.ehcache
+	api libs.h2
+	api libs.springSecurityDataTaglibs
+	api libs.springContextSupport
+	api libs.jmockData
+
+	runtimeOnly libs.springBootDevtools
+
+	testImplementation libs.bundles.springTest
+}
+
+description = 'UAA:: Example:: Application'

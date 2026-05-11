@@ -1,0 +1,32 @@
+{
+  "name": "duplicated child",
+  "policies": [
+    {
+      "name": "Policy 1",
+      "rules": [
+        "true"
+      ]
+    }
+  ],
+  "repositoryPolicies": [
+    {
+      "name": "repository policy 1",
+      "templates": [
+        "'This is a string'"
+      ]
+    }
+  ],
+  "propertyRights": [
+    {
+      "name": "Property Right 1",
+      "rights": {
+        "READ": [
+          "object.field1"
+        ],
+        "WRITE": [
+          "object.field2"
+        ]
+      }
+    }
+  ]
+}

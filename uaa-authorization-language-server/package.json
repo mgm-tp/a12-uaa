@@ -1,0 +1,72 @@
+{
+  "name": "@com.mgmtp.a12.uaa/uaa-authorization-language-server",
+  "description": "A12 UAA Authorization Language Server",
+  "version": "9.3.2-SNAPSHOT",
+  "type": "module",
+  "author": "mgm",
+  "license": "(EUPL-1.2 OR LicenseRef-commercial)",
+  "engines": {
+    "node": "*"
+  },
+  "browserslist": [
+    "last 1 chrome version",
+    "last 1 edge version",
+    "last 1 safari version",
+    "last 1 firefox version",
+    "firefox esr",
+    "node 22"
+  ],
+  "bin": {
+    "uaa-authorization-language-server": "/main/uaa-authorization-language-server"
+  },
+  "main": "/main/uaa-authorization-language-server",
+  "dependencies": {
+    "@com.mgmtp.a12.base/base-model-api": "29.3.0",
+    "@com.mgmtp.a12.kernel/kernel-core-runtime-api-ts": "30.8.1",
+    "@com.mgmtp.a12.kernel/kernel-md-facade": "30.8.1",
+    "@vscode/l10n": "0.0.18",
+    "antlr4-c3": "^3.4.1",
+    "antlr4ng": "^3.0.7",
+    "copyfiles": "^2.4.1",
+    "dotenv": "^16.4.5",
+    "java-parser": "2.2.0",
+    "jsonc-parser": "3.2.1",
+    "request-light": "0.7.0",
+    "rimraf": "^6.1.2",
+    "ts-tokenizr": "1.1.1",
+    "vscode-json-languageservice": "5.4.0",
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-textdocument": "^1.0.11",
+    "vscode-nls": "5.2.0",
+    "vscode-uri": "3.0.8"
+  },
+  "devDependencies": {
+    "@com.mgmtp.a12.devtools/tsconfig": "^1.1.0",
+    "@types/node": "22.13.5",
+    "@types/vscode": "1.90.0",
+    "npm-run-all": "4.1.5",
+    "typescript": "^5.3.3"
+  },
+  "scripts": {
+    "compile": "npm-run-all --aggregate-output --continue-on-error --parallel typescript copy-json",
+    "clean": "rimraf lib target",
+    "copy-json": "copyfiles -u 1 \"src/**/*.json\" \"lib\"",
+    "typescript": "tsc -b",
+    "watch": "tsc -b --watch",
+    "generate": "npm-run-all --parallel generate:*",
+    "generate:spring": "antlr4ng -Dlanguage=TypeScript ./src/internal/antlr4/generated/g4/SpringExpressions.g4 -o src/internal/antlr4/generated/spring -Xexact-output-dir",
+    "generate:reference": "antlr4ng -Dlanguage=TypeScript ./src/internal/antlr4/generated/g4/PropertyReferences.g4 -o src/internal/antlr4/generated/reference -Xexact-output-dir"
+  },
+  "files": [
+    "resources",
+    "main",
+    "lib",
+    "src",
+    "README.md",
+    "cyclonedx.json",
+    "LICENSE",
+    "NOTICE",
+    "THIRD_PARTY_NOTICES",
+    "licenses"
+  ]
+}

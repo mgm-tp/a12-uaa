@@ -1,0 +1,4 @@
+com.mgmtp.a12.uaa.client.rest.autoconfigure.UaaRestClientAutoconfiguration
+com.mgmtp.a12.uaa.client.rest.autoconfigure.DelegatedConfigurationFactory
+com.mgmtp.a12.uaa.client.rest.autoconfigure.InfrastructureConfiguration
+com.mgmtp.a12.uaa.client.rest.autoconfigure.UAAInterceptorsConfiguration

@@ -1,0 +1,37 @@
+{
+  "applicationBaseUrl" : "application_base_url",
+  "uaaBaseUrl" : "uaa_base_url",
+  "authorizationDataStore" : "authorization_data_store",
+  "excludedDelegatedContexts" : [ "context1", "context2" ],
+  "oidc" : {
+    "tokenType" : "BEARER",
+    "confidentialClient" : {
+      "loginRelativeUrl" : "token",
+      "logoutRelativeUrl" : "logout",
+      "tokenRenewThresholdInSeconds" : 60,
+      "idpBaseUrl" : "http://localhost:9090"
+    },
+    "publicClient" : {
+      "loginRelativeUrl" : "auth",
+      "logoutRelativeUrl" : "logout",
+      "tokenRenewThresholdInSeconds" : 60,
+      "idpBaseUrl" : "http://localhost:9090",
+      "tokenExchangeRelativeUrl" : "token",
+      "loginRedirectRelativeUrl" : "callback",
+      "logoutRedirectRelativeUrl" : "logout",
+      "silentRedirectRelativeUrl" : "silent_renew.html",
+      "enableRefreshTokenGrant" : false,
+      "ssoConfiguration" : {
+        "usernameXpath" : "//input[@name='username']",
+        "passwordXpath" : "//input[@name='password']",
+        "loginButtonXpath" : "//button[@name='login']"
+      }
+    },
+    "logoutIdp" : false
+  },
+  "tokens" : [ {
+    "authorizationHeaderName" : "Authorization",
+    "tokenType" : "BEARER",
+    "allowCredentials" : false
+  } ]
+}

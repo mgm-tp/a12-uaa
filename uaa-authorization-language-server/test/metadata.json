@@ -1,0 +1,15 @@
+{
+  "principal": "/Users/ltthai/Documents/uaa3/uaa/uaa-authentication-principal-extension/src/main/java/com/mgmtp/a12/uaa/authentication/user/LocalUser.java",
+  "A12Models": "/Users/ltthai/Documents/uaa3/uaa/uaa-authorization-language-server/test/models",
+  "resource": [
+    {
+      "path": "/Users/ltthai/Documents/uaa3/uaa/devapps/uaa-example-app/src/main/java/com/mgmtp/a12/uaa/example/entity/Company.java"
+    },
+    {
+      "path": "/Users/ltthai/Documents/uaa3/uaa/devapps/uaa-example-app/src/main/java/com/mgmtp/a12/uaa/example/entity/Employee.java"
+    },
+    {
+      "path": "/Users/ltthai/Documents/uaa3/uaa/devapps/uaa-example-app/src/main/java/com/mgmtp/a12/uaa/example/entity/Privilege.java"
+    }
+  ]
+}

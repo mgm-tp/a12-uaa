@@ -1,0 +1,15 @@
+[req]
+distinguished_name = req_distinguished_name
+prompt = no        # Stop confirmation prompts. All information is contained below.
+
+
+[ req_distinguished_name ]
+
+stateOrProvinceName = Some-State
+localityName = Munich
+organizationName = MGM
+organizationalUnitName = Development
+commonName = UAA-Server
+
+
+

@@ -1,0 +1,78 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+[[uaa-token]]
+==== UAA Access Token
+
+UAA generates and handles a standard https://jwt.io/[JWT token].
+
+UAA is capable for Access Token generation, renewal and validation.
+
+include::uaa_token_generation.adoc[]
+include::uaa_token_processing.adoc[]
+include::uaa_token_renewal.adoc[]
+
+===== Token Endpoints
+UAA offers a bunch of token related endpoints.
+
+* `tokenValid`
+* `token`
+* `authorize`
+* `exchangeAuthorizationCodeToToken`
+* `/user/logout`
+* `/user/<auth type>/login`
+
+There might be a situation that on some cluster nodes those endpoints should not be available. It can be switched of by <<token-generation-configuration, configuration>>.
+
+[[token-utility-service]]
+===== Utility service
+UAA provides a `JwtTokenService` for operations with UAA Access Token
+
+* `generateToken`
+* `isTokenValid`
+* `invalidToken`
+* `unpackToken`
+
+[[token-generation-configuration]]
+===== Configuration
+
+[%autowidth.stretch,options="header"]
+|================================================================================
+|Configuration property                                          |Default value   |Usage                                                                                                                    |Remark
+|`mgmtp.a12.uaa.authentication.jwt.expiration-seconds`           |`1800`          |Token expiration time in seconds                                                                                         |
+|`mgmtp.a12.uaa.authentication.jwt.token-renew-threshold-in-seconds`|`15`         |How many seconds before token expiration to start silent renewal
+   |
+|`mgmtp.a12.uaa.authentication.jwt.secret`                       |``              |Token secret used for encryption and decryption. It must be 32 bytes length and Base64 encoded string                    | You need to change this default empty value
+|`mgmtp.a12.uaa.authentication.jwt.private-key-location`         |``              |It is used for creating token signature. It is private RSA key resource file location                                    | If you do not provide then use the default private RSA key was generating at runtime by UAA
+|`mgmtp.a12.uaa.authentication.jwt.public-key-location`          |``              |It is used for verifying token signature. It is public RSA key resource file location                                    | If you do not provide then use the default public RSA key was generating at runtime by UAA
+|`mgmtp.a12.uaa.authentication.jwt.header-name`                  |`Authorization` |Header name when token is stored in the header.                                                                          |
+|`mgmtp.a12.uaa.authentication.jwt.store-user-in-token.enabled`  |`false`         |Specify if user resolved after login should be stored in the token.                                                      |
+|`mgmtp.a12.uaa.authentication.jwt.compress-user.enabled`        |`false`         |Specify if user should be compressed before it's stored in the token.                                                    |
+|`mgmtp.a12.uaa.authentication.jwt.user-lifetime-seconds`        |``              |Specify allowed maximum time from first login until user is validated. Token refresh preserve initial login time.        |
+|`mgmtp.a12.uaa.authentication.jwt.token-endpoints.enabled`      |`true`          |Enable/disable a bunch of token related endpoints.                                                                       |
+|`mgmtp.a12.uaa.authentication.jwt.token-signature.enabled`      |`true`          |Enable/disable a creating and verifying token signature.                                                                 | You think the token encrypted is enough for securing, and do not want the size of token is too big then you can disable (it's not recommended)
+|================================================================================
+
+[WARNING]
+====
+In a cluster environment and token-signature is enabled, you have to provide the value for below keys:
+
+. `mgmtp.a12.uaa.authentication.jwt.private-key-location`
+. `mgmtp.a12.uaa.authentication.jwt.public-key-location`
+====
+
+

@@ -1,0 +1,47 @@
+plugins {
+	id 'java-library'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding 'UTF-8'
+    options.compilerArgs.add("-parameters")
+}
+
+dependencies {
+	api(libs.opensamlSecurityExt) {
+		exclude group: 'org.apache.httpcomponents.client5', module: 'httpclient5'
+	}
+	api libs.httpclient5
+	api(libs.springSecuritySaml2Sp) {
+		exclude group: "org.opensaml", module: "opensaml-core"
+	}
+	api libs.springLdapCore
+	api libs.springSecurityLdap
+	api libs.springSecurityConfig
+	api libs.springSecurityOauth2Rs
+	api libs.springSecurityOauth2Client
+	// force use json-smart version. Will be delete in the future
+	api libs.jsonSmart
+	api libs.springSecurityWeb
+	api libs.nimbusJose
+	api libs.springCore
+	api libs.commonsIo
+	api libs.commonsCollection
+	api libs.annotationApi
+	api libs.inject
+	api libs.commonsLang
+	api libs.springSecurityJose
+	api libs.beanUtils
+	api libs.jacksonCore
+	api libs.jacksondataBind
+	api libs.jacksonDataFormatProperties
+	api libs.hibernateValidator
+	api libs.springWebflux
+	implementation libs.servletApi
+
+	testImplementation libs.bundles.springTest
+	testImplementation libs.servletApi
+}
+
+description = 'UAA:: Authentication'
+

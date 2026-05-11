@@ -1,0 +1,52 @@
+{
+	"person": {
+		"id": "Pepa",
+		"firstName": "Zdepa",
+		"addresses": [
+			{
+				"firstName": "Pepa",
+				"sureName": "Zdepa",
+				"street": "sesame",
+				"streetNumber": 1,
+				"zipCode": "123456"
+			},
+			{
+				"firstName": "Pepa",
+				"sureName": "Zdepa",
+				"street": "zadna",
+				"streetNumber": 2,
+				"zipCode": "09876"
+			}
+		],
+		"job": [
+			{
+				"Name": "Nemakacenko",
+				"companies": [
+					{
+						"name": "Crappy",
+						"startDate": "2023-09-01",
+						"description": "aaaa",
+						"type": "bad"
+					}
+				]
+			},
+			{
+				"Name": "Fajny",
+				"companies": [
+					{
+						"name": "jojo",
+						"startDate": "2023-09-02",
+						"description": "ajajaj",
+						"type": "good"
+					},
+					{
+						"name": "nono",
+						"startDate": "2023-09-02",
+						"description": "ssss",
+						"type": "good"
+					}
+				]
+			}
+		]
+	}
+}

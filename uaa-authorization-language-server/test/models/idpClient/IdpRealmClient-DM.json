@@ -1,0 +1,95 @@
+{
+  "header": {
+    "id": "IdpRealmClient-DM",
+    "modelType": "document",
+    "modelVersion": "28.1.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "uaa_um_client_role_document",
+        "value": "true"
+      },
+      {
+        "name": "roles",
+        "value": "userManagementAdmin"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "IdpRealmClient-DM"
+    },
+    "modelConfig": {
+      "decimalSeparator": ".",
+      "timeZone": "UTC",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_8d979",
+          "name": "Root",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Group",
+                "id": "group_4348e",
+                "name": "Client",
+                "Group": {
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_574be",
+                      "name": "Name",
+                      "annotations": [
+                        {
+                          "name": "uaa_um_client_name_label",
+                          "value": "name"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "requirednessConfig": {
+                          "mode": "absoluteOrRelativeToNextRepAncestor"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_3aa03",
+                      "name": "Description",
+                      "annotations": [
+                        {
+                          "name": "uaa_um_client_name_label",
+                          "value": "description"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,403 @@
+{
+	"name": "Test Permission Definition",
+	"description": "",
+	"policies": [
+		{
+			"name": "Success",
+			"description": "Return always true",
+			"rules": [
+				"true"
+			]
+		},
+		{
+			"name": "Failure",
+			"description": "Return always false",
+			"rules": [
+				"false"
+			]
+		},
+		{
+			"name": "Success And Or",
+			"description": "Return always true",
+			"rules": [
+				"true &&  true || false"
+			]
+		},
+		{
+			"name": "Failure And Or",
+			"description": "Return always true",
+			"rules": [
+				"false || true && true && false && true"
+			]
+		},
+		{
+			"name": "BadSyntax",
+			"description": "In the old one it is a stupid policy, but now It has changed",
+			"rules": [
+				"'this is totally stupid policy'"
+			]
+		},
+		{
+			"name": "RepositoryPolicy",
+			"description": "Repos",
+			"target": "#resource.first == 'one'",
+			"dataPreload": [
+				"#newResource = '100_Percents'"
+			],
+			"rules": [
+				"'The rule must have'"
+			]
+		},
+		{
+			"name": "Filterred Policy",
+			"description": "Repos",
+			"target": "false",
+			"rules": [
+				"false"
+			]
+		},
+{
+			"name": "Target True",
+			"description": "target evaluated as true",
+			"target": "true",
+			"rules": [
+				"false"
+			]
+		},
+		{
+			"name": "Target False",
+			"description": "target evaluated as false",
+			"target": "false",
+			"rules": [
+				"false"
+			]
+		},
+		{
+			"name": "Admin User",
+			"description": "check if user is admin",
+			"rules": [
+				"#principal.username == 'admin'"
+			]	
+		},
+		{
+			"name": "Guest User",
+			"description": "check if user is guest",
+			"rules": [
+				"#principal.username == 'guest'"
+			]	
+		}
+	],
+	"repositoryPolicies": [
+	{
+			"name": "RepositoryPolicy",
+			"description": "Repos",
+			"target": "#resource.first == 'one'",
+			"dataPreload": [
+				"#newResource = '100_Percents'"
+			],
+			"templates": [
+				"#resource.first",
+				"#resource.second",
+				"'country.specificName=''' + #newResource + '''' + ' && ' + 'country.name=''' + #newResource + ''''",
+				{
+					"operator": "exact_match",
+					"field": "/country_code",
+					"value": "'_' + #newResource",
+					"array": [
+						"#newResource",
+						"item"
+					]
+				}
+			]
+		},
+		{
+			"name": "RepositoryPolicyRef",
+			"description": "Repos",
+			"template-refs": [
+				"RepositoryPolicy"
+			],
+			"templates": [
+				"'The template must have'"
+			]
+		}
+	],
+	"permissions": [
+		{
+			"name": "Test Inline Success",
+			"description": "Inline Permissions",
+			"policies": [
+				"#resource.first == 'one'",
+				"#resource.second == 2"
+			],
+			"scopes": [
+				"inline policies success"
+			]
+		},
+		{
+			"name": "Test Inline Failure",
+			"description": "",
+			"policies": [
+				"#resource.first == 'one'",
+				"#resource.second == -1"
+			],
+			"scopes": [
+				"inline policies failure"
+			]
+		},
+		{
+			"name": "Test Ref Success",
+			"description": "",
+			"policy-refs": [
+				"Success"
+			],
+			"scopes": [
+				"ref policies success"
+			]
+		},
+		{
+			"name": "Test Ref Failure",
+			"description": "",
+			"policy-refs": [
+				"Failure"
+			],
+			"scopes": [
+				"ref policies failure"
+			]
+		},
+		{
+			"name": "Test And Success Ref",
+			"description": "",
+			"policy-refs": [
+				"Success"
+			],
+			"scopes": [
+				"ref policies sucess and"
+			]
+		},
+		{
+			"name": "Test And Failure Ref",
+			"description": "",
+			"policy-refs": [
+				"Success",
+				"Failure"
+			],
+			"scopes": [
+				"ref policies failure and"
+			]
+		},
+		{
+			"name": "Test Inner And Success Ref",
+			"description": "",
+			"policy-refs": [
+				"Success &&  Success"
+			],
+			"scopes": [
+				"ref policies sucess inner and"
+			]
+		},
+		{
+			"name": "Test Inner And Failure Ref",
+			"description": "",
+			"policy-refs": [
+				"Success && Success && Failure"
+			],
+			"scopes": [
+				"ref policies failure inner and"
+			]
+		},
+		{
+			"name": "Test Inner And Or Success Ref",
+			"description": "",
+			"policy-refs": [
+				"Success &&  Success || Failure"
+			],
+			"scopes": [
+				"ref policies sucess inner and or"
+			]
+		},
+		{
+			"name": "Test Inner And Or Failure Ref",
+			"description": "",
+			"policy-refs": [
+				"Failure || Success && Success && Failure && Success"
+			],
+			"scopes": [
+				"ref policies failure inner and or"
+			]
+		},
+		{
+			"name": "Test And Or Success Ref",
+			"description": "",
+			"policy-refs": [
+				"Success And Or"
+			],
+			"scopes": [
+				"ref policies sucess and or"
+			]
+		},
+		{
+			"name": "Test And Or Failure Ref",
+			"description": "",
+			"policy-refs": [
+				"Failure And Or"
+			],
+			"scopes": [
+				"ref policies failure and or"
+			]
+		},
+		{
+			"name": "Test Bad Policy Syntax",
+			"description": "",
+			"policy-refs": [
+				"BadSyntax"
+			],
+			"scopes": [
+				"bad policy syntax"
+			]
+		},
+		{
+			"name": "Test NOT operator",
+			"description": "",
+			"policy-refs": [
+				"!(Failure) && !(Success && Failure)"
+			],
+			"scopes": [
+				"Not operator"
+			]
+		},
+		{
+			"name": "Main Permission 1",
+			"description": "This Permission will be override",
+			"policy-refs": [
+				"!(Failure) && !(Success && Failure)"
+			],
+			"scopes": [
+				"Main Permission (both additional are callParent)"
+			]
+		},
+		{
+			"name": "Main Permission 2",
+			"description": "This Permission will be override",
+			"policy-refs": [
+				"!(Failure) && !(Success && Failure)"
+			],
+			"scopes": [
+				"Main Permission (2 additional - 1 callParent, another not)"
+			]
+		},
+		{
+			"name": "Main Permission 3",
+			"description": "This Permission will be override",
+			"policy-refs": [
+				"!(Failure) && !(Success && Failure)"
+			],
+			"scopes": [
+				"Main Permission (both additional are not callParent)"
+			]
+		},
+		{
+			"name": "Repository Permission",
+			"description": "Repo Permission",
+			"repository-refs" : [
+				"RepositoryPolicy"
+			],
+			"scopes": [
+				"Repository"
+			]
+		},
+		{
+			"name": "Repository Permission clone",
+			"description": "Repo Permission",
+			"repository-refs": [
+				"RepositoryPolicyRef"
+			],
+			"scopes": [
+				"RespositoryRef"
+			]
+		},
+		{
+			"name": "Empty",
+			"description": "Test filterring",
+			"scopes": [
+				"Empty"
+			],
+			"policies": [
+				"'Must have `policies` or `policy-refs`'"
+			]
+		},
+		{
+			"name": "Filterring",
+			"description": "Test filterring",
+			"policy-refs": [
+				"Filterred Policy"
+			],
+			"scopes": [
+				"Filtering"
+			]
+		},
+		{
+			"name": "Filtering 2",
+			"description": "Failing policy with target filtering",
+			"policy-refs": [
+				"(Target True) && (Success)"
+			],
+			"scopes": [
+				"Target evaluation"
+			]
+		},
+		{
+			"name": "Main Permission 5",
+			"description": "This Permission will be override",
+			"policy-refs": [
+				"(Target False) && (Failure)"
+			],
+			"scopes": [
+				"Target evaluation fasle"
+			]
+		}
+	],
+	"propertyPermissions": [
+		{
+			"name": "Admin Property Permission",
+			"description": "",
+			"policy-refs": [
+				"Admin User"
+			],
+			"rights-refs": [
+				"Rights for Admin"
+			] 
+		},
+		{
+			"name": "Guest Property Permission",
+			"description": "",
+			"policy-refs": [
+				"Guest User"
+			],
+			"rights-refs": [
+				"Rights for Guest"
+			] 
+		}
+		
+	],
+	"propertyRights": [
+		{
+			"name": "Rights for Admin",
+			"description": "",
+			"rights": {
+				"WRITE": [
+					"first",
+					"second"
+				]
+			}
+		},
+		{
+			"name": "Rights for Guest",
+			"description": "",
+			"rights": {
+				"READ": [
+					"first"
+				]
+			}
+		}
+	]
+}

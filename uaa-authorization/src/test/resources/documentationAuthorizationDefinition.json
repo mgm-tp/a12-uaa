@@ -1,0 +1,188 @@
+{
+	"name": "Example Definition File",
+	"description": "",
+	"policies": [
+		{
+			"name": "load company rest endpoint policy",
+			"description": "Everyone with admin or guest can load company",
+			"target": "#resource == 'CompanyController.loadCompany'",
+			"rules": [
+				"containsAnyRole({'Guest', 'Admin'})"
+			]
+		},
+		{
+			"name": "save company rest endpoint policy",
+			"description": "Only admin can save company",
+			"target": "#resource == 'CompanyController.saveCompany'",
+			"rules": [
+				"containsAnyRole('Admin')"
+			]
+		},
+		{
+			"name": "company saving policy",
+			"description": "Regular user must provide valid data for country and tax number",
+			"dataPreload": [
+				"#country = @countryRepository.findByCountryCode(#resource.country.code)"
+			],
+			"rules": [
+				"#country.name == principal.nationality",
+				"@taxService.isValid(#resource.taxNumber)"
+			]
+		},
+		{
+			"name": "administrator policy",
+			"description": "Admin can always save even with invalid data",
+			"rules": [
+				"containsAnyRole('Admin')"
+			]
+		},
+		{
+			"name": "guest policy",
+			"description": "User has guest role",
+			"rules": [
+				"containsAnyRole('Guest')"
+			]
+		},
+		{
+			"name": "company reading policy",
+			"description": "Only apply for a user which roles has not contains 'Admin'. Rule explain: the company's country name should valid",
+			"target": "!containsAnyRole({'Admin'})",
+			"dataPreload": [
+				"#country = @countryRepository.findByCountryCode(#resource.country.code)"
+			],
+			"rules": [
+				"#country.name == principal.nationality"
+			]
+		},
+		{
+			"name": "Company Domain Object",
+			"description": "",
+			"rules": [
+				"#resource instanceof T(com.mgmtp.a12.uaa.authorization.integration.documentation.Company)"
+			]
+		}
+	],
+	"repositoryPolicies": [
+		{
+			"name": "companies data filter policy",
+			"description": "only company which name equal principal's nationality is display",
+			"templates": [
+				"'name = ''' +  principal.nationality + ''''"
+			]
+		}
+	],
+	"permissions": [
+		{
+			"name": "allow access rest endpoint",
+			"description": "a description",
+			"policy-refs": [
+				"(load company rest endpoint policy && save company rest endpoint policy)"
+			],
+			"scopes": [
+				"rest endpoint"
+			]
+		},
+		{
+			"name": "allow read companies",
+			"description": "a description",
+			"repository-refs" : [
+				"companies data filter policy"
+			],
+			"scopes": [
+				"load companies"
+			]
+		},
+		{
+			"name": "allow read company",
+			"description": "a description",
+			"policy-refs": [
+				"company reading policy"
+			],
+			"scopes": [
+				"load company"
+			]
+		},
+		{
+			"name": "allow save company",
+			"description": "a description",
+			"policy-refs": [
+				"administrator policy || company saving policy"
+			],
+			"scopes": [
+				"save company"
+			]
+		}
+	],
+	"propertyPermissions": [
+		{
+			"name": "Company Properties Admin",
+			"description": "",
+			"policy-refs": [
+				"Company Domain Object",
+				"administrator policy"
+			],
+			"rights-refs": [
+				"Company Entity For Admin"
+			]
+		},
+		{
+			"name": "Permission for Guest user",
+			"description": "",
+			"policy-refs": [
+				"Company Domain Object",
+				"guest policy"
+			],
+			"rights-refs": [
+				"Company Entity For Guest User"
+			]
+		}
+	],
+	"propertyRights": [
+		{
+			"name": "Company Entity For Guest User",
+			"description": "",
+			"rights": {
+				"READ": [
+					"id",
+					"name",
+					"taxNumber",
+					"country.name",
+					"offices",
+					"offices[].code"
+				],
+				"MASK": [
+					"country.code::'Access Denied'",
+					"taxNumber::'masked:['+taxNumber.substring(0,3)+'...]'"
+				],
+				"WRITE": [
+					"country.name"
+				]
+			}
+		},
+		{
+			"name": "Company Entity For Admin",
+			"description": "",
+			"rights": {
+				"READ": [
+					"id",
+					"name",
+					"branchName",
+					"taxNumber",
+					"country.code",
+					"country.name",
+					"offices",
+					"offices[].code",
+					"offices[].name"
+				],
+				"WRITE": [
+					"id",
+					"name",
+					"branchName",
+					"country.code",
+					"country.name",
+					"taxNumber"
+				]
+			}
+		}
+	]
+}

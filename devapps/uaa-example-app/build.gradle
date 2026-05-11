@@ -1,0 +1,77 @@
+import org.springframework.boot.gradle.tasks.run.BootRun
+
+plugins {
+	id 'org.springframework.boot'
+    id 'java-library'
+}
+
+ext {
+    DEFAULT_JVM_ARGS = ["-Djava.net.preferIPv6Addresses=true"]
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding 'UTF-8'
+    options.compilerArgs.add("-parameters")
+}
+
+dependencies {
+    api project(':uaa-authorization')
+    api project(':uaa-authorization-spring-boot-autoconfigure')
+    api project(':uaa-authorization-web-spring-boot-autoconfigure')
+    api project(':uaa-authorization-a12-extension')
+    api project(':uaa-authorization-introspector')
+    api project(':uaa-authentication-spring-boot-autoconfigure')
+    api project(':uaa-authentication-principal-extension-spring-boot-autoconfigure')
+    api project(':uaa-authentication-principal-extension')
+    api project(':uaa-authentication-backend-spring-boot-autoconfigure')
+
+    api libs.springBootStarterSecurity
+    api libs.springBootStarterCache
+    api libs.springBootStarterActuator
+    api libs.springBootStarterWeb
+    api libs.springBootStarterThymeleaf
+    api libs.springSecurityThymeleafExtra
+    api libs.springBootStarterDataJpa
+    api libs.springSecurityData
+    api libs.cacheApi
+    api libs.ehcache
+    api libs.h2
+    api libs.springSecurityDataTaglibs
+    api libs.springContextSupport
+    api libs.jmockData
+
+    runtimeOnly libs.springBootDevtools
+    runtimeOnly libs.postgreSql
+
+    testImplementation libs.bundles.springTest
+}
+
+description = 'UAA:: Example:: Application'
+
+ext {
+	PROFILES = project.findProperty('PROFILES') ?: 'uaa_all_types'
+}
+
+springBoot {
+	mainClass = 'com.mgmtp.a12.uaa.example.Application'
+}
+
+bootRun {
+	jvmArgs = DEFAULT_JVM_ARGS
+}
+
+tasks.register('startExampleServer', BootRun) {
+	description = 'Default Server with configuring PROFILES'
+	group = ApplicationPlugin.APPLICATION_GROUP
+	mainClass = springBoot.mainClass.get()
+	classpath = sourceSets.main.runtimeClasspath
+	args = ["--spring.profiles.active=$PROFILES"]
+	jvmArgs = bootRun.jvmArgs
+	environment = bootRun.environment
+}
+
+tasks.register('startExampleApp') {
+	group = ApplicationPlugin.APPLICATION_GROUP
+	dependsOn 'startExampleServer'
+}
+

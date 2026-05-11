@@ -1,0 +1,21 @@
+plugins {
+	id 'java-library'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding 'UTF-8'
+    options.compilerArgs.add("-parameters")
+}
+
+dependencies {
+	api project(':uaa-authentication')
+	api libs.springBootAutoconfigure
+	annotationProcessor libs.springBootConfigProcessor
+	api libs.springBootStarterSecurity
+	api libs.springBootStarterValidation
+	api libs.springBootStarterWebflux
+
+	testImplementation libs.junitJupter
+	testImplementation libs.junitPlatformLauncher
+}
+

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XMLTooling xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xmlns="http://www.opensaml.org/xmltooling-config" xmlns:ekona="http://www.elster.de/schema/ekona/saml/extensions">
+
+	<ObjectProviders>
+
+		<ObjectProvider qualifiedName="ekona:AdresseType">
+			<BuilderClass className="com.mgmtp.a12.uaa.authentication.saml.ekona.internal.EkonaAddreseTypeObjectBuilder"/>
+			<MarshallingClass className="org.opensaml.core.xml.schema.impl.XSAnyMarshaller"/>
+			<UnmarshallingClass className="com.mgmtp.a12.uaa.authentication.saml.ekona.internal.EkonaAddressTypeUnmarshaller"/>
+		</ObjectProvider>
+
+
+	</ObjectProviders>
+
+</XMLTooling>

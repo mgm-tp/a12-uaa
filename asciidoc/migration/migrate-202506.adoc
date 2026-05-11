@@ -1,0 +1,160 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+=== 2025.06
+
+==== uaa-authentication-client
+
+===== Migration to ESM
+
+The npm artifact `@com.mgmtp.a12.uaa/uaa-authentication-client` was migrated
+from CommonJS to link:https://nodejs.org/api/esm.html#modules-ecmascript-modules[ESM].
+When using Node `22.12+` and modern build tools, there should be no changes necessary to your bundler setup.
+
+Migrating your own application to ESM is not required, but recommended. Consult the documentation of your bundler for specifics.
+
+===== React 19 upgrade
+
+We dropped the support for React 18 and older and now require React 19 as our peerDependency.
+This means you have to perform the React 19 migration, which is described in great detail in the official
+link:https://react.dev/blog/2024/04/25/react-19-upgrade-guide[React 19 Upgrade Guide]. They have codemods that should make the transition straightforward.
+
+Additionally, we have decided to not also include a Redux update, to minimize the migration effort.
+The "react-redux" library does not have React 19 as a peerDependency, but still works fine with it.
+One solution is to override the dependency in your package.json. You also have to update the corresponding "@types/react-redux" typings to at least 7.1.34.
+
+[source,json]
+----
+{
+	"overrides": {
+		"react-redux": {
+			"react": "^19"
+		}
+	},
+	"devDependencies": {
+		"@types/react-redux": "^7.1.34"
+	}
+}
+----
+
+==== uaa-authentication
+
+* **PrincipalCreator** api is now only responsible for creating principal, neither token verification nor token unpacking need to be involved.
+
+** The input of the api **createPrincipal()** in **PrincipalCreator** is changed to **JwtTokenData** which is extracted and verified priorly by UAA.
+
+* **LocalUserManager** has a new api *reloadUsers()* which is responsible for reloading the persisted Local users at runtime.
+** Input is the String representing the list of users in format of JSON or Yaml
+** The default implementation does nothing but returns an empty collection.
+
+* UAA provides the default implementation of **LocalUserManager** that includes **LocalUserLoader** for producing the Local user in desired type.
+Therefore, comes along with *reloadUsers()* of **LocalUserManager**, **LocalUserLoader** also has a new api *loadUsers()*:
+** Responsible for producing the list of Local users in the desired type.
+** The default implementation does nothing but returns an empty collection.
+
+* New rest api for uploading Local users at run time
+** The endpoint `<UAA context>/local-user/upload` is bound to the scope `Upload Local User Rule` so it is required to specify the new authorization rule for this scope.
+
+* Move **RoleMappingProcessor** to a12internal package so that it can be used by order A12 modules (covered by automatic migration).
+
+* Move **UAALocalUserLoader** to internal package (covered by automatic migration).
+
+* The `Certificate` authentication type has been changed to `API_KEY`.
+** The header at request has been changed from `Cert` to `APIKey`
+** The name of authentication type has been changed from `CERTIFICATE` to `API_KEY`
+** Old properties
++
+[source,properties]
+----
+// For uaa-authentication
+mgmtp.a12.uaa.authentication.certificate-authority-resources
+mgmtp.a12.uaa.authentication.certificate-white-list-access-url-patterns
+mgmtp.a12.uaa.authentication.principal.certificate.user-name-field
+mgmtp.a12.uaa.authentication.principal.certificate.user-role-field
+
+// For uaa-rest-client
+mgmtp.a12.uaa.authentication.client.rest.certificate-resource
+----
++
+** New properties (covered by automatic migration)
++
+[source,properties]
+----
+// For uaa-authentication
+mgmtp.a12.uaa.authentication.api-key-authority-resources
+mgmtp.a12.uaa.authentication.api-key-white-list-access-url-patterns
+mgmtp.a12.uaa.authentication.principal.api-key-config.user-name-field
+mgmtp.a12.uaa.authentication.principal.api-key-config.user-role-field
+
+// For uaa-rest-client
+mgmtp.a12.uaa.authentication.client.rest.api-key-resource
+----
+
+==== Deprecation
+
+===== uaa-authentication
+
+* `geteMail()` function of `ExternalPrincipalImpl` is deprecated, use `getEmail()` instead.
+
+* `seteMail()` function of `ExternalPrincipalImpl` is deprecated, use `setEmail()` instead.
+
+* `withEMail()` function of `ExternalPrincipalImpl.Builder` is deprecated, use `withEmail()` instead.
+
+* The property `template-refs` of `repositoryPolicies` in authorization definition file is deprecated and will be removed completedly in the next major version.
+In the consequence, the attribute `templateRefs` and its getter and setter are also deprecated.
+
+We implemented the new timer calculation for the silent renewal process based on the TOKEN_RENEW_IN_SECONDS value (the amount of time before the process starts).
+As the result, some keys/codes are no longer used and will be removed in the next major release:
+
+* The header `access_token_expiration` in the default value of `mgmtp.a12.uaa.authentication.cors.*exposed-headers*` will be removed and replaced by `token_renew_in_seconds`.
+
+* The header `access_token_expiration` will be removed out of the response of apis:
+** Login api of LOCAL and LDAP, replaced by `token_renew_in_seconds`.
+** `/uaa-authentication/exchangeAuthorizationCodeToToken`, replaced by `token_renew_in_seconds`.
+** `/uaa-authentication/token`, replaced by `token_renew_in_seconds`.
+
+* The attribute `generatedTokenExpirationHeaderName` and its getter and setter of class `TokenConfiguration` are unusable.
+As the result, the client self-configuration no longer contains that attribute.
+
+* The function `withGeneratedTokenExpirationHeaderName()` of class `TokenConfiguration.Builder` is unusable.
+
+* The attribute `loginTime` and its getter of class `JwtTokenData` are replaced by `issuedTime` and its corresponding getter and setter.
+
+* The function `withLoginTime` of class `JwtTokenData.Builder` is replaced by `withIssuedTime()`.
+
+* The attribute `expirationTime` and its setter of class `JwtTokenData` are unusable,
+the getter `getExpirationTime()` is now computed by attributes `issuedTime` and `expirationSeconds`.
+
+* The function `withExpirationTime` of class `JwtTokenData.Builder` is unusable.
+
+===== uaa-authentication-client
+
+* `SessionStorageKeys.ACCESS_TOKEN_EXPIRATION` is not used anymore, use `SessionStorageKeys.TOKEN_RENEW_TIMESTAMP` instead to get the start time of renewal process.
+
+* `SessionStorageKeys.TOKEN_RENEW_IN_SECONDS` is not used anymore, use `SessionStorageKeys.TOKEN_RENEW_TIMESTAMP` instead to get the start time of renewal process.
+
+===== uaa-rest-client
+
+* The attribute `authenticationTokenExpiration` and its getter of class `AuthorizationData` are replaced by `tokenRenewInSeconds` and its corresponding getter.
+
+* All `AuthorizationData`'s constructors having the parameter `authenticationTokenExpiration` are replaced by ones containing parameter `tokenRenewInSeconds`.
+
+* `mgmtp.a12.uaa.authentication.client.rest.generated-token-expiration-header-name` is unusable and will be removed.
+
+* The attribute `generatedTokenExpirationHeaderName` and its getter and setter of class `UAARestClientProperties` are unusable.
+
+* The attribute `generatedTokenExpirationHeaderName` and its getter and setter of class `TokenConfiguration` are unusable.

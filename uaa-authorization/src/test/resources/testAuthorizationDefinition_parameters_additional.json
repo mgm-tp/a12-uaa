@@ -1,0 +1,52 @@
+{
+  "name": "parameters additional",
+  "policies": [
+    {
+      "name": "policy 1",
+      "rules": [
+        "true"
+      ]
+    },
+    {
+      "name": "policy 2",
+      "rules": [
+        "true"
+      ]
+    },
+    {
+      "name": "policy 3",
+      "rules": [
+        "true"
+      ]
+    }
+  ],
+  "permissions": [
+    {
+      "name": "permisison 1",
+      "policy-refs": [
+        "Success"
+      ],
+      "scopes": [
+        "This is a scope 1"
+      ]
+    },
+    {
+      "name": "permission 2",
+      "policies": [
+        "true"
+      ],
+      "scopes": [
+        "This is scope 2"
+      ]
+    },
+    {
+      "name": "permission 3",
+      "policy-refs": [
+        "policy 1"
+      ],
+      "scopes": [
+        "This is scope 3"
+      ]
+    }
+  ]
+}

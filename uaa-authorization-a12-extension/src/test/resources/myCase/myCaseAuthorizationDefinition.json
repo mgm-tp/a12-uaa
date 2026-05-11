@@ -1,0 +1,48 @@
+{
+  "name": "Domain Case Type Authorization Definition",
+  "description": "Example Permission Definition for Domain Case Type",
+  "policies": [
+    {
+      "name": "Domain Authorization Filter",
+      "description": "",
+      "dataPreload": [
+        "#username = ((hasRole('admin') || #resource != 'DomainCaseType') ? '' : principal.username)",
+        "print('Roles: ' + principal.authorities)",
+        "print('UserName: ' + #username)",
+        "print('Condition: ' + hasRole('admin') + ', Resource: ' +  #resource)" 
+      ],
+      "rules": [
+        "myCase/models/authorization/DomainAuthorization_Full.json"
+      ],
+      "type": "A12Model"
+    }
+  ],
+  "repositoryPolicies": [
+    {
+      "name": "Repository_Domain_Authorization_Filter_Policy_Ref",
+      "description": "Repos",
+      "dataPreload": [
+        "#username = ((hasRole('admin') || #resource != 'DomainCaseType') ? '' : principal.username)"
+      ],
+      "template-refs": [
+        "Domain Authorization Filter"
+      ]
+    }
+  ],
+  "permissions": [
+    {
+      "name": "Load Document",
+      "description": "",
+      "policy-refs": [
+        "Domain Authorization Filter"
+      ],
+      "repository-refs": [
+        "Repository_Domain_Authorization_Filter_Policy_Ref"
+      ],
+      "call-parent-scope": false,
+      "scopes": [
+        "Document Read"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+users:
+  - username: "admin"
+    password: "admin"
+    authorities:
+      - "Reviewer"
+      - "Admin"
+      - "Manager"
+    email: admin@a.com
+    firstname: Ad
+    lastname: Min
+    nationality: VN
+  - username: "tom"
+    password: "tom"
+    authorities:
+      - "Reviewer"
+    email: tom@a.com
+    firstname: Tom
+    lastname: Min
+    nationality: CZ
+  - username: "sysadmin"
+    password: "sysadmin"
+    authorities:
+      - "Reviewer"
+      - "Admin"
+      - "Manager"
+    email: sysadmin@a.com
+    firstname: Sys
+    lastname: Admin
+    nationality: VN
+

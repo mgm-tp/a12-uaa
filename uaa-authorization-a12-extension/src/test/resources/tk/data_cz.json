@@ -1,0 +1,26 @@
+{
+	"Authorization": {
+		"user": {
+			"userName": "kuba",
+			"firstName": "Mistr",
+			"lastName": "Kuba",
+			"organization": {
+				"countryCode": "CZ"
+			},
+			"roles": [
+				{
+					"name": "admin"
+				},
+				{
+					"name": "guest"
+				}
+			]
+		},
+		"country": {
+			"id": "1",
+			"code": "CZ",
+			"name": "Czech",
+			"continent": null
+		}
+	}
+}

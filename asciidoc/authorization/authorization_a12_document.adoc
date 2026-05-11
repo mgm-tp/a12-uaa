@@ -1,0 +1,72 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+[[authorization_a12_document]]
+=== A12 Document Object Support
+UAA supports A12 Documents in Authorization in the same way as POJO. In any Rule expression, the same dot notation syntax is applied for both POJO and A12 Documents.
+
+Declare the dependency:
+
+Maven:
+[source, xml,subs="verbatim,attributes"]
+----
+<dependency>
+	<groupId>com.mgmtp.a12.uaa</groupId>
+	<artifactId>uaa-authorization-a12-extension</artifactId>
+	<version>{version}</version>
+</dependency>
+
+----
+
+Gradle:
+[source,css,options="nowrap"]
+----
+dependencies {
+    implementation "com.mgmtp.a12.uaa:uaa-authorization-a12-extension:{version}"
+}
+----
+
+How to express Authorization rules with A12 Documents. Here are examples:
+
+image::assets/images/authorization/a12_model.png[A12 model,title="A12 Model"]
+
+==== Resource Authorization
+In the `Resource Authorization` it's possible to use `A12 Document` in the same way as regular POJO. For example to check if `age > 18` you write expression:
+
+`person.age > 18`
+
+
+==== Property Authorization
+A12 documents(s) can be used out of the box with property authorization. Existing path notation is working with A12 documents and there is no need to use any special notation.
+
+Let's say that you would like to give access right to following properties (Kernel notation):
+
+* `/person/job/companies/name`
+* `/person/job/Name`
+* `/person/addresses/street`
+ 
+ 
+In the <<property_rights, Property Rights>> you define following paths:
+
+* `person.job[].companies[].name`
+* `person.job[].Name`
+* `person.addresses[].street`
+  
+
+
+==== Limitations
+Custom masking is not working yet.

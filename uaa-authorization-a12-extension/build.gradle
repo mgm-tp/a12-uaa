@@ -1,0 +1,26 @@
+plugins {
+    id 'java-library'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding 'UTF-8'
+    options.compilerArgs.add("-parameters")
+}
+
+dependencies {
+    api project(':uaa-authorization')
+
+	api libs.kernelMdFacade
+	api libs.kernelCorefacade
+	api libs.kernelMdDocumentService
+	api libs.kernelMdModel
+	api libs.kernelCoreParser
+    api libs.springContext
+    api libs.validationApi
+    api libs.annotationApi
+    
+	testImplementation libs.bundles.springTest
+}
+
+description = 'UAA:: Authorization:: A12 Extension'
+

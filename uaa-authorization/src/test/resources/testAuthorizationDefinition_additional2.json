@@ -1,0 +1,38 @@
+{
+"name": "Additional 2",
+"description": "additional 2 description",
+"permissions": [
+	{
+	  "name": "Additional Permission 2",
+	  "description": "This Permission will be override",
+	  "policy-refs": [
+		"!(Failure) && !(Success && Failure)"
+	  ],
+	  "scopes": [
+		"Main Permission (both additional are callParent)"
+	  ]
+	},
+	{
+		"name": "Additional Permission 4",
+		"description": "This Permission will be override",
+		"policy-refs": [
+			"!(Failure) && !(Success && Failure)"
+		],
+		"scopes": [
+			"Main Permission (2 additional - 1 callParent, another not)"
+		],
+		"call-parent-scope": false
+	},
+	{
+		"name": "Additional Permission 6",
+		"description": "This Permission will be override",
+		"policy-refs": [
+			"!(Failure) && !(Success && Failure)"
+		],
+		"scopes": [
+			"Main Permission (both additional are not callParent)"
+		],
+		"call-parent-scope": false
+	}
+]
+}

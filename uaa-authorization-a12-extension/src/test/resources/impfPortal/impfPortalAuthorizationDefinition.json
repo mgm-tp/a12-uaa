@@ -1,0 +1,38 @@
+{
+  "name": "Impf Portal Authorization Definition",
+  "description": "Example from Impf Portal",
+  "policies": [
+    {
+      "name": "Admin_Guest_RegionManager",
+      "description": "",
+      "type": "A12Model",
+      "rules": [
+        "impfPortal/models/authorization/AuthorizationImpfPortal_Full.json"
+      ]
+    }
+  ],
+  "repositoryPolicies": [
+    {
+      "name": "Repository_Admin_Guest_RegionManager_Policy",
+      "description": "Repos",
+      "template-refs": [
+        "Admin_Guest_RegionManager"
+      ]
+    }
+  ],
+  "permissions": [
+    {
+      "name": "View all application",
+      "description": "Users can view all applications with role 'ADMIN' or 'REGION_MANAGER' or 'GUEST' with specific rules.",
+      "policy-refs": [
+        "Admin_Guest_RegionManager"
+      ],
+      "repository-refs" : [
+        "Repository_Admin_Guest_RegionManager_Policy"
+      ],
+      "scopes": [
+        "View all application"
+      ]
+    }
+  ]
+}

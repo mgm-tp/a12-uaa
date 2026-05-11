@@ -1,0 +1,86 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+[[local]]
+=== LOCAL
+LOCAL authentication type is used in the simple scenario where the application also acts as the Identity Provider (IDP).
+This means that UAA provide login endpoint which verifies user credentials.  
+In this mode application is responsible for storing user data and validating user password.
+
+LOCAL is using standard UAA `JWT Token` <<token-generation,generation>> and <<uaa-token-processing,processing>>.
+
+
+The authentication type provides an <<local-sequence, extension points>> which allows connecting the application's user data to UAA infrastructure.
+
+[CAUTION]
+====
+LOCAL authentication type is mainly intended for development purposes not for production usage! 
+====
+ 
+
+[[local-flow]]
+==== Login Flow
+
+Initially it's necessary to send a standard POST request to `/user/local/login` endpoint.
+When the credentials are validated, UAA Access Token is generated and sent back as a response header.
+
+For complete communication flow, see following screenshot:
+
+image:assets/images/flow_local.png[Local,title="Local authentication flow"]
+
+[[local-sequence]]
+==== Sequence Diagram
+
+Login flow starts by sending a standard POST request to `/user/local/login` endpoint.
+The credentials are validated in `LocalAuthenticationService` which returns user data.
+In the success handler the UAA access token is generated based on user data.
+
+For complete flow see following sequence diagram:
+
+image:assets/images/local.png[LOCAL sequence diagram,title="LOCAL sequence diagram",link="assets/images/local.png" ]
+
+[[local-authentication-service]]
+==== LocalAuthenticationService
+The UAA has no notion where users are stored. An implementor is responsible for creating the user repository.
+
+The UAA provides an interface `LocalAuthenticationService<T extends UserDetails>` which verify credentials  and returns user object. The interface is required to be implemented by an implementor.
+
+[source, java]
+----
+@Component
+public class ExampleLocalAuthenticationService implements LocalAuthenticationService<UserDetails> {
+
+	@Override
+	public UserDetails authenticate(String username, String rawPassword) {
+		UserDetails loadedUser = loadUserFromRepository(username);
+		if ((loadedUser == null) || (!rawPassword.equals(loadedUser.getPassword()))) {
+			throw new BadCredentialsException(String.format("Invalid credentials for %s", userName));
+		}
+		return new UAAPrincipal<>(username, "***", loadedUser.getAuthorities());
+	}
+
+	private UserDetails loadUserFromRepository(String username) {
+		// code
+	}
+
+}
+
+---- 
+
+
+include::login_logout_endpoints.adoc[]
+include::login_logout_redirection.adoc[]

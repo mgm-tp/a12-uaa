@@ -1,0 +1,423 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+In plain Java you need to instantiate REST Connector and UAA REST Client manually by provided factories.
+First it's needed to create a configuration class: `UAARestClientProperties`
+With the configuration it's possible to instantiate a factory `UAARestClientFactory`.
+Only necessary object is the configuration.
+All others are optional.
+
+[TIP]
+====
+Not only for Plain Java application, for any reason if you want to have another rest instance with difference behaviour than default then you can use this UAARestClientFactory also.
+====
+
+From `UAARestClientFactory` you can get AuthenticationRestClient instance which contains set functions to work with set of UAA authentication end points.
+
+`UAARestClientFactory` also wraps all REST Connector classes, so you can get them from the factory.
+
+Below is a set of examples for each authentication types:
+
+===== LOCAL
+
+[source,java]
+----
+public class ProjectLocalRestClientFactory {
+	private UAARestClientFactory factory = createFactory();
+
+	public static restClientFactory() {
+		return factory;
+	}
+
+	private UAARestClientFactory createFactory() {
+		// Create Rest Properties
+		UAARestClientProperties restClientProperties = new UAARestClientProperties();
+		restClientProperties.setAuthorizationHeaderName("Authorization");
+		restClientProperties.setUaaBase(new UrlProperty("{http}://{uaa-server-host}/{uaa-context-path}"));
+		restClientProperties.setAuthenticationType(AuthenticationType.LOCAL);
+		restClientProperties.setGeneratedTokenHeaderName("access_token");
+		restClientProperties.setGeneratedTokenExpirationSecondsHeaderName("token_renew_in_seconds");
+
+		// Create Rest Authentication
+		UAARestClientAuthenticationProperties authenticationProperties = new UAARestClientAuthenticationProperties();
+		authenticationProperties.setUsername("{username}");
+		authenticationProperties.setPassword("{password}");
+
+		UrlProperty relativeLoginUrlProperty = new UrlProperty("user/local/login");
+		authenticationProperties.setLoginRelative(relativeLoginUrlProperty);
+
+		// Set Rest Authentication for Rest Properties
+		restClientProperties.setAuthenticationConfiguration(authenticationProperties);
+
+		UAARestClientFactory uaaRestClientFactory = UAARestClientFactoryBuilder.withConfiguration(restClientProperties).build();
+
+		return uaaRestClientFactory;
+	}
+
+}
+
+public class ProjectUsage {
+	private AuthenticationRestClient authClient =  ProjectLocalRestClientFactory.restClientFactory().getAuthenticationRestClient();
+
+	public void aMethod() {
+		CurrentUser currentUser = authClient.currentUser();
+	}
+}
+----
+
+===== ACTIVE_DIRECTORY_LDAP
+
+[source,java]
+----
+public class ProjectLdapRestClientFactory {
+	private UAARestClientFactory factory = createFactory();
+
+	public static restClientFactory() {
+		return factory;
+	}
+
+	private UAARestClientFactory createFactory() {
+		// Create Rest Properties
+		UAARestClientProperties restClientProperties = new UAARestClientProperties();
+		restClientProperties.setAuthorizationHeaderName("Authorization");
+		restClientProperties.setUaaBase(new UrlProperty("{http}://{uaa-server-host}/{uaa-context-path}"));
+		restClientProperties.setAuthenticationType(AuthenticationType.ACTIVE_DIRECTORY_LDAP);
+		restClientProperties.setGeneratedTokenHeaderName("access_token");
+		restClientProperties.setGeneratedTokenExpirationSecondsHeaderName("token_renew_in_seconds");
+
+		// Create Rest Authentication
+		UAARestClientAuthenticationProperties authenticationProperties = new UAARestClientAuthenticationProperties();
+		authenticationProperties.setUsername("{username}");
+		authenticationProperties.setPassword("{password}");
+
+		UrlProperty relativeLoginUrlProperty = new UrlProperty("user/active_directory_ldap/login");
+		authenticationProperties.setLoginRelative(relativeLoginUrlProperty);
+
+		// Set Rest Authentication for Rest Properties
+		restClientProperties.setAuthenticationConfiguration(authenticationProperties);
+
+		UAARestClientFactory uaaRestClientFactory = UAARestClientFactoryBuilder.withConfiguration(restClientProperties).build();
+
+		return uaaRestClientFactory;
+	}
+
+}
+
+public class ProjectUsage {
+	private AuthenticationRestClient authClient =  ProjectLdapRestClientFactory.restClientFactory().getAuthenticationRestClient();
+
+	public void aMethod() {
+		CurrentUser currentUser = authClient.currentUser();
+	}
+}
+----
+
+===== SAML
+
+[source,java]
+----
+public class ProjectSamlRestClientFactory {
+	private UAARestClientFactory factory = createFactory();
+
+	public static restClientFactory() {
+		return factory;
+	}
+
+	private UAARestClientFactory createFactory() {
+		// Create Rest Properties
+		UAARestClientProperties restClientProperties = new UAARestClientProperties();
+		restClientProperties.setAuthorizationHeaderName("Authorization");
+		restClientProperties.setUaaBase(new UrlProperty("{http}://{uaa-server-host}/{uaa-context-path}"));
+		restClientProperties.setAuthenticationType(AuthenticationType.SAML);
+		restClientProperties.setGeneratedTokenHeaderName("access_token");
+		restClientProperties.setGeneratedTokenExpirationSecondsHeaderName("token_renew_in_seconds");
+
+		// Create Rest Authentication
+		UAARestClientAuthenticationProperties authenticationProperties = new UAARestClientAuthenticationProperties();
+		authenticationProperties.setUsername("{username}");
+		authenticationProperties.setPassword("{password}");
+
+		UrlProperty relativeLoginUrlProperty = new UrlProperty("saml2/authenticate/{registrationId}?uaa_success={http}://{uaa-server-host}/{uaa-context-path}");
+		UrlProperty relativeLogoutUrlProperty = new UrlProperty("/user/logout");
+		SamlProperties saml = new SamlProperties();
+		saml.setLoginRelative(relativeLoginUrlProperty);
+		saml.setLogoutRelative(relativeLogoutUrlProperty);
+		SsoProperties sso = new SsoProperties();
+		sso.setUsernameXpath("//input[@name='username']");
+		sso.setPasswordXpath("//input[@name='password']");
+		sso.setLoginButtonXpath("//button[@name='login']");
+		saml.setSsoConfiguration(sso);
+		authenticationProperties.setSaml(saml);
+
+		// Set Rest Authentication for Rest Properties
+		restClientProperties.setAuthenticationConfiguration(authenticationProperties);
+
+		UAARestClientFactory uaaRestClientFactory = UAARestClientFactoryBuilder.withConfiguration(restClientProperties).build();
+
+		return uaaRestClientFactory;
+	}
+
+}
+
+public class ProjectUsage {
+	private AuthenticationRestClient authClient =  ProjectSamlRestClientFactory.restClientFactory().getAuthenticationRestClient();
+
+	public void aMethod() {
+		CurrentUser currentUser = authClient.currentUser();
+	}
+}
+----
+
+===== OAUTH2 (CONFIDENTIAL)
+
+[source,java]
+----
+
+public class ProjectOauth2RestClientFactory {
+	private UAARestClientFactory factory = createFactory();
+
+	public static restClientFactory() {
+		return factory;
+	}
+
+	private UAARestClientFactory createFactory() {
+		// Create Rest Properties
+		UAARestClientProperties restClientProperties = new UAARestClientProperties();
+		restClientProperties.setAuthorizationHeaderName("Authorization");
+		restClientProperties.setUaaBase(new UrlProperty("{http}://{uaa-server-host}/{uaa-context-path}"));
+		restClientProperties.setAuthenticationType(AuthenticationType.OAUTH2);
+
+		// Create Rest Authentication
+		UAARestClientAuthenticationProperties authenticationProperties = new UAARestClientAuthenticationProperties();
+		authenticationProperties.setUsername("{username}");
+		authenticationProperties.setPassword("{password}");
+
+		// Create Oauth2 Confidential Credential
+		Oauth2Properties oauth2Properties = new Oauth2Properties();
+		UrlProperty idpBaseUrl = new UrlProperty("{http}://{keycloak-server-host}/{keycloak-context-path}");
+		Oauth2Properties.ConfidentialClientProperties confidentialClientProperties = new Oauth2Properties.ConfidentialClientProperties();
+		confidentialClientProperties.setClientSecret("{client-secret}");
+		confidentialClientProperties.setClientId("{confidential-client-id}");
+		confidentialClientProperties.setRealmName("{realm-name}");
+		confidentialClientProperties.setIdpBase(idpBaseUrl);
+		UrlProperty loginRelativeUrl = new UrlProperty("token");
+		confidentialClientProperties.setLoginRelative(loginRelativeUrl);
+		oauth2Properties.setConfidentialClient(confidentialClientProperties);
+
+		// Set Oauth2 Confidential Credential For Rest Authentication
+		authenticationProperties.setOauth2(oauth2Properties);
+
+		// Set Rest Authentication for Rest Properties
+		restClientProperties.setAuthenticationConfiguration(authenticationProperties);
+
+		UAARestClientFactory uaaRestClientFactory = UAARestClientFactoryBuilder.withConfiguration(restClientProperties).build();
+
+		return uaaRestClientFactory;
+	}
+
+}
+
+public class ProjectUsage {
+	private AuthenticationRestClient authClient =  ProjectOauth2RestClientFactory.restClientFactory().getAuthenticationRestClient();
+
+	public void aMethod() {
+		CurrentUser currentUser = authClient.currentUser();
+	}
+}
+----
+
+===== OAUTH2 (PUBLIC)
+
+[source,java]
+----
+
+public class ProjectOauth2RestClientFactory {
+	private UAARestClientFactory factory = createFactory();
+
+	public static restClientFactory() {
+		return factory;
+	}
+
+	private UAARestClientFactory createFactory() {
+		// Create Rest Properties
+		UAARestClientProperties restClientProperties = new UAARestClientProperties();
+		restClientProperties.setAuthorizationHeaderName("Authorization");
+		restClientProperties.setUaaBase(new UrlProperty("{http}://{uaa-server-host}/{uaa-context-path}"));
+		restClientProperties.setAuthenticationType(AuthenticationType.OAUTH2);
+
+		// Create Rest Authentication
+		UAARestClientAuthenticationProperties authenticationProperties = new UAARestClientAuthenticationProperties();
+		authenticationProperties.setUsername("{username}");
+		authenticationProperties.setPassword("{password}");
+
+		// Create Oauth2 Public
+		Oauth2Properties oauth2Properties = new Oauth2Properties();
+		UrlProperty idpBaseUrl = new UrlProperty("{http}://{keycloak-server-host}/{keycloak-context-path}");
+		oauth2Properties.setClientType(ClientType.PUBLIC);
+
+		PublicClientProperties publicClientProperties = new PublicClientProperties();
+		publicClientProperties.setClientId("{public-client-id}");
+		publicClientProperties.setRealmName("{realm-name}");
+		publicClientProperties.setIdpBase(idpBaseUrl);
+        UrlProperty loginRelativeUrl = new UrlProperty("auth");
+		SsoProperties sso = new SsoProperties();
+		sso.setUsernameXpath("//input[@name='username']");
+		sso.setPasswordXpath("//input[@name='password']");
+		sso.setLoginButtonXpath("//button[@name='login']");
+        publicClientProperties.setLoginRelative(loginRelativeUrl);
+		publicClientProperties.setSsoConfiguration(sso);
+
+		oauth2Properties.setPublicClient(publicClientProperties);
+
+		// Set Oauth2 Confidential Credential For Rest Authentication
+		authenticationProperties.setOauth2(oauth2Properties);
+
+		// Set Rest Authentication for Rest Properties
+		restClientProperties.setAuthenticationConfiguration(authenticationProperties);
+
+		UAARestClientFactory uaaRestClientFactory = UAARestClientFactoryBuilder.withConfiguration(restClientProperties).build();
+
+		return uaaRestClientFactory;
+	}
+
+}
+
+public class ProjectUsage {
+	private AuthenticationRestClient authClient =  ProjectOauth2RestClientFactory.restClientFactory().getAuthenticationRestClient();
+
+	public void aMethod() {
+		CurrentUser currentUser = authClient.currentUser();
+	}
+}
+----
+
+===== CERTIFICATE
+[source,java]
+----
+
+public class ProjectCertificateRestClientFactory {
+	private UAARestClientFactory factory = createFactory();
+
+	public static restClientFactory() {
+		return factory;
+	}
+
+	private UAARestClientFactory createFactory() {
+		CertificateProperties certificateProperties = new CertificateProperties();
+		certificateProperties.setKeyStore("classpath:${KeyStorePath}");
+		certificateProperties.setkeyStorePassword("${KeyStorePassword}");
+		certificateProperties.settrustStore("classpath:${TrustStorePath}");
+		certificateProperties.settrustStorePassword("${TrustStorePassword}");
+
+		UAARestClientAuthenticationProperties authConfig = new UAARestClientAuthenticationProperties();
+		authConfig.setCertificate(certificateProperties);
+
+		UrlProperty uaaBaseUrlProperty = new UrlProperty("{http}://{uaa-server-host}/{uaa-context-path}");
+		UAARestClientProperties uaaRestConfig = new UAARestClientProperties();
+		uaaRestConfig.setUaaBase(uaaBaseUrlProperty);
+
+		uaaRestConfig.setAuthenticationType(AuthenticationType.CERTIFICATE);
+		uaaRestConfig.setAuthenticationConfiguration(authConfig);
+
+		return UAARestClientFactoryBuilder
+				.withConfiguration(uaaRestConfig)
+				.build();
+	}
+
+}
+
+public class ProjectUsage {
+	private AuthenticationRestClient authClient =  ProjectCertificateRestClientFactory.restClientFactory().getAuthenticationRestClient();
+
+	public void aMethod() {
+		CurrentUser currentUser = authClient.currentUser();
+	}
+}
+----
+
+===== API_KEY
+[source,java]
+----
+
+public class ProjectAPIKeyRestClientFactory {
+	private UAARestClientFactory factory = createFactory();
+
+	public static restClientFactory() {
+		return factory;
+	}
+
+	private UAARestClientFactory createFactory() {
+		UrlProperty uaaBaseUrlProperty = new UrlProperty("{http}://{uaa-server-host}/{uaa-context-path}");
+		UAARestClientProperties restClientProperties = new UAARestClientProperties();
+		restClientProperties.setAuthorizationHeaderName("Authorization");
+		restClientProperties.setUaaBase(uaaBaseUrlProperty);
+		restClientProperties.setAuthenticationType(AuthenticationType.API_KEY);
+		restClientProperties.setAPIKeyResource("classpath:/{path}/{apikey-name}.crt");
+		UAARestClientFactory uaaRestClientFactory = UAARestClientFactoryBuilder
+                    .withConfiguration(restClientProperties)
+                    .build();
+	}
+
+}
+
+public class ProjectUsage {
+	private AuthenticationRestClient authClient =  ProjectAPIKeyRestClientFactory.restClientFactory().getAuthenticationRestClient();
+
+	public void aMethod() {
+		CurrentUser currentUser = authClient.currentUser();
+	}
+}
+----
+
+===== DELEGATED
+[source,java]
+----
+
+public class ProjectDelegatedRestClientFactory {
+	private UAARestClientFactory factory = createFactory();
+
+	public static restClientFactory() {
+		return factory;
+	}
+
+	private UAARestClientFactory createFactory() {
+		UrlProperty uaaBaseUrlProperty = new UrlProperty("{http}://{uaa-server-host}/{uaa-context-path}");
+		UAARestClientProperties restClientProperties = new UAARestClientProperties();
+		restClientProperties.setAuthorizationHeaderName("Authorization");
+		restClientProperties.setUaaBase(uaaBaseUrlProperty);
+		restClientProperties.setAuthenticationType(AuthenticationType.DELEGATED);
+		UAARestClientFactory uaaRestClientFactory = UAARestClientFactoryBuilder
+                    .withConfiguration(restClientProperties)
+                    .build();
+	}
+
+}
+
+public class ProjectUsage {
+	private AuthenticationRestClient authClient =  ProjectDelegatedRestClientFactory.restClientFactory().getAuthenticationRestClient();
+
+	public void aMethod() {
+		CurrentUser currentUser = authClient.currentUser();
+	}
+}
+----
+
+[TIP]
+====
+It makes no sense to instantiate the rest client again.
+Once the `UAARestClientFactory` is created it's recommended to keep the reference for application lifetime.
+====

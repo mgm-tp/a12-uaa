@@ -1,0 +1,1966 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+[[authorization]]
+== Authorization
+Authorization is a process to check if a logged user has access to (a) `resource(s)`. This is done by defining rules which resolve to "true" in case of access granted.
+The concept behind the authorization mechanism is based on policy enforcement point and policy decision point. In order to make a decision if access is granted (user is authorized) the following input is required:
+
+* object / resource
+* principal / user
+* environment (like current date, role / access right mapping)
+* policies (rules)
+
+In the **p**olicy **d**ecision **p**oint (PEP) the above information is taken and processed in order to grant access.
+
+image::assets/images/authorization/uaa_decision_context.png[Authorization,title="Policy enforcement and decision point"]
+
+The authorization logic is based on **A**ttribute-**B**ased **A**ccess **C**ontrol (ABAC). ABAC is represented by an expressions which can use functions and compare properties of a user and resource object.  With ABAC, **R**oled **B**ased **A**ccess **C**ontrol (RBAC) can be implemented. In this case, one "attribute" is the role.
+
+The authorization functionality can be used in Java to grant access to Java Objects (POJOS) or in A12 DataServices to grant access to A12 documents (see authorization documentation in DataServices).
+
+[NOTE]
+====
+The resource can be any object in the system or even an URL.
+====
+ 
+
+=== Overview
+UAA supports different type of the authorization. 
+
+* Resource Authorization
+* Repository Authorization
+* Property Authorization
+
+image::assets/images/authorization/Authorization.png[Authorization,title="Authorization Concepts"]
+
+==== Resource Authorization
+
+Checking the user permission on a `Resource`. The process will *grant* or *deny* permission based on ABAC rules executed during evaluation process. This authorization type is the most important type.
+The resource authorization is only evaluating access to individual objects / documents.
+
+
+==== Repository Authorization
+
+Repository authorization is used to intercept repository query with generated authorization filter.
+The process is using a *template* which generates a language *agnostic* query criteria. During the generation process there is same execution environment
+like in resource authorization. It's possible to reference principal/resource or any other decision context variable(s).
+
+Note: Due to performance reason the resource authorization is not executed in a list query. For authorization on lists (repository queries), only repository authorization is used.
+
+[CAUTION]
+There is no consistency check between resource and repository authorization. It is in the responsibility of the developer to make sure that the two authorization definitions are consistent.
+The same authorization rules should be applied in both The Resource Authorization and The Repository Authorization enable the consistency between these 2 types.
+
+
+==== Property Authorization
+Property authorization is granting a READ and WRITE permission on a `Resource` object. It's intended to be used together with `Resource Authorization`.
+The Property Authorization is working in two modes.
+
+
+===== Read Mode
+The *read* mode is used when the object is read from a repository and returned to the client. In this mode authorization process will not 
+reject the access to an `resource`. The process will *mask* all properties which has no read access.
+[NOTE]
+====
+Masking process will replace all property values with `null` for which a user has no READ permission. 
+====
+[WARNING]
+====
+Masking is not working on *primitive* types!
+====
+  
+===== Write Mode
+The *write* mode is used when the object is updated on client side and changed data are written to the repository. The authorization process will compare *persisted* and *updated* resource.
+When there is a change to a property for which user has no permission then the change is rejected.
+
+[NOTE]
+====
+To compare *persisted* and *updated* resource system needs full objects. 
+==== 
+
+=== Authorization strategy
+UAA uses Attribute-Based Access Control (ABAC) techniques to grant method access to a `Resource` or `Property`.
+A rule can use a User, Resource or Environment objects and it's properties.
+
+* *User* is Spring Security principal. Its attributes could be a username, authorities.... The principal object must inherit `UserDetails` interface.
+
+* *Resource* represents protected data. Any kind of data.
+
+* *Environment* is optional additional data. Any kind of data.
+
+[[authorization-SpEL]]
+=== Spring Expression Language (SpEL)
+https://docs.spring.io/spring-framework/docs/5.3.x/reference/html/core.html#expressions[The Spring Expression Language (“SpEL” for short)] is a powerful expression language
+that supports querying and manipulating an object graph at runtime.
+
+UAA provides some expression functions integrated into SpEL.
+
+==== hasAccessRight
+
+[cols="h,5a"]
+|===
+|Signature |
+[source,java]
+----
+hasAccessRight(String accessRight):boolean
+----
+|Description | Check if principal accessRights contains give accessRight.
+|Example |
+[source,spel]
+----
+"hasAccessRight('READ')"
+----
+|===
+
+==== containsAnyRole
+
+[cols="h,5a"]
+|===
+|Signature |
+[source,java]
+----
+containsAnyRole(Collection<String> roles):boolean
+----
+|Description | Check if principal roles contains any of given role(s).
+|Example |
+[source,spel]
+----
+"containsAnyRole({'Reviewer', 'Admin'}))"
+----
+|===
+
+==== isResourceName
+
+[cols="h,5a"]
+|===
+|Signature |
+[source,java]
+----
+isResourceName(Object resource, String name):boolean
+----
+|Description | Check if resource type object is matching with give name.
+|Example |
+[source,spel]
+----
+"isResourceName(#resource,'string')"
+----
+|===
+
+==== hasObjectWithPropertyValue
+
+[cols="h,5a"]
+|===
+|Signature |
+[source,java]
+----
+hasObjectWithPropertyValue(Collection<Object> collection, String propertyName, String propertyValue):boolean
+----
+|Description | Check if object inside collection is matching with propertyValue.
+|Example |
+[source,spel]
+----
+"hasObjectWithPropertyValue(principal.authorities, 'role', 'ADMIN')"
+----
+|===
+
+==== hasNestedObjectWithPropertyValue
+
+[cols="h,5a"]
+|===
+|Signature |
+[source,java]
+----
+hasNestedObjectWithPropertyValue(Collection<? extends Object> collection, String collectionName, String propertyName, String propertyValue):boolean
+----
+|Description | Check if nested collection object inside collection is matching with propertyValue.
+|Example |
+[source,spel]
+----
+"hasNestedObjectWithPropertyValue(principal.authorities, 'accessRights', 'name', 'READ')"
+----
+|===
+
+==== print
+
+[cols="h,5a"]
+|===
+|Signature |
+[source,java]
+----
+print(Object message):boolean
+----
+|Description | Print the input message to the console log.
+|Example |
+[source,spel]
+----
+"print('Preload for:' + #resource)"
+----
+|===
+
+[NOTE]
+====
+The `print(...)` method is using DEBUG level logger to write the message to a log file.
+
+The correct log level must be enabled.
+[source, properties]
+----
+logging.level.com.mgmtp.a12.uaa.authorization.security.spel=DEBUG
+----
+====
+
+
+[[decision-context-variables]]
+=== Decision Context Variables
+The decision context used to evaluate UAA policies require a resource object and optionally other variables. 
+ 
+UAA provide custom annotation which ease this task.
+Annotation *@DecisionContext("<variable name>")* is used in method parameter(s) to put a parameter into decision context. 
+The variable can be referenced in an expression with `#<variable_name>`
+
+See the difference between 2 approaches.
+
+[source, java]
+----
+@PreAuthorize("hasUAAPermission('Scope'")
+public void aMethod(@DecisionContext('resource') Company company, @DecisionContext("anObject") String parameter) {...}
+
+@PreAuthorize("hasUAAPermission('Scope', #company")
+public void aMethod(Company company, @DecisionContext("anObject") String parameter) {...}
+----
+
+
+[TIP]
+====
+Inside the decision context it's possible to use any method parameter in the expression with following syntax `#<prameter name>`. Advantage of the `@DecisionContext("<variable name>")` annotation is that you can give custom name to it and it's explicitly visible. 
+====   
+
+[[authorization-getting-started]]
+=== Getting Started
+
+==== Setting Up project example
+Expand to see the example application is using following classes. The Company is a domain object and User represents logged user. They will be used in authorization file.
+[%collapsible]
+====
+[source, java]
+----
+public class Company {
+
+	private Long id;
+	private String name;
+	private String taxNumber;
+	private Country country;
+}
+
+public class Country {
+
+	private String code;
+	private String name;
+}
+
+public class User implements UserDetails {
+
+	private String password;
+	private String username;
+	private String nationality;
+	private Set<SimpleGrantedAuthority> authorities;
+}
+----
+====
+
+First step is to define authorization file where all security rules are defined for the application.
+
+Expand to see the example authorization definition file:
+
+[%collapsible]
+====
+[source, json]
+----
+{
+  "name": "Example Definition File",
+  "description": "",
+  "policies": [
+    {
+      "name": "load company rest endpoint policy",
+      "description": "Everyone with admin or guest can load company",
+      "target": "#resource == 'CompanyController.loadCompany'",
+      "rules": [
+        "containsAnyRole({'Guest', 'Admin'})"
+      ]
+    },
+    {
+      "name": "save company rest endpoint policy",
+      "description": "Only admin can save company",
+      "target": "#resource == 'CompanyController.saveCompany'",
+      "rules": [
+        "containsAnyRole('Admin')"
+      ]
+    },
+    {
+      "name": "company saving policy",
+      "description": "Regular user must provide valid data for country and tax number",
+      "dataPreload": [
+        "#country = @countryRepository.findByCountryCode(#resource.country.code)"
+      ],
+      "rules": [
+        "#country.name == principal.nationality",
+        "@taxService.isValid(#resource.taxNumber)"
+      ]
+    },
+    {
+      "name": "administrator policy",
+      "description": "Admin can always save even with invalid data",
+      "rules": [
+        "containsAnyRole('Admin')"
+      ]
+    },
+    {
+      "name": "guest policy",
+      "description": "User has guest role",
+      "rules": [
+        "containsAnyRole('Guest')"
+      ]
+    },
+    {
+      "name": "company reading policy",
+      "description": "Only apply for a user which roles has not contains 'Admin'. Rule explain: the company's country name should valid",
+      "target": "!containsAnyRole({'Admin'})",
+      "dataPreload": [
+        "#country = @countryRepository.findByCountryCode(#resource.country.code)"
+      ],
+      "rules": [
+        "#country.name == principal.nationality"
+      ]
+    },
+    {
+      "name": "Company Domain Object",
+      "rules": [
+        "#resource instanceof T(com.mgmtp.a12.uaa.authorization.integration.documentation.Company)"
+      ]
+    }
+  ],
+  "repositoryPolicies": [
+    {
+      "name": "companies data filter policy",
+      "description": "only company which name equal principal's nationality is display",
+      "templates": [
+        "'name = ''' +  principal.nationality + ''''"
+      ]
+    }
+  ],
+  "permissions": [
+    {
+      "name": "allow access rest endpoint",
+      "description": "a description",
+      "policy-refs": [
+        "(load company rest endpoint policy && save company rest endpoint policy)"
+      ],
+      "scopes": [
+        "rest endpoint"
+      ]
+    },
+    {
+      "name": "allow read companies",
+      "description": "a description",
+      "repository-refs": [
+        "companies data filter policy"
+      ],
+      "scopes": [
+        "load companies"
+      ]
+    },
+    {
+      "name": "allow read company",
+      "description": "a description",
+      "policy-refs": [
+        "company reading policy"
+      ],
+      "scopes": [
+        "load company"
+      ]
+    },
+    {
+      "name": "allow save company",
+      "description": "a description",
+      "policy-refs": [
+        "administrator policy || company saving policy"
+      ],
+      "scopes": [
+        "save company"
+      ]
+    }
+  ],
+  "propertyPermissions": [
+    {
+      "name": "Company Properties Admin",
+      "description": "",
+      "policy-refs": [
+        "Company Domain Object",
+        "administrator policy"
+      ],
+      "rights-refs": [
+        "Company Entity For Admin"
+      ]
+    },
+    {
+      "name": "Permission for Guest user",
+      "description": "",
+      "policy-refs": [
+        "Company Domain Object",
+        "guest policy"
+      ],
+      "rights-refs": [
+        "Company Entity For Guest User"
+      ]
+    }
+  ],
+  "propertyRights": [
+    {
+      "name": "Company Entity For Guest User",
+      "description": "",
+      "rights": {
+        "READ": [
+          "id",
+          "name",
+          "taxNumber",
+          "country.name",
+          "offices",
+          "offices[].code"
+        ],
+        "MASK": [
+          "country.code::'Access Denied'",
+          "taxNumber::'masked:['+taxNumber.substring(0,3)+'...]'"
+        ],
+        "WRITE": [
+          "country.name"
+        ]
+      }
+    },
+    {
+      "name": "Company Entity For Admin",
+      "description": "",
+      "rights": {
+        "READ": [
+          "id",
+          "name",
+          "branchName",
+          "taxNumber",
+          "country.code",
+          "country.name",
+          "offices",
+          "offices[].code",
+          "offices[].name"
+        ],
+        "WRITE": [
+          "id",
+          "name",
+          "branchName",
+          "country.code",
+          "country.name",
+          "taxNumber"
+        ]
+      }
+    }
+  ]
+}
+----
+====
+
+[TIP]
+====
+`Company` can be read by a user which has `Admin` role *OR* his nationality is the same as Company's country.
+
+`Company` can be updated by a user which has `Admin` role *AND*  his nationality is the same as Company's country *AND* Company must contains valid tax number.
+
+====
+
+Next step is to update source code to use those rights. In the following example there are demonstrated simple example with REST controller and service class.
+
+
+See the following example
+[source, java]
+----
+@RestController
+public class CompanyController {
+
+	@Inject
+	private CompanyService companyService;
+
+	@PreAuthorize("hasUAAPermission('rest endpoint')")
+	@GetMapping("/loadCompany")
+	@ResponseBody
+	public Company loadCompany(String companyId) {
+		return companyService.loadCompany(companyId);
+	}
+
+	@PreAuthorize("hasUAAPermission('rest endpoint')")
+	@GetMapping("/saveCompany")
+	@ResponseBody
+	public String saveCompany(Company company) {
+		return companyService.saveCompany(company);
+	}
+}
+
+@Service
+public class CompanyService {
+
+	@PostAuthorize("hasUAAPermission('load company', returnObject)")
+	public Company loadCompany(String companyId) {
+		// code
+	}
+
+	@PreAuthorize("hasUAAPermission('save company')")
+	public String saveCompany(@DecisionContext('resource') Company company) {
+		// code
+	}
+}
+----
+
+[TIP]
+====
+The REST endpoint is using default `#resource` object.
+
+Second is a service class which secures reading and writing with a concrete `#resource` object for decision context.
+====
+
+
+Authorization can be used in plain Spring or Spring Boot application. Choose proper section below for Spring or Spring Boot application.
+
+
+[TIP]
+=====
+For an easier dependency management it's possible to use UAA BOM
+[source, xml,subs="verbatim,attributes"]
+----
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.mgmtp.a12.uaa</groupId>
+				<artifactId>uaa-bom</artifactId>
+				<version>{version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+            <dependency>
+				<groupId>com.mgmtp.a12.uaa</groupId>
+				<artifactId>uaa-catalog</artifactId>
+				<version>{version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+----
+=====
+
+
+
+[[authorization-getting-started-spring]]
+==== Spring Application
+Add following dependency:
+
+Maven:
+[source, xml,subs="verbatim,attributes"]
+----
+<dependency>
+	<groupId>com.mgmtp.a12.uaa</groupId>
+	<artifactId>uaa-authorization</artifactId>
+	<version>{version}</version>
+</dependency>
+
+----
+
+Gradle:
+[source,css,options="nowrap"]
+----
+dependencies {
+    implementation "com.mgmtp.a12.uaa:uaa-authorization:{version}"
+}
+----
+
+You need to initialize two beans for UAA impl. For example in a configuration class.
+[source, java]
+----
+@Configuration
+@ComponentScan("com.mgmtp.a12.uaa.authorization")
+
+public class AuthorizationConfiguration {
+	@Bean
+	public AuthorizationDefinitionService createAuthorizationDefinitionService() {
+		return new AuthorizationDefinitionService(<mainDefinitionResource>,[additionalDefinitionResources:List]);
+	}
+
+	@Bean
+	public UAASecurityBypass createUaaSecurityBypass() {
+		return new UAASecurityBypass(<disableSecurityOnStartUp>);
+	}
+}
+
+----
+
+[[authorization-getting-started-spring-boot]]
+==== Spring Boot Application
+Spring Boot handles complete initialization of the module.
+
+Add following dependency:
+
+Maven:
+[source, xml,subs="verbatim,attributes"]
+----
+<dependency>
+	<groupId>com.mgmtp.a12.uaa</groupId>
+	<artifactId>uaa-authorization-spring-boot-autoconfigure</artifactId>
+	<version>{version}</version>
+</dependency>
+<!-- optional dependency -->
+<dependency>
+	<groupId>com.mgmtp.a12.uaa</groupId>
+	<artifactId>uaa-authorization-web-spring-boot-autoconfigure</artifactId>
+	<version>{version}</version>
+</dependency>
+
+----
+
+Gradle:
+[source,css,options="nowrap"]
+----
+dependencies {
+    implementation "com.mgmtp.a12.uaa:uaa-authorization-spring-boot-autoconfigure:{version}"
+    implementation "com.mgmtp.a12.uaa:uaa-authorization-web-spring-boot-autoconfigure:{version}"
+}
+----
+
+Configure authorization definition file:
+[source,properties]
+----
+mgmtp.a12.uaa.authorization.authorization-definition=<file path>
+----
+
+[NOTE]
+====
+`authorization-spring-boot-autoconfigure` handles configuration loading and module initialization.
+`authorization-web-spring-boot-autoconfigure` brings a web controller which allows controlling the authorization module like reloading the rules on runtime.
+====
+
+[[authorization-authorizationDefintion]]
+=== Authorization Definition
+
+Authorization Definition (AD) file is a JSON file which contains the structure of an Authorization logic.
+The authorization file is verified and loaded on application start-up.
+An application requires to have configured `authorization-definition` (parent authorization definition) which contains authorization rules.
+Optionally an application can have several `child-authorization-definitions` which can extend(s) scopes from `authorization-definition` or define new scopes.
+
+See class diagram of the authorization definition object model representation.
+
+[[authorization-class-diagram]]
+image::assets/images/authorization/policies_class_diagram.png[Authorization Class Diagram,title="Authorization Class Diagram"]
+
+JSON document:
+_authorization-definition.json_
+
+[source,json]
+----
+{
+  "name": "Example Authorization Definition",
+  "description": "",
+  "policies": [...],
+  "repositoryPolicies": [...],
+  "permissions": [...],
+  "propertyRights": [...],
+  "propertyPermissions": [...]
+}
+----
+
+[cols="1,3,3,3"]
+|===
+|Field |Description |Type |Consistency
+
+|*name*
+|The title of the AD file
+|String
+a|* Mandatory
+* None-empty String
+
+|*description*
+|A brief description of the AD file
+|String
+a|* Optional
+
+|*policies*
+|A list of polices that can be referenced from <<Permission>> and <<Property Permission>>.
+|Array<<<Policy>>>
+a|* This field will be mandatory if there are any references from <<Permission>> or <<Property Permission, PropertyPermission>>.
+
+|*repositoryPolicies*
+|A list of repository policies that can be referenced from <<Permission>>.
+|Array<<<Repository Policy, RepositoryPolicy>>>
+a|* This field will be mandatory if there are any references from <<Permission>>
+
+|*permissions*
+|A list of permissions that define what actions a user can perform.
+|Array<<<Permission>>>
+|
+
+|*propertyRights*
+|A list of property rights that ca be referenced from <<Property Permission, PropertyPermission>>.
+|Array<<<Property Rights, PropertyRight>>>
+a|* This field will be mandatory if there are any references from <<Property Permission, PropertyPermission>>
+
+|*propertyPermissions*
+|A list of property permissions that specify which properties a user can access and what actions they can perform.
+|Array<<<Property Permission, PropertyPermission>>>
+|
+|===
+
+[[authorization-policy]]
+==== Policy
+
+Policy is defined in the `policies` element.
+Policies contain list of individual policies.
+The policy must be referenced in a permission(s) otherwise it's orphan.
+
+JSON document:
+[source,json]
+----
+{
+  "name": "policy 1",
+  "description": "Everyone with admin or guest can load company",
+  "type": "SpEL",
+  "target": "#resource == 'CompanyController.loadCompany'",
+  "dataPreload": ["#country = @countryRepository.findByCountryCode(#resource.country.code)"],
+  "rules": [
+    "containsAnyRole({'Guest', 'Admin'})"
+  ]
+}
+----
+
+[cols="1,3,3,3"]
+|===
+|Field |Description |Type |Consistency
+
+|*name*
+|The identifier of the Policy.
+|String
+a| * Unique
+* Mandatory
+* None-empty String
+
+|*description*
+|A brief description of Policy.
+|String
+a| * Optional
+
+|*type*
+|The Execution type of the Policy.
+|Enum<SpEL>
+a| * Optional
+* Default value is *SpEL*
+
+|*target*
+|A quick expression used to filter out the Policy if it matches or not.
+|StringExpression
+a| * Optional
+* None-empty String
+
+|*dataPreload*
+|An array of expressions used to prepare all data which can be referenced in rule execution.
+|Array<StringExpression>
+a| * Optional
+* Unique Items
+* None-empty Array
+* Item: None-empty String
+
+|*rules*
+|A set of rules that will be executed when the Policy is evaluated.
+|Array<StringExpression>
+a| * Optional
+* Unique Items
+* None-empty Array
+* Item: None-empty String
+|===
+
+Example:
+[source,json]
+----
+"policies": [
+  {
+    "name": "load company rest endpoint policy",
+    "description": "Everyone with admin or guest can load company",
+    "target": "#resource == 'CompanyController.loadCompany'",
+    "rules": [
+      "containsAnyRole({'Guest', 'Admin'})"
+    ]
+  },
+  {
+    "name": "save company rest endpoint policy",
+    "description": "Only admin can save company",
+    "target": "#resource == 'CompanyController.saveCompany'",
+    "rules": [
+      "containsAnyRole('Admin')"
+    ]
+  },
+  {
+    "name": "company saving policy",
+    "description": "Regular user must provide valid data for country and tax number",
+    "dataPreload": [
+      "#country = @countryRepository.findByCountryCode(#resource.countryCode)"
+    ],
+    "rules": [
+      "#country.name == principal.nationality",
+      "@taxService.isValid(#resource.taxNumber)"
+    ]
+  },
+  {
+    "name": "administrator policy",
+    "description": "Admin can always save even with invalid data",
+    "rules": [
+      "containsAnyRole('Admin')"
+    ]
+  },
+  {
+    "name": "company reading policy",
+    "description": "Only apply for a user which roles has not contains 'Admin'. Rule explain: the company's country name should valid",
+    "target": "!containsAnyRole({'Admin'})",
+    "dataPreload": [
+      "#country = @countryRepository.findByCountryCode(#resource.countryCode)"
+    ],
+    "rules": [
+      "#country.name == principal.nationality"
+    ]
+  }
+]
+----
+[NOTE]
+====
+Target filter can be used to filter out the policy. When the policy is filtered out it evaluates as it would pass. This means that whole policy will be evaluated as *true*.
+
+When more rules are defined, then the default logical expression between them is AND.
+====
+
+
+==== Repository Policy
+
+A RepositoryPolicy is defined inside a `RepositoryPolicies` element.
+A Repository Policy is similar to a Policy.
+It shares few properties as illustrated in the <<authorization-class-diagram,class diagram>>.
+It contains in-line template(s) in the `templates`.
+The template could be either an <<authorization-SpEL,SpEL>> expression string or a json object (which also can contain SpEL expression inside).
+Therefore, you can inject any valid placeholder(s) which are resolved during the execution.
+
+CAUTION: The template is language agnostic and implementor must know the target repository language syntax.
+
+NOTE: During the execution: +
+- If the *template* is an invalid expression string (syntax error, null references,...),
+UAA will throw exception immediately. +
+- If a json object, however, contains invalid expression inside,
+UAA still resolve that object but keep the raw value of those invalid placeholders.
+
+JSON document:
+[source,json]
+----
+{
+  "name": "repository policy 1",
+  "description": "only company which name equal principal's nationality is display",
+  "dataPreload": ["#country = @countryRepository.findByCountryCode(#resource.country.code)"],
+  "templates": [
+    "'name = ''' +  principal.nationality + ''''",
+    {
+      "operator": "exact_match",
+      "field": "/Address/City",
+      "value": "principal.nationality"
+    }
+  ]
+}
+----
+[cols="1,3,3,3"]
+|===
+|Field |Description |Type |Consistency
+
+|*name*
+|The identifier of RepositoryPolicy.
+|String
+a| * Mandatory
+* None-empty String
+
+|*description*
+|A brief description of RepositoryPolicy
+|String
+a| * Optional
+
+|*target*
+|A quick expression used to filter out the RepositoryPolicy if it matches or not.
+|StringExpression
+a| * Optional
+* None-empty String
+
+|*dataPreload*
+|An array of expressions used to prepare all data which can be referenced in rule execution.
+|Array<StringExpression>
+a| * Optional
+* Unique Items
+* None-empty Array
+* Item: None-empty String
+
+|*templates*
+|Variables can be used in repos.
+|Array<StringExpression>
+a| * Mandatory
+* Unique Items
+* None-empty Array
+* Item: None-empty String
+|===
+
+Example:
+
+[source,json]
+----
+"repositoryPolicies": [
+  {
+    "name": "companies data filter policy",
+    "description": "only company which name equal principal's nationality is display",
+    "templates": [
+      "'name = ''' +  principal.nationality + ''''"
+    ]
+  },
+  {
+    "name": "Region_Manager_Repository_Domain_Business_Policy",
+    "description": "Repos",
+    "target": "hasRole('REGION_MANAGER')",
+    "templates": [
+      "'Application.region:' +  #resource.region + ' OR Application.createdBy:' + principal.username"
+    ]
+  },
+  {
+    "name": "Guest_Repository_Domain_Business_Policy",
+    "description": "Repos",
+    "target": "hasRole('GUEST')",
+    "templates": [
+      "'Application.createdBy:' + principal.username"
+    ]
+  }
+]
+----
+
+The output of the first Repository Policy in the example above:
+
+The list with one String item *name = 'VietNam'* is generated from 
+
+`templates: ["'name = ''' +  principal.nationality + ''''"]`.
+
+If a list of elements is defined inside templates then UAA will generate a list of String items.
+
+==== Permission
+
+Permission is defined in a `permissions` section.
+A Policy can be referenced in a `policy-refs`/`repository-refs` or defined inline in `policies` section.
+It also contains one or more scope(s).
+
+JSON document:
+
+[source,json]
+----
+{
+  "name": "allow access rest endpoint",
+  "description": "a description",
+  "call-parent-scope": true,
+  "policy-refs": [
+    "(load company rest endpoint policy && save company rest endpoint policy)"
+  ],
+  "policies": ["true"],
+  "repository-refs": ["repository Policy 1"],
+  "scopes": [
+    "rest endpoint"
+  ]
+}
+----
+
+[cols="1,3,3,3"]
+|===
+|Field |Description |Type |Consistency
+
+|*name*
+|The identifier of Permission.
+|String
+a| * Mandatory
+* Non-empty String
+
+|*description*
+|A brief description of Permission
+|String
+a| * Optional
+
+|*call-parent-scope*
+|This flag indicates whether parent permissions with the same scope as those in the parent authorization definition file should be executed.
+|StringExpression
+a| * Optional
+* Default value is *true*
+
+|*policy-refs*
+|An array of Policy name references.
+|Array<StringExpression>
+a| * References to the names defined in the <<authorization-policy, Policies>>.
+* Can contain logical expression `&&`, `\|\|`
+
+
+|*policies*
+|Inline policy template definition.
+|Array<StringExpression>
+a| * Optional
+* Direct SpEL expression(s), same like a *rule* in a <<authorization-policy, Policy>>
+
+|*repository-refs*
+|An array of RepositoryPolicy name references.
+|Array<String>
+a| * Optional.
+* References to the names defined in the <<Repository Policy, RepositoryPolicies>>.
+
+|*scopes*
+|An array of scope names that can be referenced from the business code.
+|Array<String>
+a| * Mandatory
+* Not-empty Array
+|===
+
+Example:
+
+[source,json]
+----
+"permissions": [
+  {
+    "name": "allow access rest endpoint",
+    "description": "a description",
+    "policy-refs": [
+      "(load company rest endpoint policy && save company rest endpoint policy)"
+    ],
+    "scopes": [
+      "rest endpoint"
+    ]
+  },
+  {
+    "name": "allow read companies",
+    "description": "a description",
+    "repository-refs": [
+      "companies data filter policy"
+    ],
+    "scopes": [
+      "load companies"
+    ]
+  },
+  {
+    "name": "allow read company",
+    "description": "a description",
+    "policy-refs": [
+      "company reading policy"
+    ],
+    "scopes": [
+      "load company"
+    ]
+  },
+  {
+    "name": "allow save company",
+    "description": "a description",
+    "policy-refs": [
+      "administrator policy || company saving policy"
+    ],
+    "scopes": [
+      "save company"
+    ]
+  }
+]
+----
+
+[NOTE]
+====
+When writing script using Spring Expression Language, please be aware that the bean name by default is the name of the implementation class but not the interface's name.
+====
+
+===== Permission Hierarchy
+
+Permissions inside authorization definition file(s) which are configured at `authorization-definition` and `child-authorization-definitions` are processed as parent-child.
+The permission from `authorization-definition` is the parent and permissions from `child-authorization-definitions` are the children.
+There is no additional parent-child relation inside Authorization Definition files.
+The parent-child relation is only valid for permissions with the *same scope*.
+
+When child permission(s) has/have the flag *"call-parent-scope" = false* then only child permission will be executed.
+Otherwise, the parent and child permission will be executed.
+
+Please refer to the examples below in order to know how to use the permission hierarchy correctly:
+
+* Example 1:
+With scope name *rest endpoint* only one permission which name *project custom allow access rest endpoint* is executed.
+
+On parent-definition-file.json:
+
+[source,json]
+----
+"permissions": [
+  {
+    "name": "allow access rest endpoint",
+    "description": "Combine a set of policies into one single policy by using logical operator",
+    "policy-refs": [
+      "(load company rest endpoint policy || save company rest endpoint policy)"
+    ],
+    "scopes": [
+      "rest endpoint"
+    ]
+  }
+]
+----
+
+On child-definition-file.json:
+
+[source,json]
+----
+"permissions": [
+  {
+    "name": "project custom allow access rest endpoint",
+    "description": "",
+    "policies": [
+      "'VN' == principal.nationality"
+    ],
+    "scopes": [
+      "rest endpoint"
+    ],
+    "call-parent-scope": false
+  }
+]
+----
+
+* Example 2:
+With scope name *rest endpoint* 3 permissions (The parent and child permission(s)) are executed.
+
+On parent-definition file:
+
+[source,json]
+----
+"permissions": [
+  {
+    "name": "allow access rest endpoint",
+    "description": "Combine a set of policies into one single policy by using logical operator",
+    "policy-refs": [
+      "(load company rest endpoint policy || save company rest endpoint policy)"
+    ],
+    "scopes": [
+      "rest endpoint"
+    ]
+  }
+]
+----
+
+On child-definition-file-1.json:
+
+[source,json]
+----
+"permissions": [
+  {
+    "name": "project custom allow access rest endpoint permission 1",
+    "description": "",
+    "policies": [
+      "'CZ' == principal.nationality"
+    ],
+    "scopes": [
+      "rest endpoint"
+    ],
+    "call-parent-scope": false
+  }
+]
+----
+
+On child-definition-file-2.json:
+
+[source,json]
+----
+"permissions": [
+  {
+    "name": "project custom allow access rest endpoint permission 2",
+    "description": "",
+    "policies": [
+      "containsAnyRole('SuperAdmin')"
+    ],
+    "scopes": [
+      "rest endpoint"
+    ],
+    "call-parent-scope": true
+  }
+]
+----
+
+This will avoid replace/override by mistake since it WILL NOT enable as global configuration.
+You have to check and set *"call-parent-scope" = false* for every permission on `child-authorization-definitions` if you ready one to replace/override the permission(s) for the same scope from `authorization-definition`.
+
+[NOTE]
+====
+When a list of permission(s) are executed then AND operator is applied to get the final result.
+====
+
+==== Property Permission
+
+Property permission is defined in a `propertyPermission` section.
+It's similar to the `Permission` definition as it contains references to a <<authorization-policy, Policy>> and in-line policy.
+
+JSON document:
+
+[source,json]
+----
+{
+  "name": "Resource Properties User",
+  "description": "",
+  "policy-refs": [
+    "Test Resource Object",
+    "User"
+  ],
+  "policies": ["true"],
+  "rights-refs": [
+    "User Data"
+  ]
+}
+----
+
+[cols="1,3,3,3"]
+|===
+|Field |Description |Type |Consistency
+
+|*name*
+|The identifier of PropertyPermission.
+|String
+a| * Mandatory
+* None-empty String
+
+|*description*
+|A brief description of PropertyPermission
+|String
+a| * Optional
+
+|*policy-refs*
+|An array of Policy name references.
+|Array<StringExpression>
+a| * If any `policies` or `rights-refs` fields exist, then this field is optional.
+* The values of `policy-refs` field must match the names of policies defined at the root level in the <<authorization-policy, Policies>> field.
+* Unique Items
+* None-empty Array
+* Item: None-empty String
+
+|*policies*
+|Inline policy template definition.
+|Array<StringExpression>
+a| * If any `policy-refs` or `rights-refs` fields exist, then this field is optional.
+* Unique Items
+* None-empty Array
+* Item: None-empty String
+
+|*rights-refs*
+|An array of PropertyRight name references.
+|Array<String>
+a| * If any `policies` or `policy-refs` fields exist, then this field is optional.
+* The values of `rights-refs` field must match the names of property rights defined at the root level in the <<Property Rights, propertyRights>> field.
+* Unique Items
+* None-empty Array
+* Item: None-empty String
+|===
+
+Example:
+
+[source,json]
+----
+"propertyPermissions": [
+  {
+    "name": "Company Properties Admin",
+    "description": "",
+    "policy-refs": [
+      "Company Domain Object",
+      "administrator policy"
+    ],
+    "rights-ref": [
+      "Company Entity For Admin"
+    ]
+  },
+  {
+    "name": "Permission for Guest user",
+    "description": "",
+    "policy-refs": [
+      "Company Domain Object",
+      "guest policy"
+    ],
+    "rights-refs": [
+      "Company Entity For Guest User"
+    ]
+  }
+]
+----
+
+[[property_rights]]
+==== Property Rights
+
+Property rights defines READ/WRITE access right to individual resource properties.
+Additionally, it's possible to define custom MASKing behaviour.
+
+JSON document:
+
+[source,json]
+----
+{
+  "name": "User Data",
+  "description": "",
+  "rights": {
+    "READ": [
+      "id",
+      "name",
+      "description",
+      "nested",
+      "nested.id"
+    ],
+    "WRITE": [
+      "id",
+      "name",
+      "description"
+    ],
+    "MASK": [
+      "nestedCollection[].name::Empty"
+    ]
+  }
+}
+----
+
+[cols="1,3,3,3"]
+|===
+|Field |Description |Type |Consistency
+
+|*name*
+|The identifier of PropertyRight.
+|String
+a| * Mandatory
+* None-empty String
+
+|*description*
+|A brief description of PropertyRight.
+|String
+a| * Optional
+
+|*rights*
+|The right that user actions can perform on properties
+|Array<Right>
+a| * Mandatory
+|===
+
+`Right` Elements:
+
+[cols="1,3,3,3"]
+|===
+|Field |Description |Type |Consistency
+
+|*READ*
+|A list of property paths that the user is allowed to read.
+|Array<String>
+a| * This field is optional if any of the `WRITE` exist.
+* Unique Items
+* None-empty Array
+* Item: None-empty String
+
+|*WRITE*
+|A list of property paths that the user is allowed to write.
+|Array<String>
+a| * This field is optional if any of the `READ` exist.
+* Unique Items
+* None-empty Array
+* Item: None-empty String
+
+|*MASK*
+|A list of expressions that will be used to replace the actual data in the properties that the user does not have permission to view. The expressions return masking data that will be displayed instead of the actual data.
+|Array<PropertyReferenceExpression::ValueExpression>
+a| * Optional
+|===
+
+[NOTE]
+====
+It's possible to define access rights to an object tree.
+To reference nested property in a referenced object the standard dot notation is used.
+
+Example: `manufacturer.name`
+
+The `resource` object has property `manufacturer` which is reference to an Manufacturer object. The Manufacturer object has a property `name`.
+
+====
+
+===== Property Rights Syntax
+
+Properties are referenced by their names and nested properties are referenced by dot notation: `property.nested.nested`
+
+Collection is referenced with suffix `[]`: `property[]`
+
+Nested property inside a collection is referenced by dot notation: `property[].nested`
+
+[NOTE]
+====
+In order to grant access to collection elements like `offices[].code`  you need to grant access to the collection itself `offices`.
+====
+
+[TIP]
+====
+It's possible to use A12 documents in the property authorization in the same way as ordinary POJO with <<authorization_a12_document, uaa-authorization-a12-extension>>.
+====
+
+
+Example:
+
+[source,json]
+----
+"propertyRights": [
+  {
+    "name": "Company Entity For Guest User",
+    "description": "",
+    "rights": {
+      "READ": [
+        "id",
+        "name",
+        "taxNumber",
+        "country.name",
+        "offices",
+        "offices[].code"
+      ],
+      "MASK": [
+        "country.code::'Access Denied'",
+        "taxNumber::'masked:['+taxNumber.substring(0,3)+'...]'"
+      ],
+      "WRITE": [
+        "country.name"
+      ]
+    }
+  },
+  {
+    "name": "Company Entity For Admin",
+    "description": "",
+    "rights": {
+      "READ": [
+        "id",
+        "name",
+        "branchName",
+        "taxNumber",
+        "country.code",
+        "country.name",
+        "offices",
+        "offices[].code",
+        "offices[].name"
+      ],
+      "WRITE": [
+        "id",
+        "name",
+        "branchName",
+        "country.code",
+        "country.name",
+        "taxNumber"
+      ]
+    }
+  }
+]
+----
+
+[NOTE]
+====
+To ensure correct detection of object data changes, the hashcode and equals functions must be properly implemented in the POJO object.
+====
+
+==== Custom Masking
+
+Custom masking behaviour is defined by several SpEL expressions: `<property reference SpEL>::<value SpEL>`.
+For each expression the SpEL root object is the `resource` object thus it's possible to reference it's properties.
+
+For example the expression: 
+
+`taxNumber::'masked:['+taxNumber.substring(0,3)+'...]'` 
+
+masks the `taxNumber` property with substring of original value with leading and trailing value.
+
+[NOTE]
+====
+The `taxNumber` property must have *READ* access, otherwise it's value is `null` during custom masking processing.
+====
+
+==== Consistency Error Messages
+
+[cols="1,4"]
+|===
+|Consistency |Error Message
+
+|*Unique*
+a| * File: classpath:authorization-definition.json, Line: 12, Column: 3. Error: The identity [name] with value ["policy 1"] of the item must be unique.
+* File: classpath:child-definition.json, Line: 4, Column: 3. Error: The identity [name] with value ["policy 1"] in the [classpath:child-definition.json] file is a duplicate of the one in the [classpath:authorization-definition.json] file.
+
+|*Unique Items*
+a| * File: classpath:authorization-definition.json, Line: 12, Column: 19. Error: the items in the array must be unique.
+
+|*Mandatory*
+a| * File: classpath:authorization-definition.json, Line: 5, Column: 3. Error: Missing required property [name].
+
+|*Reference*
+a| * File: classpath:authorization-definition.json, Line: 148, Column: 5. Error: The reference ["policy 1"] does not exist in Authorization Definition files.
+
+|*None-empty String*
+a| * File: classpath:authorization-definition.json, Line: 6, Column: 12. Error: must be at least 1 characters long.
+
+|*None-empty Array*
+a| * File: classpath:authorization-definition.json, Line: 8, Column: 13. Error: there must be a minimum of 1 items in the array.
+
+|*Enum<x,y,z>*
+a| * File: classpath:authorization-definition.json, Line: 8, Column: 12. Error: does not have a value in the enumeration [x,y,z].
+
+|*String Expression*
+a| * File: classpath:authorization-definition.json, Line: 9, Column: 5. Error: ["value is true"] is a wrong expression syntax, Compile error: EL1041E: After parsing a valid expression, there is still more data in the expression: 'is'.
+
+|*Data type*
+a| * File: classpath:authorization-definition.json, Line: 6, Column: 12. Error: boolean found, string expected.
+
+|===
+
+==== IDE Syntax and Formatting Supporting
+
+We also provide the Authorization Definition Schema in compliance with JSON Schema version 7. You can add it to the JSON plugin in your IDE.
+This allows for code completion and validation of your Authorization Definition JSON files.
+
+* Download link:assets/files/authorization/authorization-definition-schema-v7.zip[authorization-definition-schema-v7.zip,role=resource,window=_blank], and extract it.
+
+===== IntelliJ IDEA
+
+* Current version: *2024.1.4* (other versions might have different UI)
+* In the *Settings* (Windows) or *Preferences* (macOS), go to *Languages & Frameworks* -> *Schemas and DTDs* -> *JSON Schema Mappings*
+* In the central pane, click image:assets/images/authorization/schema/add.svg[] on the toolbar.
+* Specify the name of the schema and select the *Schema version* as *JSON Schema version 7*.
+In the *Schema file or URL* field, provide the path of `authorization-definition-schema.json` file which is in the folder that was extracted from the downloaded zip file earlier.
+
+image:assets/images/authorization/schema/json-mapping.png[]
+
+* Create a list of files or folders that you want to validate against the schema.
+The list may contain the names of specific files, entire directories, and filename patterns.
+IntelliJ IDEA will internally detect the files to be validated based on the list you provide.
+
+image:assets/images/authorization/schema/file-mapping.png[]
+
+===== Visual Studio Code
+
+* Current version: *1.91*
+* Follow these instructions link:https://code.visualstudio.com/docs/languages/json#_json-schemas-and-settings[JSON schemas and settings] and link:https://code.visualstudio.com/docs/languages/json#_mapping-to-a-schema-in-the-workspace[Mapping to a schema in the workspace]. Then, in the `url` field, provide the path to the `authorization-definition-schema.json` file, which is in the folder that was extracted from the downloaded zip file earlier.
+
+=== Permission evaluation
+
+> Main paradigm for an execution can be expressed: The permission is checked on secured resource object.
+
+UAA checks a method access based on given *scope* and one or more policies wrapped into permission.
+To make a decision it's necessary to create a permission which will be evaluated in the *decision context*.
+
+Permission is defined by four main actors:
+
+. *Scope* - define access context for a permission.
+. *Policy* - set of rules which are evaluated in decision context. The <<authorization-SpEL,Spring SpEL>> language is used.
+. *Resource* -A protected object for which permissions are evaluated. It can be an REST endpoint, method in the system or domain object (any data structure).
+. *Data Objects* - Optional map of data object used in decision context
+
+Before each property permission evaluation a *decision context* is created. The decision context contains common environment for rule execution, resource object and other optional data object(s).
+
+All permission(s) are loaded for given `Scope`. The permission can have in-line policy expression inside the `policies` element or contains reference(s) to a `Policy` inside `policy-refs` element. The reference is to a policy name and can contains logical expression.
+The expression can use && (AND), || (OR) between Policy Names.
+
+[CAUTION]
+====
+If no `Permissions` are defined in the `Scope` then evaluation result is `false`.
+
+If no `Policies` are defined in a `Permission` then evaluation result is  `true`.
+====
+
+Permission check can be executed in two different ways.
+
+[[authorization-annotation]]
+==== Spring Security Annotations
+Annotation approach is a preferred approach. All Spring Security annotations can be used with UAA SpEL methods.
+
+See: <<decision-context-variables,specify decision context variables>>
+
+UAA provides a set methods to execute a permissions in a given scope.
+
+[source, java]
+----
+hasUAAPermission(String scope):boolean
+
+hasUAAPermission(String scope, Object resource):boolean
+----
+
+[NOTE]
+====
+*Resource* is a variable like any other. 
+If no resource is passed into *hasUAAPermission(...)*, default one is generated: `<Class name>.<method name>`
+====
+
+[CAUTION]
+====
+The method *hasUAAPermission(...)* must be presented only once in the annotation, otherwise the results are unpredictable. Even technically it's possible to write expression like: `hasUAAPermission(...) and hasUAAPermission(...)`.
+====
+
+[[authorization-java-base]]
+==== Java API
+
+An `AuthorizationService` provides the same methods which are available in the annotation approach.
+
+[source, java]
+----
+checkPermissions(Object resource, String scopeName):PermissionCheckResult<Permission> 
+
+checkPermissions(Object resource, String scopeName, Map<String, Object> variables):PermissionCheckResult<Permission> 
+----
+
+=== Property Authorization Execution
+Property authorization is defined by a list of property permissions. Each permission contains reference to a policy/in-line policy and property rights.
+During the evaluation all property permission's  polices are evaluated. Those which pass their property rights are applied to a *resource* object.
+
+[CAUTION]
+====
+If no `Permissions` are defined for property permission then evaluation result is `true`.
+
+If no `Policies` are defined in a `Permission` then evaluation result is  `true`.
+====
+
+==== Custom Property Right
+By default, property right is defined in the `authorization file`. It's possible to reference a property and define R/W right.
+It's impossible to implement any custom and more complicated logic. For this UAA introduced an interface `JavaPropertyRight`.
+
+[source, java]
+----
+public interface JavaPropertyRight<T, V extends UserDetails> {
+
+	/**
+	 * Check properties with custom logic. It's also possible to mask the properties with custom logic.
+	 *  
+	 * NOTE: return object must be the same instance as #resource parameter! It's returned to make it clear that the object is changed.
+	 * 
+	 * @return modified object
+	 */
+	T maskData(T resource, V principal);
+
+	/**
+	 * Compare persisted object with changed objects and return <code>true</code> when permissions are fulfilled.
+	 */
+	boolean checkPropertyChanges(T persistedResource, T updatedResource, V principal);
+}
+----
+
+To make an implementation active it's required to register it as a Spring bean. Then it will be executed during property authorization.
+In the `Read Mode` the  `checkProperies` method will be called.
+In the `Write Mode` the  `checkPropertyChanges` method will be called.
+
+==== Spring Security Annotations
+Preferred approach is annotation based. All UAA SpEL methods can be used with Spring Security annotations.
+
+See: <<decision-context-variables,specify decision context variables>>
+
+==== Read Mode
+UAA provides a method to execute a `Property Authorization` in `Read Mode`
+
+[source, java]
+----
+hasUAAPropertyPermission(Object resource):boolean
+----
+[NOTE]
+====
+The method always returns `true` since it's not rejecting permissions.
+====
+[NOTE]
+====
+`Custom Property Right` is executed as last step after standard processing.  
+====
+ 
+==== Write Mode
+UAA provides a method to execute a `Property Authorization` in `Write Mode`
+
+[source, java]
+----
+hasUAAPropertyPermission(Object persistedResource, Object updatedResource):boolean
+----
+[NOTE]
+====
+`Custom Property Right` is executed as last step after standard processing.  
+====
+
+==== Java API
+An `AuthorizationService` provides the same methods which are available in the annotation approach.
+[source, java]
+----
+	//Read Mode
+	public checkPropertyPermissionsAndMaskData(Object resource): PermissionCheckResult<PropertyPermission>
+	public checkPropertyPermissionsAndMaskData(Object resource, Map<String, Object> variables): PermissionCheckResult<PropertyPermission>
+
+	//Write Mode
+	public checkPropertyPermissionsForChanges(Object persistedResource, Object updatedResource): Boolean 
+	public checkPropertyPermissionsForChanges(Object persistedResource, Object updatedResource, Map<String, Object> variables): Boolean 
+----
+
+=== Security by-pass at start up
+If you want to execute your code to process some data at the project starting up (boostrap), and the data are retrieved via services which has authorization check, you need to disable security check by configuration.
+
+`mgmtp.a12.uaa.authorization.security-on-startup.enabled=false`
+
+All security checks during start-up will be ignored when turning on this configuration.
+In order to enable security again, UAA listens to Spring Event `org.springframework.context.event.ContextRefreshedEvent` within `ApplicationContext` which 
+enables security back.
+
+=== Repository Authorization Execution
+The execution joins to the existing @PreAuthorize annotation and all required data are stored to Security Context.
+That's the reason why @PostFilter will not work and will not be supported.
+
+Execution flow is illustrated on the diagram. As well as data service integration.
+
+image::assets/images/authorization/repository_authorization.png[Repository Authorization execution,title="Repository Authorization execution"]
+
+==== Java Service Based
+Repository Authorization is executed from Java code by calling `AuthorizationService`.
+
+AuthorizationService supports 2 methods:
+
+* *generateRepositoryPermissions(): String* - most common method used in cooperation  with @PreAuthorize annotation. All data are loaded from decision context.
+* *generateRepositoryPermissions(Object resource, String scopeName, Map<String, Object> variables): String* - Java API for repository
+
+NOTE: Preferred way is to use the method `generateRepositoryPermissions()` unless it's necessary to execute repository authorization from different scope.
+
+==== Java Annotation Based
+Annotation based execution supports the same functionality as Java execution but the generated result is propagated to optional `RepositoryAuthorizationCallback` implementation.
+
+UAA supports following methods:
+
+* *generateRepositoryPermissions()* - recommended way to use repository permission. The scope is used from last method in the call stack which define a `scope`.
+* *generateRepositoryPermissions(String scope)* - optional method if it's necessary to call from custom scope.
+* *generateRepositoryPermissions(String scope, Object resource)* - optional method if it's necessary to call from custom scope and with custom resource.
+
+Each method above has also version with `RepositoryAuthorizationCallback` as last parameter. Example: `generateRepositoryPermissions(RepositoryAuthorizationCallback callback)`.
+The callback can be sent as method parameter to get generated templates as illustrated in the following example:
+
+[source, java]
+----
+public class Repository {
+
+	@PreAuthorize("generateRepositoryPermissions(#callback)")
+	public String repositoryPermission(RepositoryAuthorizationCallback callback) {
+		Set<String> templateFilters = callback.getFilters();
+		// project code will use the templateFilters
+	}
+}
+----
+
+include::authorization_a12_document.adoc[]
+
+include::authorization_web_support.adoc[]
+
+=== Limitation
+. UAA uses annotations from Spring (*@PreAuthorize* and *@PostAuthorize* etc.) - which are basically implemented by using Spring AOP.
+These annotations are put on method level. This has to be done by Developers.
+. You cannot call one method (with Spring annotation) within another method (with Spring annotation) in same Class. This is not possible with https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-proxying[Spring AOP].
+
+[source,java]
+----
+public class ExampleService  {
+  @PostAuthorize("hasUAAPermission('read_submission_one', returnObject)")
+  public SubmissionTO securityMethodOne(String id) {
+    securityMethodTwo(id);
+  }
+  @PostAuthorize("hasUAAPermission('read_submission_two', returnObject)")
+  public SubmissionTO securityMethodTwo(String id) {
+
+  }
+}
+----
+The above example will not work. In order to make it work you have to split the second method into a different Service.
+
+[source,java]
+----
+public class ExampleService  {
+  private AnotherExampleService anotherExampleService;
+  @PostAuthorize("hasUAAPermission('read_submission_one', returnObject)")
+  public SubmissionTO securityMethodOne(String id) {
+    anotherExampleService.securityMethodTwo(id);
+  }
+}
+public class AnotherExampleService  {
+  @PostAuthorize("hasUAAPermission('read_submission_two', returnObject)")
+  public SubmissionTO securityMethodTwo(String id) {
+  }
+}
+----
+[[authorization-configuration]]
+=== Configuration
+[%autowidth.stretch,options="header"]
+|================================================================================
+|Configuration property |Default value |Usage |Remark
+|`mgmtp.a12.uaa.authorization.authorization-definition` |  | Spring `resource` notation for main definition authorization resource. | The system will not starts if it is empty, or the resource could not be found
+|`mgmtp.a12.uaa.authorization.child-authorization-definitions` |  | list of spring `resource` notations for complementary definitions to main definition authorization. | This is optional but in case providing. The system will not start if one of each resource could not be found
+|`mgmtp.a12.uaa.authorization.security-on-startup.enabled` | `false` | Authorization is bypassed on startup when `true`. This is useful for data pre-loading for example. |
+|`mgmtp.a12.uaa.authorization.scan-entity-packages` | `com.mgmtp` | List of entity packages to scan, also use for introspections scanning. | Entities need to be scanned in order to make property changes detection working properly.
+|`mgmtp.a12.uaa.authorization.web.context-path` | `/` | UAA context where all authorization admin endpoints are registered |
+|`mgmtp.a12.uaa.authorization.web.uri-secured-contexts` | `${management.endpoints.web.base-path:/actuator}/**::RelativePath` | URLs-based authorization | Pattern: `<Context Path>::<Scope Name>`
+|================================================================================
+
+=== Local Development
+It's a fact that using json for authorization configuration makes it hard for development debugging.
+Uaa recognizes that and providers some callback functions in authorization java models:
+
+==== Policy
+
+Java model class: `com.mgmtp.a12.uaa.authorization.model.AbstractPolicy`
+
+Callback function:
+
+* `policyExecuted(String name, Object result)`:
+** name: name of the policy
+** result: result after the policy is executed (true/false/repository template/...)
+* `targetExecuted(String name, boolean result)`
+** name: name of the policy
+** result: result after the target of policy is executed
+
+==== Permission
+
+Java model class: `com.mgmtp.a12.uaa.authorization.model.PolicyAware`
+
+Callback function:
+
+* `permissionExecuted(String name, Object result)`:
+** name: name of the permission
+** result: result after the permission is executed (true/false/repository template/...)
+
+==== Property permission
+
+Java model class: `com.mgmtp.a12.uaa.authorization.model.PropertyPermission`
+
+Callback function:
+
+* `rightExecuted(String name, boolean result, Set<String> updatedProperties, Set<String> invalidProperties)`:
+** name: name of the property permission
+** updatedProperties: `Set` of all updated properties
+** invalidProperties: `Set` of properties not allowed to modify
+
+=== Authorization introspection
+Along with UAA authorization configurations, there are many security points which are sometimes accidentally overlooked by developers.
+To raise the awareness of them, Uaa provides a set of introspectors which run at the boot time of applications.
+
+==== Scopes introspection
+As <<Permission, Permission definition>>, each permission comes along with a set of scopes used to configure authorization.
+In reality, the number of scopes might become enormous and makes it hard to know which scopes are never used anywhere (orphan scopes).
+
+With scopes introspection, UAA will automatically scan all project's authorization configurations and detect orphan scopes.
+All these scopes are warned by uaa through warning logs.
+
+[NOTE]
+====
+The introspector only scans the configurations setup by security annotations (PreAuthorize, PostAuthorize, PreFilter, PostFilter).
+If you are using java functions, uaa cannot scan them.
+====
+
+==== Endpoints introspection
+To enable endpoints introspection, firstly you need to add dependency:
+
+Maven:
+[source, xml,subs="verbatim,attributes"]
+----
+<dependency>
+	<groupId>com.mgmtp.a12.uaa</groupId>
+	<artifactId>uaa-authorization-introspector</artifactId>
+	<version>{version}</version>
+</dependency>
+----
+
+Gradle:
+[source,css,options="nowrap"]
+----
+dependencies {
+    implementation "com.mgmtp.a12.uaa:uaa-authorization-introspector:{version}"
+}
+----
+
+Next, you need to register all rest endpoints you have, they might originate from other library/framework project depends on,
+example property:
+[source, properties,subs="verbatim,attributes"]
+----
+mgmtp.a12.uaa.authorization.web.introspection.whitelist-endpoints=/uaa-authentication/authorize,/uaa-authentication/currentUser
+----
+
+The endpoint introspector will stop the application from starting if there's any endpoint:
+
+* NOT configured by any of spring security annotation (PreAuthorize, PostAuthorize, PreFilter, PostFilter)
+* NOT included in `mgmtp.a12.uaa.authorization.web.introspection.whitelist-endpoints` property
+* NOT included in `mgmtp.a12.uaa.authorization.web.uri-secured-contexts` property
+
+[NOTE]
+====
+The introspector only scans one level of interface inheritance and also one level of composed annotation.
+Let check below examples:
+
+Controller inheritance:
+[source,java]
+----
+@PreAuthorize("rule")
+@RequestMapping("api")
+interface ControllerA {
+    void endpoint();
+}
+
+@AnyAnnotation()
+interface ExtendedControllerA extends ControllerA {
+}
+
+@RestController
+public class ExtendedControllerAImpl implements ExtendedControllerA {
+	// This endpoint will NOT be marked as authorized because inherited interface ExtendedControllerA is not authorized
+	// => only one level of inheritance is considered
+	void endpoint() {
+	}
+}
+
+@RestController
+public class ControllerAImpl implements ControllerA {
+	// This endpoint will be marked as authorized because ControllerA is authorized by @PreAuthorize
+	void endpoint() {
+	}
+}
+----
+
+Composed annotation:
+[source,java]
+----
+@Target({ ElementType.TYPE })
+@Retention(RetentionPolicy.RUNTIME)
+@Controller
+@PreAuthorize("rule")
+public @interface SecuredController {
+}
+
+@Target({ ElementType.TYPE })
+@Retention(RetentionPolicy.RUNTIME)
+@SecuredController()
+public @interface ExtendedSecuredController {
+}
+
+@RestController
+public class ControllerClass {
+	// This endpoint will NOT be marked as authorized because annotation ExtendedSecuredController is not an authorized annotation
+	// => only one level of composed annotation is considered so annotation SecuredController is NOT authorized in this context
+	@ExtendedSecuredController
+	void endpointA() {
+	}
+
+	// This endpoint will be marked as authorized because annotation SecuredController is a composed annotation which includes @PreAuthorize
+	@SecuredController
+	void endpointB() {
+	}
+}
+----
+====
+
+include::authorization-language-server.adoc[]

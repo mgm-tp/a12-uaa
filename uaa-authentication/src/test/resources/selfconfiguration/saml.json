@@ -1,0 +1,18 @@
+{
+  "applicationBaseUrl" : "application_base_url",
+  "uaaBaseUrl" : "uaa_base_url",
+  "authorizationDataStore" : "authorization_data_store",
+  "excludedDelegatedContexts" : [ "context1", "context2" ],
+  "saml" : {
+    "loginRelativeUrl" : "login_url",
+    "logoutRelativeUrl" : "user/logout",
+    "logoutMethod" : "POST",
+    "tokenType" : "UAABEARER",
+    "ssoConfiguration" : {
+      "usernameXpath" : "username_xpath",
+      "passwordXpath" : "password_xpath",
+      "loginButtonXpath" : "login_button_xpath"
+    }
+  },
+  "tokens" : [ ]
+}

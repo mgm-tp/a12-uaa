@@ -1,0 +1,230 @@
+{
+	"LossDescription": {
+		"ProductId": null,
+		"LossId": null,
+		"LossNumber": null,
+		"IsFirmenichLoss": false,
+		"Coverage": null,
+		"CauseStructured": null,
+		"CauseOfLossDescription": null,
+		"Notes": null,
+		"Cause": {
+			"NoClaimsBonusAffected": false,
+			"Responsible": {
+				"ResponsiblePartyInvolved": null,
+				"ThirdPartyYachtInvolved": null,
+				"InvolvementDescription": null
+			}
+		},
+		"Objects": {
+			"ObjectClaimant": {
+				"ObjectType": null,
+				"Shipyard": null,
+				"Model": null,
+				"Name": null,
+				"YearOfManufacture": null,
+				"HullInsuranceClaimant": {
+					"HullInsurerClaimant": null,
+					"PolicyNumberClaimant": null
+				}
+			},
+			"ObjectResponsibleParty": {
+				"ObjectType": null,
+				"Shipyard": null,
+				"Model": null,
+				"Name": null,
+				"YearOfManufacture": null,
+				"Insurer": null,
+				"PolicyNumber": null
+			},
+			"ObjectPHAddInfo": {
+				"NavigationArea": null,
+				"Optimist": false,
+				"Dinghy": false,
+				"Trailer": false,
+				"Sailboat": false,
+				"Motorboat": false,
+				"Jetski": false,
+				"RowingBoat": false,
+				"ClubsEngine": false,
+				"Other": false
+			}
+		},
+		"Circumstances": {
+			"PlaceOfLoss": {
+				"Country": null,
+				"City": null,
+				"Longitude": null,
+				"Latitude": null
+			},
+			"Weather": {
+				"Weather": null,
+				"WindSpeed": null,
+				"WindForce": null,
+				"WindDirection": null
+			},
+			"Signals": {
+				"LightsOwn": null,
+				"AcousticSignalsOwn": null,
+				"LightSignalsOwn": null,
+				"LightsForeign": null,
+				"AcousticSignalsForeign": null,
+				"LightSignalsForeign": null
+			},
+			"AdditionalInformation": {
+				"Regatta": null,
+				"Caution": null,
+				"CautionedPerson": null,
+				"Police": null,
+				"CriminalProceedings": null,
+				"CrimimalProceedingsDetails": null,
+				"PenaltyOrder": null,
+				"AccusementOfFault": null,
+				"ClaimantFault": null,
+				"RegattaDetails": {
+					"ArbitrationRecord": null
+				},
+				"PoliceReport": {
+					"PoliceDepartment": null,
+					"FileReference": null,
+					"DateOfReport": null
+				},
+				"AccusementDetails": {
+					"ReasonOfAccusement": null,
+					"DateOfAccusement": null,
+					"FormOfAccusement": null
+				},
+				"ClaimantFaultDetail": {
+					"Claimant": null,
+					"Explanation": null
+				}
+			}
+		},
+		"Liability": {
+			"PropertyDamageSelect": false,
+			"YachtClaimantAffected": null,
+			"OtherObjectsAffected": null,
+			"BodilyInjurySelect": false
+		},
+		"Scope": {
+			"PropertyDamage": {
+				"HullPropertyDamage": {
+					"HullExpenses": {
+						"AnticipatedExpenses": null,
+						"CostEstimate": null,
+						"SurveyAvailable": null,
+						"PlaceOfInspection": null
+					}
+				},
+				"LiabilityPropertyDamage": {
+					"LiabilityExpenses": {
+						"AnticipatedExpenses": null,
+						"CostEstimate": null,
+						"SurveyAvailable": null,
+						"PlaceOfInspection": null
+					},
+					"RelationToDamagedProperty": {
+						"Owner": null,
+						"RelationToDamagedItems": null,
+						"RelationDate": null,
+						"RelationPurpose": null
+					}
+				}
+			},
+			"BodilyInjury": {
+				"BodilyInjuryDescription": null,
+				"AgeInjuredPerson": null
+			}
+		},
+		"Parties": {
+			"Skipper": {
+				"AuthorizedSkipper": null,
+				"IsAuthorizedSkipper": false,
+				"Email": null,
+				"DialingCode": null
+			},
+			"Claimant": {
+				"Type": null,
+				"LegalRelationship": null,
+				"Street": null,
+				"PostalCode": null,
+				"City": null,
+				"Country": null,
+				"EMail": null,
+				"DialingCode": null,
+				"ClaimantNatural": {
+					"Salutation": null,
+					"Title": null,
+					"FirstName": null,
+					"LastName": null,
+					"CommonHousehold": null,
+					"Profession": null
+				},
+				"ClaimantLegal": {
+					"Name1": null,
+					"Name2": null,
+					"Name3": null
+				}
+			},
+			"OpposingParty": {
+				"Type": null,
+				"LegalRelationship": null,
+				"Street": null,
+				"PostalCode": null,
+				"City": null,
+				"Country": null,
+				"EMail": null,
+				"DialingCode": null,
+				"OpposingPartyNatural": {
+					"Salutation": null,
+					"Title": null,
+					"FirstName": null,
+					"LastName": null,
+					"CommonHousehold": null,
+					"Profession": null
+				},
+				"OpposingPartyLegal": {
+					"Name1": null,
+					"Name2": null,
+					"Name3": null
+				}
+			},
+			"InsuredPerson": {
+				"Salutation": null,
+				"Title": null,
+				"FirstName": null,
+				"LastName": null,
+				"Profession": null,
+				"LegalRelationship": null,
+				"Street": null,
+				"PostalCode": null,
+				"City": null,
+				"Country": null,
+				"EMail": null,
+				"DialingCode": null
+			},
+			"ResponsibleParty": {
+				"Type": null,
+				"LegalRelationship": null,
+				"Street": null,
+				"PostalCode": null,
+				"City": null,
+				"Country": null,
+				"EMail": null,
+				"DialingCode": null,
+				"ResponsiblePartyNatural": {
+					"Salutation": null,
+					"Title": null,
+					"FirstName": null,
+					"LastName": null,
+					"FullAge": null
+				},
+				"ResponsiblePartyLegal": {
+					"Name1": null,
+					"Name2": null,
+					"Name3": null
+				}
+			}
+		}
+	}
+}

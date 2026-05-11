@@ -1,0 +1,72 @@
+{
+	"name": "The name must have",
+	"description": "",
+	"policies": [
+		{
+			"name": "Failing Policy",
+			"description": "",
+			"rules": [
+				"false"
+			]
+		},
+		{
+			"name": "Passing Policy",
+			"description": "",
+			"rules": [
+				"true"
+			]
+		},
+		{
+			"name": "Filterred Policy",
+			"target": "false",
+			"rules": [
+				"true"
+			]
+		}
+	],
+	"permissions": [
+		{
+			"name": "Passing Permission",
+			"description": "",
+			"policy-refs": [
+				"Passing Policy"
+			],
+			"scopes": [
+				"Partially Failing Scope",
+				"Passing Scope"
+			]
+		},
+		{
+			"name": "Failing Permission",
+			"description": "",
+			"policy-refs": [
+				"Failing Policy"
+			],
+			"scopes": [
+				"Partially Failing Scope",
+				"Failing Scope"
+			]
+		},
+		{
+			"name": "Failing Permission II",
+			"description": "",
+			"policy-refs": [
+				"Failing Policy"
+			],
+			"scopes": [
+				"Failing Scope"
+			]
+		},
+		{
+			"name": "Filterred Permission",
+			"description": "",
+			"policy-refs": [
+				"Filterred Policy"
+			],
+			"scopes": [
+				"Partially Failing Scope",
+				"Passing Scope"
+			]
+		}
+	]
+}

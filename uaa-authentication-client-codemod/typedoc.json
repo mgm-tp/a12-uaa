@@ -1,0 +1,9 @@
+{
+	"name": "UAA Authentication Client Codemod",
+	"entryPoints": ["./src"],
+	"excludeExternals": true,
+	"excludeInternal": false,
+	"entryPointStrategy": "expand",
+	"out": "build/docs/typedoc",
+	"theme": "default"
+}

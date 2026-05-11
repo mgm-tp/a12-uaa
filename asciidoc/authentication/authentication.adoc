@@ -1,0 +1,337 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+[[authentication]]
+== Authentication
+
+`uaa-authentication` is a Spring module which is tightly integrated with Spring Security. It supports multiple authentication protocols (types) simultaneously. It has a side module `uaa-authentication-spring-boot-autoconfigure` for Spring Boot configuration support.
+ 
+*UAA Feature Matrix*
+
+image:assets/images/uaa_feature_matrix.png[Uaa Feature Matrix,title="Uaa Feature Matrix",link="assets/images/uaa_feature_matrix.png"]
+
+A12 uses KeyCloak as IDP (Identity Provider). In this set-up KeyCloak is configured to provide functionality in regard to token management and password management. The A12 default set-up is supporting the following configuration.
+
+
+image:assets/images/uaa_feature_matrix_keycloak.png[Uaa Feature Matrix keycloak ,title="Uaa Feature Matrix Keycloak", link="assets/images/uaa_feature_matrix_keycloak.png"]
+
+[[overview]]
+=== Overview
+UAA is built on Spring Security with extended functionality. It simplifies and standardizes most common authentication types.
+
+* *LOCAL* - UAA acts as IDP (provides login endpoint) and is responsible for credential validation.
+* *Active Directory
+ LDAP* - UAA acts as IDP (provides login endpoint) but credentials are validated by AD server.
+* *SAML* - Standard SAML protocol. External IDP is required.
+* *UAA_ACCESS_TOKEN* - UAA understands JWT token which is created by other instance.
+* *OAUTH2* - Standard OpenIDConnect/OAUTH2 protocol. External IDP is required.
+* *CERTIFICATE* - Both client and server verify each other’s identity using certificates, ensuring two-way authentication.
+* *API_KEY* - Client api key is used for authentication. Validated by Root certificate.
+* *Anonymous* - Anonymous access.
+* *Custom* - Open type to be implemented by an Implementor.
+
+==== Spring Security Architecture
+
+
+Following diagram illustrates Spring Security architecture and all actors.
+
+image::assets/images/spring_security_authentication_architecture.png[Spring Authentication Architecture,title="Spring Authentication Architecture"]
+
+Authentication starts in a respective filter where the payload is accepted and Authentication token is created. The token is used in authentication manager which is responsible to pick proper `AuthenticationProvider` based on the `AuthenticationToken` type. 
+The created token is *NOT* authenticated then the selected `AuthenticationProvider` will perform authentication.
+
+[NOTE]
+====
+Here the Authentication means either verifying username/password or understanding a UAABearer/Bearer token.
+==== 
+
+[[authentication-handling]]
+==== Authentication Handling
+
+Each authentication type has dedicated `AuthenticationProvider` which is responsible for credential validation and providing final `AuthenticationToken` with principal which will be put into `SpringSecurityContext`. 
+
+The following diagram illustrates UAA `AuthenticationProvider`(s) and respective `AuthenticationToken`(s) which they handles.
+ 
+image:assets/images/authentication_providers.png[UAA Authentication Providers,title="UAA Authentication Providers"]
+
+
+The result of the authentication process is a Spring Security `AuthenticationToken` which contains the following fields.
+ 
+* `Principal` - An object which implements `UserDetails`.
+* `Granted Authorities` - A collection of assigned roles to the user. Optional property and can be empty.
+
+The Spring Security `AuthenticationToken` is stored into `SecurityContext` (Spring Security Context object) and used by a Java application during request processing.
+
+[NOTE]
+====
+The `principal` also contains `granted authorities`. During further user processing those fields might differ because only the `principal` is updated. The `AuthenticationToken` stays untouched.
+Due to this fact it's strongly recommended to use only `principal.authorities` in the code or during authorization.
+====
+
+image:assets/images/tokens.png[Tokens,title="Tokens in the application"]
+
+
+
+ 
+==== Implementing Authentication Type
+
+Each authentication type has its own configurer class named `<type>SecurityConfigurer`. The configurer class must extend the `UAASecurityConfigurer`. Each configurer class is annotated with respective authentication type `@ConditionalOnAuthentication(AuthenticationType.<Type>)`
+
+Example:
+[source, java]
+----
+@Configuration
+@ConditionalOnAuthentication(AuthenticationType.CUSTOM)
+public class CustomSecurityConfigurer extends UAASecurityConfigurer<CustomSecurityConfigurer> {
+	public void configure(HttpSecurity http) throws Exception {
+	...
+	}
+
+	public void configureHttpSecurity(HttpSecurity http) throws Exception {
+	...
+	}
+}
+----
+
+On bootstrap time only the configured authentications are loaded and others are ignored. 
+The UAA provides main configuration class named `UAAGlobalSecurityConfiguration`. 
+The class is responsible for shared set-up and calling all loaded authentications based on `UAASecurityConfigurer`.
+
+[[context-configuration]]
+==== UAA security context configuration
+UAA stack has main `context-path` which is secured  and all endpoints are registered.
+The  configuration property is:  `mgmtp.a12.uaa.authentication.context-path`.
+Additionally, it's possible to secure more context(s) of an application by defining list of those contexts in configuration: `mgmtp.a12.uaa.authentication.secured-contexts`
+
+[CAUTION]
+====
+The configuration is working together with standard spring context configuration `server.servlet.context-path`. The UAA `context-path` is a child of spring `context-path`.
+For example:
+[source,properties]
+----
+server.servlet.context-path=/api
+mgmtp.a12.uaa.authentication.context-path=/xyz
+----
+
+This configuration leads that the UAA stack is registered to `/api/xyz` context.
+====
+
+
+[[generic-configuration]]
+==== Configuration
+Global UAA configurations:
+
+[%autowidth.stretch,options="header"]
+|================================================================================
+|Configuration property |Default value |Usage |Remark
+|`mgmtp.a12.uaa.authentication.types` |`LOCAL` |List authentication types used by the server|
+|`mgmtp.a12.uaa.authentication.context-path` |`/` | UAA context where all endpoints are registered|
+|`mgmtp.a12.uaa.authentication.secured-contexts` |`` |List of context(s) secured by  UAA. Complementary to context-path|
+|`mgmtp.a12.uaa.authentication.unauthorized-code` |`404` |Status code sent by the server when user is unauthorized.|
+
+
+
+|================================================================================
+
+
+[[authentication-getting-started]]
+=== Getting Started
+Authentication can be used in Spring or Spring Boot applications. Choose proper section below for the required application type.
+
+[TIP]
+====
+For easier dependency management it's possible to use UAA BOM
+[source, xml,subs="verbatim,attributes"]
+----
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.mgmtp.a12.uaa</groupId>
+				<artifactId>uaa-bom</artifactId>
+				<version>{version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+            <dependency>
+				<groupId>com.mgmtp.a12.uaa</groupId>
+				<artifactId>uaa-catalog</artifactId>
+				<version>{version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+---- 
+
+====
+
+[[authentication-getting-started-configuration]]
+==== Security Information Preparing
+There are certain security related configuration properties which need to be manually configured in order to make UAA working.
+[[authentication-getting-started-configuration-token]]
+===== UAA Access Token
+Authentication types which use <<uaa-token,UAA Access Token>> requires JWT secret configuration `mgmtp.a12.uaa.authentication.jwt.secret`. 
+See <<token-generation-configuration, configuration>>
+
+[NOTE]
+====
+LOCAL, ACTIVE_DIRECTORY_LDAP, and SAML are authentication types that use UAA Access Token.
+====
+
+[[authentication-getting-started-configuration-saml]]
+===== SAML Authentication Type
+With authentication type is SAML, private key/ certificate pairs for signing and encryption must be configured:
+[source, properties]
+----
+spring.security.saml2.relyingparty.registration.uaa.signing.credentials[0].certificate-location
+spring.security.saml2.relyingparty.registration.uaa.signing.credentials[0].private-key-location
+
+spring.security.saml2.relyingparty.registration.uaa.decryption.credentials[0].certificate-location
+spring.security.saml2.relyingparty.registration.uaa.decryption.credentials[0].private-key-location
+---- 
+Follows these steps to generate the private/public key for encryption and signing. During the private key encryption it's needed to provide the password for the key.
+After generating the key it's possible to deploy it with the application and reference it from `classpath:` or as regular file `file:`. See the https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#resources-implementations[Spring documentation] how to refer different resources.
+[source, java]
+----
+Generate private key:
+openssl genpkey  -out private.key -algorithm RSA -pkeyopt rsa_keygen_bits:4096
+
+Generate certificate request
+openssl req -new -x509 -key private.key -out certificate.crt -days 1825
+
+
+Validate pair:
+openssl pkey -in private.key -pubout -outform pem | sha256sum
+openssl x509 -in certificate.crt -pubkey -noout -outform pem | sha256sum
+----
+
+[[authentication-getting-started-spring]]
+==== Spring Application 
+In a Spring application the following dependency needs to be added:
+
+Maven:
+[source, xml,subs="verbatim,attributes"]
+----
+<dependency>
+	<groupId>com.mgmtp.a12.uaa</groupId>
+	<artifactId>uaa-authentication</artifactId>
+	<version>{version}</version>
+</dependency>
+----
+
+Gradle:
+[source,css,options="nowrap"]
+----
+dependencies {
+    implementation "com.mgmtp.a12.uaa:uaa-authentication:{version}"
+}
+----
+
+Next step is to create a configuration class which loads proper authentication type and instantiates required beans.
+[source, java]
+----
+@Configuration
+@Import([LocalSecurityConfigurer | ActiveDirectoryLdapSecurityConfigurer | SamlSecurityConfigurer | Oauth2SecurityConfigurer | Oauth2ClientSecurityConfigurer].class)
+public class AuthenticationConfiguration {
+
+	@Inject
+	private AuthenticationAutoconfigProperties authenticationAutoconfigProperties;
+
+	@Bean
+	public DataEncoder bypassingEncoder() {
+		boolean isCompressUserEnable = authenticationAutoconfigProperties.getAuthentication().getJwt().getCompressUser().isEnabled();
+		if (isCompressUserEnable) {
+			return new HuffmanEncoder();
+		}
+		return new BypassingEncoder();
+	}
+
+	@Bean
+	public AnonymousPrincipalAdapter anonymousPrincipalAdapter() {
+		return new PlainAnonymousPrincipalAdapter();
+	}
+
+	@Bean
+	public AuthenticationController createAuthenticationController() {
+		return new AuthenticationController();
+	}
+
+	@Bean
+	public AuthenticationProperties authenticationProperties() {
+		return authenticationAutoconfigProperties.getAuthentication();
+	}
+}
+
+----
+
+Last step is to implement the `LocalAuthenticationService<T extends UserDetails>`. The implementation is responsible for verifying user credentials.
+See <<local-authentication-service, LocalAuthenticationService>>
+
+[[authentication-getting-started-spring-boot]]
+==== Spring Boot Application 
+
+In a Spring Boot application the following dependencies need to be added:
+
+Maven:
+[source, xml,subs="verbatim,attributes"]
+----
+<dependency>
+	<groupId>com.mgmtp.a12.uaa</groupId>
+	<artifactId>uaa-authentication-spring-boot-autoconfigure</artifactId>
+	<version>{version}</version>
+</dependency>
+----
+
+Gradle:
+[source,css,options="nowrap"]
+----
+dependencies {
+    implementation "com.mgmtp.a12.uaa:uaa-authentication-spring-boot-autoconfigure:{version}"
+}
+----
+
+Complete initialization is handled by the `uaa-authentication-spring-boot-autoconfigure` module. 
+No need to provide any additional configuration. The UAA uses default authentication  type: LOCAL.
+If you need different authentication type please check the respective section(s) below.
+ 
+
+
+include::access_token/index.adoc[]
+include::local.adoc[]
+include::active_directory.adoc[]
+include::saml.adoc[]
+include::oauth2/open_id_connect_oauth2_java.adoc[]
+include::certificate.adoc[]
+include::apikey.adoc[]
+include::anonymous.adoc[]
+include::uaa_access_token.adoc[]
+include::self-configuration.adoc[]
+include::other.adoc[]
+
+[[authentication-trouble]]
+=== Troubleshooting
+[TIP]
+====
+In case of issues with configuration look into the log file for messages with pattern `.\*UAA_Config.*`. It prints all information about actual runtime configuration.
+ 
+Example:   
+
+`INFO 28084 --- [  restartedMain] c.m.a.u.a.s.i.U.UAA_Config               : Configuring Spring Security with authentication: LOCAL`
+====
+
+include::development_enviroment_issues.adoc[]

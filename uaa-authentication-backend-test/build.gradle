@@ -1,0 +1,26 @@
+plugins {
+    id 'java-library'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding 'UTF-8'
+    options.compilerArgs.add("-parameters")
+}
+
+dependencies {
+	api project(':uaa-authentication-backend-spring-boot-autoconfigure')
+	
+	api libs.springBootStarterTest
+    api libs.springBootTest
+    api libs.springTx
+    api libs.springJdbc
+    api libs.junitJupter
+    api libs.junitPlatformLauncher
+    api libs.junitJupterPlatformEngine
+    api libs.springSecurityTest
+    api libs.springBootStarterSecurity
+    
+}
+
+description = 'UAA:: Backend Authentication Test'
+

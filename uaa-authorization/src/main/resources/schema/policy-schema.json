@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "examples": [
+    {
+      "name": "",
+      "description": "",
+      "target": "",
+      "dataPreload": [],
+      "rules": []
+    }
+  ],
+  "identityProperty": "name",
+  "required": [
+    "name",
+    "rules"
+  ],
+  "properties": {
+    "name": {
+      "description": "The identifier of the Policy.",
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string"
+    },
+    "type": {
+      "description": "The Execution type of the Policy, the default value is SpEL.",
+      "enum": [
+        "SpEL",
+        "A12Model"
+      ],
+      "default": "SpEL"
+    },
+    "target": {
+      "description": "A quick expression used to filter out the Policy if it matches or not.",
+      "type": "string",
+      "minLength": 1,
+      "expressionType": "SpEL"
+    },
+    "dataPreload": {
+      "description": "An array of expressions used to prepare all data which can be referenced in rule execution.",
+      "type": "array",
+      "uniqueItems": true,
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "expressionType": "SpEL"
+      }
+    },
+    "rules": {
+      "description": "A set of rules that will be executed when the Policy is evaluated.",
+      "type": "array",
+      "uniqueItems": true,
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "expressionType": "SpEL"
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,25 @@
+oid_section = new_oids
+
+[req]
+distinguished_name = req_distinguished_name
+prompt = no        # Stop confirmation prompts. All information is contained below.
+eq_extensions = uaa_extension
+
+
+[ new_oids ]
+UserRoles=1.2.276.128       # 2=country,276=DE
+Country=1.2.276.256
+
+
+[ req_distinguished_name ]
+stateOrProvinceName = Some-State
+localityName = Munich
+organizationName = MGM
+organizationalUnitName = Development
+commonName = admin
+
+
+[ uaa_extension ]
+#UserRoles = ASN1:UTF8String:Admin,Manager
+1.2.276.128=ASN1:UTF8String:Admin,Manager
+1.2.276.256=ASN1:UTF8String:VN

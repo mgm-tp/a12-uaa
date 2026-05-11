@@ -1,0 +1,39 @@
+{
+  "name": "Domain Case Type Authorization Definition",
+  "description": "Example Permission Definition for Domain Case Type",
+  "policies": [
+    {
+      "name": "Domain_Business_Policy",
+      "description": "",
+      "rules": [
+        "hasRole('admin') || hasRole('formManager')"
+      ]
+    }
+  ],
+  "repositoryPolicies": [
+    {
+      "name": "Repository_Domain_Business_Policy",
+      "description": "Repos",
+      "target": "hasRole('formManager') && #resource == 'DomainCaseType'",
+      "templates": [
+        "'CaseType.MetaInformation.createdBy:' +  principal.username"
+      ]
+    }
+  ],
+  "permissions": [
+    {
+      "name": "Load Document",
+      "description": "",
+      "policy-refs": [
+        "Domain_Business_Policy"
+      ],
+      "repository-refs": [
+        "Repository_Domain_Business_Policy"
+      ],
+      "call-parent-scope": false,
+      "scopes": [
+        "Document Read"
+      ]
+    }
+  ]
+}

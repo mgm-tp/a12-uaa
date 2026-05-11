@@ -1,0 +1,36 @@
+{
+	"header": {
+		"id": "uaa-example-appmodel",
+		"modelType": "application",
+		"modelVersion": "1.0.0",
+		"locales": [
+			{ "code": "en" },
+			{ "code": "de" }
+		],
+		"annotations": []
+	},
+	"content": {
+		"modules": [],
+		"region": {
+			"name": "APP",
+			"layout": {
+				"name": "ApplicationFrame"
+			},
+			"subRegions": [
+				{
+					"name": "CONTENT",
+					"layout": {
+						"name": "ContentLayout"
+					}
+				},
+				{
+					"name": "SIDEBAR",
+					"layout": {
+						"name": "Null"
+					}
+				}
+			]
+		},
+		"defaultRegion": ["CONTENT"]
+	}
+}

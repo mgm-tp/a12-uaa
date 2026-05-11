@@ -1,0 +1,219 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+:source-language: javascript
+==== Integrate with UAA Client
+
+===== How to set up
+
+To build an application integration with UAA, follow these general steps:
+
+- Determine the configuration of authentication types that is used
+- Determine the `UaaClientConfiguration` including the authentication types as determined above
+- Add UaaReducer, UaaMiddlewares to redux
+- Initialize your client by one of the following two ways:
+    * Wrapper the main react component by UaaProvider with `UaaClientConfiguration`
+        ** The `automaticallyLogin` option will be applied to all authentication types when used in this way.
+    * Manually initialize the UaaClient using `UaaClient.init(UaaClientConfiguration)`
+        ** The `automaticallyLogin` option will only be applied to the `OAUTH2` authentication type, while the rest of the authentication types will be managed by `restoreAuthenticationState`.
+
+[WARNING]
+====
+Do not use both ways simultaneously.
+====
+
+You can follow these instructions
+
+Example determine the configuration of Local authentication:
+
+[source,javascript]
+----
+// Create one local configure
+const localConfigure: UaaLocalConfiguration = {
+    timeout?: 3000,
+    serverURL: "{your_uaa_server_domain}/{uaa-context-path}",
+    serverConnector?: "{your_server_connector}",
+    additionalRequestFilter?: [],
+    additionalResponseFilter?: [],
+    logoutMethod?: "{method_logout}",
+    tokenType?: "{token_type}",
+    loginRelativeUrl?: "{login_relative_url}",
+    logoutRelativeUrl?: "{logout_relative_url}"
+};
+----
+
+Example determine the configuration of Ldap authentication:
+
+[source,javascript]
+----
+// Create one ldap configuration
+const ldapConfigure: UaaLdapConfiguration = {
+    timeout?: 3000,
+    serverURL: "{your_uaa_server_domain}/{uaa-context-path}",
+    serverConnector?: "{your_server_connector}",
+    additionalRequestFilter?: [],
+    additionalResponseFilter?: [],
+    logoutMethod?: "{method_logout}",
+    tokenType?: "{token_type}",
+    loginRelativeUrl?: "{login_relative_url}",
+    logoutRelativeUrl?: "{logout_relative_url}"
+};
+----
+
+Example determine the configuration of Saml authentication:
+
+[source,javascript]
+----
+// Create one saml configure
+const samlConfigure: UaaSamlConfiguration = {
+    timeout?: 3000,
+    serverURL: "{your_uaa_server_domain}/{uaa-context-path}",
+    serverConnector?: "{your_server_connector}",
+    additionalRequestFilter?: [],
+    additionalResponseFilter?: [],
+    logoutMethod?: "{method_logout}",
+    tokenType?: "{token_type}",
+    loginRelativeUrl?: "{login_relative_url}",
+    logoutRelativeUrl?: "{logout_relative_url}",
+    logoutIDP?: true | false,
+    showTargetPageAfterTokenExchangeHandler?(url: string): void
+};
+----
+
+.. *_timeout_*: (Optional) The timeout of restoring authentication state +
+.. *_serverURL_*: (Optional) Your server domain url (which contains uaa server authentication context also). +
+.. *_serverConnector_*: (Optional) replace default connector +
+.. *_additionalRequestFilter_*: (Optional) add more request filters to the connector  +
+.. *_additionalResponseFilter_*: (Optional) add more response filters to the connector +
+.. *_logoutMethod_*: (Optional) The method logout +
+.. *_tokenType_*: (Optional) Token Type.
+It can be UAABearer or regular Bearer +
+.. *_loginRelativeUrl_*: (Optional) Login Relative url +
+.. *_logoutRelativeUrl_*: (Optional) Logout Relative url +
+.. *_logoutIDP_*: (Optional) Also logout IDP when the user logging out.
+Default value is true +
+.. *_showTargetPageAfterTokenExchangeHandler_*: (Optional) Change the behaviour to show the page after saml token exchange process, default is browser redirect +
+
+Example determine the configuration of Oidc authentication:
+
+[source,javascript]
+----
+// Create one oidc configure
+const oidcConfigure: UaaOidcConfiguration = {
+    serverURL: "{your_uaa_server_domain}/{uaa-context-path}",
+    tokenType?: [],
+    serverConnector?: "{your_server_connector}",
+    additionalRequestFilter?: [],
+    additionalResponseFilter?: [],
+    authority: "{your_idp_domain}/realms/{realm_name}",
+    client_id: "uaa-spa-client",
+    redirect_uri: `{your_client_domain}/callback`,
+    post_logout_redirect_uri: `{your_client_domain}/logout`,
+    silent_redirect_uri: `{your_client_domain}/silent_renew.html`,
+    automaticallyLogin: true,
+    popupAuthentication: false,
+};
+----
+
+.. *_serverURL_*: your server domain url ( include mgmtp.a12.uaa.authentication.context-path ) +
+.. *_serverConnector_*: (Optional) replace default connector +
+.. *_tokenType_*: (Optional) token Type. It can be UAABearer or regular Bearer +
+.. *_additionalRequestFilter_*: (Optional) add more request filters to the connector  +
+.. *_additionalResponseFilter_*: (Optional) add more response filters to the connector +
+.. *_authority_*: configuration to your Realm URL. +
+.. *_client_id_*: configuration to your client +
+.. *_redirect_uri_*: your callback URL this has to be configured in your Authorization Server. +
+.. *_post_logout_redirect_uri_*: after logout Authorization server. here is redirect URI. +
+.. *_silent_redirect_uri_*: please make sure you configure your application to serve silent_renew page. +
+.. *_automaticallyLogin_*: this would allow UAA to automatically login for you if your SSO session is available in Authorization Server.
+.. *_popupAuthentication_*: this would allow UAA to trigger login process within a popup with Authorization Server.
+
+Example determine `UaaClientConfiguration`:
+
+[source,javascript]
+----
+const uaaClientConfiguration: UaaClientConfiguration = {
+    serverURL: `{your_server_url}`,
+    overrideClientConfigures: {
+        local?: localConfigure,
+        ldap?: ldapConfigure,
+        saml?: samlConfigure,
+        oidc?: oidcConfigure
+    },
+    ..........................
+}
+----
+
+.. *_serverURL_*: (Optional) Your server domain url (which contains uaa server authentication context also). +
+.. *_overrideClientConfigures_*: (Optional) override just a specific property in the application. +
+
+Example setting up `UaaReducer`, `UaaMiddlewares`:
+
+[source,javascript]
+----
+// Setting up reducer by include UaaReducer and UaaMiddlewares
+const createRootReducer = (history: History<unknown>) =>
+combineReducers({
+    router: connectRouter(history),
+    uaa: UaaReducer
+});
+const reduxStore = createStore(
+    createRootReducer(history),
+    compose(
+        applyMiddleware(
+            routerMiddleware(history),
+            ...UaaMiddlewares(),
+        _)_
+    )
+);
+----
+
+Initialize your client by one of the following two ways:
+
+- Example use API `UaaClient.init(UaaClientConfiguration)`
+
+[source,javascript]
+----
+UaaClient.init(uaaClientConfigure);
+----
+
+- Example wrapper the main react component by `UaaProvider` component:
+
+[source,javascript]
+----
+<UaaProvider store={reduxStore} clientConfigure={uaaClientConfiguration}>
+	<App />
+</UaaProvider>
+----
+
+===== How to use after setup
+
+====== LOCAL
+
+include::local.adoc[]
+
+====== LDAP
+
+include::ldap.adoc[]
+
+====== SAML
+
+include::saml.adoc[]
+
+====== OIDC
+
+include::oidc.adoc[]

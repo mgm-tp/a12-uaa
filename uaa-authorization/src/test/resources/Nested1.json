@@ -1,0 +1,242 @@
+{
+  "DomainReleaseBundle": {
+    "-id": "-610105296594843366",
+    "releaseBundle": {
+      "bundles": [
+        {
+          "releaseBundleName": "Bundle 1 changed",
+          "startReleaseBundle": "2019-12-03",
+          "endReleaseBundle": "2019-12-20",
+          "numberOfReleases": "3",
+          "comment": "Comment bundle 1",
+          "releases": [
+            {
+              "releaseName": "Product 1-1.0.1",
+              "comment": "Release comment 1",
+              "internalLinkGroup": {
+                "internalLink": {
+                  "specifiedLinkTarget": "{\"repeatLocation\":{\"path\":[],\"locationPath\":[{\"elementName\":\"Screen1\"}]},\"activityDescriptor\":{\"model\":\"Release\",\"instance\":\"DomainRelease/20\"}}"
+                }
+              }
+            },
+            {
+              "releaseName": "Release 2",
+              "comment": "Release comment 22",
+              "internalLinkGroup": {
+                
+              }
+            },
+            {
+              "releaseName": "Release 22222",
+              "comment": "Release comment 22",
+              "internalLinkGroup": {
+
+              }
+            },
+            {
+              "releaseName": "Release 3",
+              "comment": "Comment for release 3",
+              "internalLinkGroup": {
+                
+              }
+            }
+          ],
+          "ticket": {
+            "smartUrl": {
+              "prettyUrlName": "A12 Ticket",
+              "specifiedTitle": "A12 Ticket",
+              "specifiedUrl": "https://jira.mgm-tp.com/jira/browse/A12-10138"
+            }
+          },
+          "wiki": {
+            "smartUrl": {
+              "prettyUrlName": "Wiki URL",
+              "specifiedTitle": "Wiki URL",
+              "specifiedUrl": "https://jira.mgm-tp.com/jira/browse/A12-10138"
+            }
+          },
+          "releaseBundleResponsible": {
+            "smartUrl": {
+              "prettyUrlName": "Ngo Quang 123",
+              "specifiedTitle": "Ngo Quang 123",
+              "specifiedUrl": "https://jira.mgm-tp.com/jira/browse/A12-10131"
+            }
+          }
+        },
+        {
+          "releaseBundleName": "Bundle 2",
+          "startReleaseBundle": "2019-12-02",
+          "endReleaseBundle": "2019-12-03",
+          "numberOfReleases": "2",
+          "comment": "Comment for release",
+          "systembranchorTag": { "svnTag": "Tag 1" },
+          "releases": [
+            {
+              "releaseName": "Product 1-1.0.1",
+              "internalLinkGroup": {
+                
+              }
+            },
+            {
+              "releaseName": "Release 2",
+              "internalLinkGroup": {
+                "internalLink": {
+                  "specifiedLinkTarget": "{\"repeatLocation\":{\"path\":[],\"locationPath\":[{\"elementName\":\"Screen1\"}]},\"activityDescriptor\":{\"model\":\"Release\",\"instance\":\"DomainRelease/17\"}}",
+                  "internalLinkLabel": "Cross-Link"
+                }
+              }
+            }
+          ],
+          "ticket": {
+            "smartUrl": {
+              "prettyUrlName": "A12 Release",
+              "specifiedTitle": "A12 Release",
+              "specifiedUrl": "https://wiki.mgm-tp.com/confluence/display/A12/Releases"
+            }
+          },
+          "wiki": {
+            "smartUrl": {
+              "prettyUrlName": "NCB Interest",
+              "specifiedTitle": "NCB Interest",
+              "specifiedUrl": "https://webgia.com/lai-suat/ncb"
+            }
+          },
+          "releaseBundleResponsible": {
+            "smartUrl": {
+              "prettyUrlName": "A12 Ticket",
+              "specifiedTitle": "A12 Ticket",
+              "specifiedUrl": "https://jira.mgm-tp.com/jira/browse/A12-1013"
+            }
+          }
+        },
+        {
+          "releaseBundleName": "Bundle 3",
+          "startReleaseBundle": "2019-12-26",
+          "endReleaseBundle": "2019-12-28",
+          "numberOfReleases": "1",
+          "releases": {
+            "releaseName": "Release 1",
+            "internalLinkGroup": {
+              "internalLink": {
+                "specifiedLinkTarget": "{\"repeatLocation\":{\"path\":[],\"locationPath\":[{\"elementName\":\"Screen1\"}]},\"activityDescriptor\":{\"model\":\"Release\",\"instance\":\"DomainRelease/17\"}}",
+                "internalLinkLabel": "Cross-Link"
+              }
+            }
+          },
+          "ticket": {
+            "smartUrl": {
+              "prettyUrlName": "A12-10138",
+              "specifiedUrl": "https://jira.mgm-tp.com/jira/browse/A12-10138"
+            }
+          },
+          "wiki": {
+            "smartUrl": {
+              "prettyUrlName": "Releases",
+              "specifiedUrl": "https://wiki.mgm-tp.com/confluence/display/A12/Releases"
+            }
+          },
+          "releaseBundleResponsible": {
+            "smartUrl": {
+              "prettyUrlName": "Quang Ngo",
+              "specifiedTitle": "Quang Ngo",
+              "specifiedUrl": "https://jira.mgm-tp.com/jira/browse/A12-1234"
+            }
+          }
+        },
+        {
+          "releaseBundleName": "Bundle 4",
+          "startReleaseBundle": "2019-12-01",
+          "endReleaseBundle": "2019-12-26",
+          "numberOfReleases": "1",
+          "releases": {
+            "releaseName": "Release 2",
+            "comment": "This is another release",
+            "internalLinkGroup": {
+              "internalLink": {
+                "specifiedLinkTarget": "{\"repeatLocation\":{\"path\":[{\"elementName\":\"Projekt\",\"index\":1},{\"elementName\":\"Produkte\",\"index\":3}],\"locationPath\":[{\"elementName\":\"Screen1\"},{\"elementName\":\"Overview\"},{\"elementName\":\"repeat-Produkte\"},{\"elementName\":\"repeat-Produkte-detail-screen\"}]},\"activityDescriptor\":{\"model\":\"Projekt\",\"single\":true}}",
+                "internalLinkLabel": "Cross link to release 2",
+                "specifiedLinkName": "Cross link to release 2"
+              }
+            }
+          },
+          "ticket": {
+            "smartUrl": {
+              "prettyUrlName": "BAP",
+              "specifiedUrl": "https://wiki.mgm-tp.com/confluence/display/A12/BAP"
+            }
+          },
+          "wiki": {
+            "smartUrl": {
+              "prettyUrlName": "BAP+Engines",
+              "specifiedUrl": "https://wiki.mgm-tp.com/confluence/display/A12/BAP+Engines"
+            }
+          },
+          "releaseBundleResponsible": {
+            "smartUrl": {
+              "prettyUrlName": "BAPEnginesRelease27.2.1",
+              "specifiedUrl": "https://wiki.mgm-tp.com/confluence/display/A12/BAPEnginesRelease27.2.1"
+            }
+          }
+        },
+        {
+          "releaseBundleName": "Bundle 5.1",
+          "startReleaseBundle": "2019-12-01",
+          "endReleaseBundle": "2019-12-26",
+          "numberOfReleases": "1",
+          "releases": {
+            "releaseName": "Product 1-1.0.1",
+            "internalLinkGroup": {
+              
+            }
+          },
+          "ticket": {
+            "smartUrl": {
+              "prettyUrlName": "BAP Client",
+              "specifiedTitle": "BAP Client",
+              "specifiedUrl": "https://wiki.mgm-tp.com/confluence/display/A12/BAP"
+            }
+          },
+          "wiki": {
+            "smartUrl": {
+              "prettyUrlName": "BAP Engines",
+              "specifiedTitle": "BAP Engines",
+              "specifiedUrl": "https://wiki.mgm-tp.com/confluence/display/A12/BAP+Engines"
+            }
+          },
+          "releaseBundleResponsible": {
+            "smartUrl": {
+              "prettyUrlName": "BAP Engine Release",
+              "specifiedTitle": "BAP Engine Release",
+              "specifiedUrl": "https://wiki.mgm-tp.com/confluence/display/A12/BAPEnginesRelease27.2.1"
+            }
+          }
+        },
+        {
+          "releaseBundleName": "Bundle 6",
+          "startReleaseBundle": "2019-12-01",
+          "endReleaseBundle": "2019-12-27",
+          "systembranchorTag": { "svnTag": "123_tag" },
+          "ticket": {
+            "smartUrl": {
+              "prettyUrlName": "A12",
+              "specifiedUrl": "https://wiki.mgm-tp.com/confluence/display/A12"
+            }
+          },
+          "wiki": {
+            "smartUrl": {
+              "prettyUrlName": "NCB",
+              "specifiedTitle": "NCB",
+              "specifiedUrl": "https://webgia.com/lai-suat/ncb"
+            }
+          },
+          "releaseBundleResponsible": {
+            "smartUrl": {
+              "prettyUrlName": "A12-1013",
+              "specifiedUrl": "https://jira.mgm-tp.com/jira/browse/A12-1013"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

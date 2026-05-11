@@ -1,0 +1,49 @@
+{
+	"name": "Impf Portal Authorization Definition",
+	"description": "Example from Impf Portal",
+	"policies": [
+		{
+			"name": "Domain_Business_Policy",
+			"description": "",
+			"rules": [
+				"print('User: ' + principal.username)",
+				"print('Roles: ' + principal.Authorities)",
+				"hasRole('REGION_MANAGER') || hasRole('GUEST')"
+			]
+		}
+	],
+	"repositoryPolicies": [
+		{
+			"name": "Region_Manager_Repository_Domain_Business_Policy",
+			"description": "Repos",
+			"target": "hasRole('REGION_MANAGER')",
+			"templates": [
+				"'Application.region:' +  #resource.region + ' OR Application.createdBy:' + principal.username"
+			]
+		},
+		{
+			"name": "Guest_Repository_Domain_Business_Policy",
+			"description": "Repos",
+			"target": "hasRole('GUEST')",
+			"templates": [
+				"'Application.createdBy:' + principal.username"
+			]
+		}
+	],
+	"permissions": [
+		{
+			"name": "View all application",
+			"description": "Users can view all applications with role 'ADMIN' or 'REGION_MANAGER' or 'GUEST' with specific rules.",
+			"policy-refs": [
+				"Domain_Business_Policy"
+			],
+			"repository-refs" : [
+				"Region_Manager_Repository_Domain_Business_Policy",
+				"Guest_Repository_Domain_Business_Policy"
+			],
+			"scopes": [
+				"Document Read"
+			]
+		}
+	]
+}

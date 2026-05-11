@@ -1,0 +1,16 @@
+[ req ]
+distinguished_name = req_distinguished_name
+prompt = no
+
+[ req_distinguished_name ]
+countryName             = AB
+stateOrProvinceName     = CD
+localityName            = EFG_HIJ
+organizationName        = MyOrg
+organizationalUnitName  = MyOrgUnit
+commonName              = mycommname
+emailAddress            = emailaddress@myemail.com
+
+[ v3_ca ]
+basicConstraints = critical,CA:true,pathlen:0
+keyUsage         = critical,keyCertSign,cRLSign

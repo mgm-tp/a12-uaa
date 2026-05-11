@@ -1,0 +1,6 @@
+.nyc_output
+lib/
+coverage
+doc/
+LINT-com.mgmtp.a12-connector.xml
+TEST-com.mgmtp.a12-connector.xml

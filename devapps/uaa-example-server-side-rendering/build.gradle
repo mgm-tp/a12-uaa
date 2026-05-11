@@ -1,0 +1,31 @@
+plugins {
+    id 'org.springframework.boot'
+    id 'java-library'
+}
+
+ext {
+    DEFAULT_JVM_ARGS = ["-Djava.net.preferIPv6Addresses=true"]
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding 'UTF-8'
+    options.compilerArgs.add("-parameters")
+}
+
+dependencies {
+    api project(':uaa-authentication-spring-boot-autoconfigure')
+    
+    api libs.springBootStarterSecurity
+    api libs.springBootStarterWeb
+	api libs.commonsLogging
+}
+
+description = 'UAA:: Example:: Server Side Rendering'
+
+springBoot {
+  mainClass = 'com.mgmtp.a12.uaa.example.ssr.Application'
+}
+
+bootRun {
+	jvmArgs = DEFAULT_JVM_ARGS
+}

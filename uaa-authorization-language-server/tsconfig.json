@@ -1,0 +1,9 @@
+{
+	"extends": "../tsconfig.src.json",
+	"compilerOptions": {
+		"allowUnusedLabels": true,
+		"experimentalDecorators": true,
+		"noEmitOnError": false,
+		"typeRoots": ["./node_modules/@types", "../node_modules/@types"]
+	}
+}

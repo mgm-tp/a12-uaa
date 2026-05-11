@@ -1,0 +1,88 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+[[token-generation]]
+===== Token Generation
+The token contains a few required fields and optionally it can contain any key/value pair.
+
+*Token contains those required fields*
+
+* `userName` - login name
+* `expiration time` - Token expiration timestamp.
+* `initial login time` - Time when user logged in. 
+
+In basic set-up the Access token contains just the `username` and `authorities`. The server is responsible to reconstruct a principal object from the token. There are several extension points which helps to achieve that.
+
+Another strategy is to serialize complete principal object to the token. The principal is serialized right after the login flow is finished. Only at that time the system has all necessary data for full principal object.
+This strategy doesn't require any user data stored locally. It can be (only) based on a response from an IDP which contains user data. Another advantage is when user data are gathered from remote data sources.
+That means there is just one remote request compared to basic set-up which requires all remote requests at the beginning of each HTTP request coming to a server.
+
+[NOTE]
+====
+When the principal is serialized in the token then the `authorization` are not serialized in the token separate field. Since they are part of the principal object.
+====
+
+[NOTE]
+====
+UAA token with signing, encryption processes and serialization UserDetails into the token.
+It's possible that the generated token will reach beyond the limit of header size. Please configure your environment in case you encounter the issue of header size is too big.
+In case you are running the application directly, you may need to configure Spring Boot/Tomcat properties to allow larger headers, for example:
+
+[source, properties]
+----
+server.tomcat.maxHttpResponseHeaderSize=32KB
+server.max-http-request-header-size=48KB
+----
+
+If your application is deployed behind a reverse proxy (e.g., Nginx), you also need to increase proxy buffer sizes to avoid “header too large” errors. Example Nginx configuratio
+
+[source, properties]
+----
+client_header_buffer_size 16k;
+large_client_header_buffers 8 48k;
+proxy_buffer_size 32k;
+proxy_buffers 4 32k;
+proxy_busy_buffers_size 64k;
+----
+
+Make sure to configure both the application server and the proxy consistently.
+====
+
+When the principal is serialized it might be encoded. UAA supports concept of `DataEncoder` which might be used to compress the data.
+
+UAA provides 2 implementations:
+
+* `BypassingEncoder` - Don't modify the input data. (Used by default)
+* `HuffmanEncoder` - Compress the input data. (Enabled by configuration)
+
+[TIP]
+====
+When the complete user is stored in the token, it is serialized to json. Due to the limitation of Spring Security objects, there is a need to serialize class names into the data. This strategy prolongs serialized data and there might be a need
+to compress the data.
+`HuffmanEncoder` is the only one that is suitable for small data sizes with effective performance.
+====
+
+
+Serialization and compression can be enabled by a <<token-generation-configuration, configuration option>>
+
+The token is secured by using RS256 (RSA Signature with SHA-256) where a private key is used for signing the JWT,
+and HS256 (HMAC with SHA-256) where the same secret key (256 bits) is used for encrypting the JWT.
+
+NOTE: UAA Authentication will return the token, its expiration time and expiration seconds in the response header by the name `access_token and token_renew_in_seconds`.
+
+NOTE: When you use with UAA Access Token and receive a `502 Bad Gateway` status in the response, you might need to increase the size of the response header.
+

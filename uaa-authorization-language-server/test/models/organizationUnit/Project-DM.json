@@ -1,0 +1,121 @@
+{
+  "header": {
+    "id": "Project-DM",
+    "modelType": "document",
+    "modelVersion": "28.1.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "uaa_um_orga_unit_type",
+        "value": "true"
+      },
+      {
+        "name": "roles",
+        "value": "userManagementAdmin"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "Project-DM"
+    },
+    "modelConfig": {
+      "decimalSeparator": ".",
+      "timeZone": "UTC",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_8d979",
+          "name": "Root",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Group",
+                "id": "group_bb682",
+                "name": "Tenant",
+                "Group": {
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_c5557",
+                      "name": "ID",
+                      "annotations": [
+                        {
+                          "name": "uaa_um_orga_unit_label",
+                          "value": "name"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Group",
+                      "id": "group_4df9f",
+                      "name": "Project",
+                      "Group": {
+                        "repeatability": 1,
+                        "elements": [
+                          {
+                            "type": "Field",
+                            "id": "field_a08a8",
+                            "name": "Name",
+                            "annotations": [
+                              {
+                                "name": "uaa_um_orga_unit_label",
+                                "value": "name"
+                              }
+                            ],
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_3aa03",
+                            "name": "Information",
+                            "annotations": [
+                              {
+                                "name": "uaa_um_orga_unit_label",
+                                "value": "description"
+                              }
+                            ],
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

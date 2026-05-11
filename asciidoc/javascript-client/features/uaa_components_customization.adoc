@@ -1,0 +1,70 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+==== How to customize UAA components
+
+To override some default components provided by UAA
+
+===== UserInfoHeader
+
+- In order to customize this component, UAA team introduce property named *customUserInfoHeader* in *UserInfoHeader* component.
+You can customize the menu login (logout).
+
+- By default, if this property is not defined, UserInfoHeader will be added automatically with a "Sign In as" and a logout button.
+In this case project should provide their own value for some properties need to render default UserInfoHeader:
+
+[source,javascript]
+----
+readonly logoutButtonLabel?: string;
+readonly loggedInAsLabel?: string;
+readonly mobileMode?: boolean;
+readonly additionalItems?: {
+    readonly orientation: "top" | "bottom";
+    readonly element: React.ReactNode;
+}[];
+----
+
+[NOTE]
+====
+The "Sign In as" is the username of current logged-in user and is derived from:
+
+- Oauth2: the response of the IDP (Keycloak) login api.
+- Other auth types: the response of the UAA login api when the first time logging in and the */uaa-authentication/currentUser* api when the page is refresh.
+The api */uaa-authentication/currentUser* is also used to fetch the user roles and access rights information for Oauth2 type.
+
+====
+
+[NOTE]
+====
+- By default, if you are using Oauth2, you will see the api */userinfo* is called after the login success.
+This api is made by `oidc-client-ts` lib and UAA do nothing with that so if you want to disablse that api, let set `false` on `UaaOidcConfiguration` inside` overrideClientConfigures` of `UaaClientConfiguration` (client-side).
+Setting it as a backend property has no effect.
+====
+
+- If project want to pass their own implementation for UserInfoHeader, please set your JSX.Element as value of property *customUserInfoHeader*.
+The default UAA implementation will be totally overwritten by this custom property value.
+
+- Example:
+
+[source,javascript]
+----
+<UserInfoHeader
+    customUserInfoHeader={
+        <div>Hello</div>
+    }
+/>
+----

@@ -1,0 +1,31 @@
+pluginManagement {
+	repositories {
+		gradlePluginPortal()
+	}
+}
+
+rootProject.name = 'UAA'
+
+include(':uaa-authentication-spring-boot-autoconfigure')
+include(':uaa-authentication-principal-extension-spring-boot-autoconfigure')
+include(':uaa-rest-client-spring-boot-autoconfigure')
+include(':uaa-authorization-spring-boot-autoconfigure')
+include(':uaa-authorization-web-spring-boot-autoconfigure')
+include(':uaa-authentication-principal-extension')
+include(':uaa-authentication')
+include(':uaa-rest-client')
+include(':uaa-authorization-a12-extension')
+include(':uaa-authorization')
+include(':uaa-authentication-backend')
+include(':uaa-authentication-backend-spring-boot-autoconfigure')
+include(':uaa-authentication-backend-test')
+include(':uaa-authentication-client')
+include(':uaa-authentication-a12-client')
+include(':uaa-authorization-introspector')
+include(':uaa-authorization-language-server')
+include(':uaa-authentication-client-codemod')
+
+include 'devapps:uaa-example-app-client'
+include 'devapps:uaa-example-app'
+include 'devapps:uaa-example-server-side-rendering'
+

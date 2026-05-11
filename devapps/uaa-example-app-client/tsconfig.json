@@ -1,0 +1,13 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"include": ["src", "src/**/*.json"],
+	"compilerOptions": {
+		"skipLibCheck": true,
+		"types": ["node"],
+		"noEmit": true
+	},
+	"references": [
+		{ "path": "../../uaa-authentication-client" },
+		{ "path": "../../uaa-authentication-a12-client" }
+	]
+}

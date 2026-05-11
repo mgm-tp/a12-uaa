@@ -1,0 +1,119 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+[[active-directory-ldap]]
+=== Active Directory (LDAP)
+
+Active directory protocol is based on LDAP but with different semantics. It supports Microsoft Active Directory implementation as well as Samba (https://www.samba.org/samba/). AD is used to validate user credentials and store any kind of user data.
+In this mode UAA acts also as the Identity Provider (IDP) and provide login endpoint.
+After authentication the framework allows to convert data received from AD into a principal.
+
+Active Directory uses standard UAA `JWT Token` <<token-generation,generation>> and <<uaa-token-processing,processing>>.
+
+[[ad-flow]]
+==== Login Flow
+
+Initially it’s necessary to send a standard POST request to `/user/active_directory_ldap/login` endpoint and the UAA acts as a proxy and contacts the AD controller.
+When the credentials are validated, then the user data are processed from LDAP response and UAA Access Token is generated and sent back as a response header.
+
+For complete communication flow, see following screenshot:
+
+image:assets/images/flow_ad_ldap.png[Active Directory,title="Active Directory with header"]
+
+
+[[ad-ldap-sequence]]
+==== Sequence Diagram
+
+After accepting login `POST` request the credentials are validated by the Spring Security infrastructure. When the credentials are validated an LDAP response converter is called. Implementor can provide an implementation of `UserDetailsContextMapper`. If there is no custom implementation then one from Spring security is used.
+
+For complete interaction, see the following sequence diagram:
+
+image:assets/images/ad_ldap.png[Active Directory sequence diagram,title="Active Directory sequence diagram",link="assets/images/ad_ldap.png" ]
+
+include::login_logout_endpoints.adoc[]
+include::login_logout_redirection.adoc[]
+
+
+[[ldap-configuration]]
+==== Configuration
+
+UAA provides configuration keys for successful connection to AD server.
+
+
+[%autowidth.stretch,options="header"]
+|================================================================================
+|Configuration property |Default value |Usage |Remark
+
+|`mgmtp.a12.uaa.authentication.ldap.domain` |`mgm` | Server domain. | For MGM controller use 'mgm' as domain
+|`mgmtp.a12.uaa.authentication.ldap.url` |`ldap://localhost:389/` | Server URL |
+|`mgmtp.a12.uaa.authentication.ldap.root-dn` |`DC=sambaad,DC=local` | Server root DN | For MGM controller use 'DC=mgm-edv,DC=de'.
+|`mgmtp.a12.uaa.authentication.ldap.search-filter` |`(&(objectClass=user)(sAMAccountName=\{1}))`| Template based search filter for user |
+
+|================================================================================
+
+
+[[ldap-local-set-up]]
+==== Example Local set-up
+
+Default configuration is configured for local AD instance. The easiest way to set it up is to use docker. You can use the pre-configured image.
+
+[source, plain]
+----
+docker pull sonohara/samba4-ad-dc
+----
+After the image is downloaded, you can start it by using your own command based on Docker run documentation (https://docs.docker.com/engine/reference/commandline/run/[link]) - here is an example:
+
+[source, plain]
+----
+sudo docker run --privileged -it -p 389:389 -e "DOCKER_DEBUG=1" -e "DNS_FORWARD=8.8.8.8" -e "DNS_DOMAIN=sambaad.local" -e "AD_PASSWORD=PASS0rd123" -e "AD_REALM=sambaad.local" -e "AD_DOMAIN=SAMBAAD" --restart=always sonohara/samba4-ad-dc
+----
+
+After the image is started, you need to create new user. Just connect to the running container with:
+[source, plain]
+----
+docker exec -it $containerId /bin/bash 
+----
+
+You can change policy for password with following command: 
+[source, plain]
+----
+samba-tool domain passwordsettings set <option>
+----
+
+We encourage you to set your own password policy.
+
+- --complexity: Password complexity: on, off (default is on)
+- --store-plaintext: Store plaintext passwords: on, off (default is off)
+- --history-length: Password history length (default is 24)
+- --min-pwd-length: Minimum password length (default is 7)
+- --min-pwd-age: Minimum password age (default is 1)
+- --account-lockout-duration: Account lockout duration (default is 30)
+- --account-lockout-threshold: Account lockout threshold (default is 0)
+- --reset-account-lockout-after: Reset account lockout after (default is 30)
+
+Example:
+[source, plain]
+----
+samba-tool domain passwordsettings set --complexity=off --history-length=0 --min-pwd-length=0 --min-pwd-age=0 --max-pwd-age=0
+----
+
+and execute following shell command:
+[source, plain]
+----
+samba-tool user create <user> <password>
+---- 
+

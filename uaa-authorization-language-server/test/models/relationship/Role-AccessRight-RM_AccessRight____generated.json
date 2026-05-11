@@ -1,0 +1,70 @@
+{
+  "header": {
+    "id": "Role-AccessRight-RM_AccessRight____generated",
+    "modelType": "document",
+    "modelVersion": "28.1.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "application",
+        "value": ""
+      },
+      {
+        "name": "roles",
+        "value": "userManagementAdmin"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "AccessRight-DM",
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "AccessRight-DM"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "Role-AccessRight-RM_AccessRight____generated",
+      "immutable": false
+    },
+    "modelConfig": {
+      "decimalSeparator": ".",
+      "timeZone": "UTC",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "G2",
+          "name": "target",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Group",
+                "id": "I4",
+                "name": "Root",
+                "Group": {
+                  "repeatability": 1,
+                  "modelAlias": "AccessRight-DM"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

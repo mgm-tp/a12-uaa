@@ -1,0 +1,674 @@
+{
+	"info": {
+		"_postman_id": "993d186b-9c16-4e51-8a57-2b9498f9eabf",
+		"name": "UAA in MiMAS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "mimasadmin - login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "username",
+							"value": "mimasadmin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "mimas",
+							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "0942515c-b670-422d-97fe-52a60e958131",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{LOGIN}}",
+					"host": [
+						"{{LOGIN}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mimasadmin - read submission",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{READ_SUBMISSION}}/test-submission-pdbi-1",
+					"host": [
+						"{{READ_SUBMISSION}}"
+					],
+					"path": [
+						"test-submission-pdbi-1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mimasadmin - create submission",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id\": \"test-submission-pdbi-2\",\n  \"url\": \"https://mgm-cosmo.cosmodev.mgm-edv.de/int/AnbahnungView.xhtml?id=test-submission-pdbi-2\",\n  \"submissionNumber\": \"S900002\",\n  \"submissionName\": \"Testsubmission Property for PD/PI\",\n  \"status\": \"OPEN\",\n  \"description\": \"Property submission created by the bootstrapper for automated and manual tests for the PD/BI product2\",\n  \"marketSegment\": \"Industry\",\n  \"underwriterId\": \"mgm underwriter 2\",\n  \"departmentId\": \"PROPERTY\",\n  \"expernalPolicyNumber\": \"\",\n  \"ownAuthority\": \"true\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{CREATE_SUBMISSION}}",
+					"host": [
+						"{{CREATE_SUBMISSION}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mimasadmin - all submissions",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{FIND_ALL_SUBMISSIONS}}",
+					"host": [
+						"{{FIND_ALL_SUBMISSIONS}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mimasadmin - read offer",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{READ_OFFER}}/test-offer-pdbi-performance-10",
+					"host": [
+						"{{READ_OFFER}}"
+					],
+					"path": [
+						"test-offer-pdbi-performance-10"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mimasadmin - create offer",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"id\": \"test-offer-pdbi-performance-20\",\n\t\"url\": \"http://localhost:8374/mgm-cosmo/AngebotView.xhtml?id=test-offer-pdbi-performance-20\",\n\t\"status\": \"ANGEBOT_IN_BEARBEITUNG\",\n\t\"bindingFlag\": true,\n\t\"offerRecipient\": \"test-broker-1\",\n\t\"submissionId\": \"test-submission-pdbi-2\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{CREATE_OFFERS}}",
+					"host": [
+						"{{CREATE_OFFERS}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mimasadmin - update offer",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"test-offer-pdbi-performance-10\",\n    \"url\": \"http://localhost:8374/mgm-cosmo/AngebotView.xhtml?id=test-offer-pdbi-performance-50\",\n    \"offerNumber\": \"O900005\",\n    \"externalOfferId\": null,\n    \"status\": \"ANGEBOT_IN_BEARBEITUNG\",\n    \"bindingFlag\": true,\n    \"offerRecipient\": \"test-broker-1\",\n    \"offerDocumentId\": null,\n    \"stateReason\": null,\n    \"stateReasonDescription\": null,\n    \"offerValidFrom\": [\n        2018,\n        4,\n        23\n    ],\n    \"offerValidUntil\": [\n        2018,\n        7,\n        23\n    ],\n    \"departmentId\": null,\n    \"submissionId\": \"test-submission-pdbi-2\",\n    \"updateInfo\": {\n        \"lastChangeTimestamp\": null,\n        \"lastChangedUserId\": null,\n        \"createdTimestamp\": null,\n        \"createdUserId\": null\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{UPDATE_OFFER}}/test-offer-pdbi-performance-10",
+					"host": [
+						"{{UPDATE_OFFER}}"
+					],
+					"path": [
+						"test-offer-pdbi-performance-10"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mimasadmin - find all offers",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{FIND_ALL_OFFERS}}",
+					"host": [
+						"{{FIND_ALL_OFFERS}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SEPARATION BETWEEN USERS",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "mimasadmin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "mimas",
+							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "7f8fffaa-8ac0-449a-a1db-608fc7f0599e",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mimasdepartmentonly - login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "username",
+							"value": "mimasdepartmentonly",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "mimas",
+							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "03183e65-ec7a-46cd-b981-5007f63ed204",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{LOGIN}}?",
+					"host": [
+						"{{LOGIN}}"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "mimasdepartmentonly",
+							"disabled": true
+						},
+						{
+							"key": "password",
+							"value": "mimas",
+							"disabled": true
+						},
+						{
+							"key": "_csrf",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mimasdepartmentonly - read submission",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{READ_SUBMISSION}}/test-submission-pdbi-2",
+					"host": [
+						"{{READ_SUBMISSION}}"
+					],
+					"path": [
+						"test-submission-pdbi-2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mimasdepartmentonly - create submission",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id\": \"test-submission-pdbi-2\",\n  \"url\": \"https://mgm-cosmo.cosmodev.mgm-edv.de/int/AnbahnungView.xhtml?id=test-submission-pdbi-2\",\n  \"submissionNumber\": \"S900002\",\n  \"submissionName\": \"Testsubmission Property for PD/PI\",\n  \"status\": \"OPEN\",\n  \"description\": \"Property submission created by the bootstrapper for automated and manual tests for the PD/BI product2\",\n  \"marketSegment\": \"Industry\",\n  \"underwriterId\": \"mgm underwriter 2\",\n  \"departmentId\": \"PROPERTY\",\n  \"expernalPolicyNumber\": \"\",\n  \"ownAuthority\": \"true\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{CREATE_SUBMISSION}}",
+					"host": [
+						"{{CREATE_SUBMISSION}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mimasdepartmentonly - read offer",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{READ_OFFER}}/test-offer-pdbi-performance-20",
+					"host": [
+						"{{READ_OFFER}}"
+					],
+					"path": [
+						"test-offer-pdbi-performance-20"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mimasdepartmentonly - create offer",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"id\": \"test-offer-pdbi-performance-40\",\n\t\"url\": \"http://localhost:8374/mgm-cosmo/AngebotView.xhtml?id=test-offer-pdbi-performance-20\",\n\t\"status\": \"ANGEBOT_IN_BEARBEITUNG\",\n\t\"bindingFlag\": true,\n\t\"offerRecipient\": \"test-broker-1\",\n\t\"submissionId\": \"test-submission-pdbi-2\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{CREATE_OFFERS}}",
+					"host": [
+						"{{CREATE_OFFERS}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mimasdepartmentonly - update offer",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"id\": \"test-offer-pdbi-performance-20\",\n\t\"url\": \"http://localhost:8374/mgm-cosmo/AngebotView.xhtml?id=test-offer-pdbi-performance-20\",\n\t\"status\": \"ANGEBOT_IN_BEARBEITUNG\",\n\t\"bindingFlag\": true,\n\t\"offerRecipient\": \"test-broker-1\",\n\t\"submissionId\": \"test-submission-pdbi-1\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{UPDATE_OFFER}}/test-offer-pdbi-performance-20",
+					"host": [
+						"{{UPDATE_OFFER}}"
+					],
+					"path": [
+						"test-offer-pdbi-performance-20"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mimasdepartmentonly - find all offers",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{FIND_ALL_OFFERS}}",
+					"host": [
+						"{{FIND_ALL_OFFERS}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SEPARATION BETWEEN USERS 2",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "mimasadmin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "mimas",
+							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "7f8fffaa-8ac0-449a-a1db-608fc7f0599e",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mimasroledepartment - login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "username",
+							"value": "mimasroledepartment",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "mimas",
+							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "57f95188-c7b7-43c4-85a6-ad440c9d0517",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{LOGIN}}",
+					"host": [
+						"{{LOGIN}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mimasroledepartment - read submission",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{READ_SUBMISSION}}/test-submission-pdbi-1",
+					"host": [
+						"{{READ_SUBMISSION}}"
+					],
+					"path": [
+						"test-submission-pdbi-1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mimasroledepartment - create submission",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id\": \"test-submission-pdbi-2\",\n  \"url\": \"https://mgm-cosmo.cosmodev.mgm-edv.de/int/AnbahnungView.xhtml?id=test-submission-pdbi-2\",\n  \"submissionNumber\": \"S900002\",\n  \"submissionName\": \"Testsubmission Property for PD/PI\",\n  \"status\": \"OPEN\",\n  \"description\": \"Property submission created by the bootstrapper for automated and manual tests for the PD/BI product2\",\n  \"marketSegment\": \"Industry\",\n  \"underwriterId\": \"mgm underwriter 2\",\n  \"departmentId\": \"PROPERTY\",\n  \"expernalPolicyNumber\": \"\",\n  \"ownAuthority\": \"true\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{CREATE_SUBMISSION}}",
+					"host": [
+						"{{CREATE_SUBMISSION}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mimasroledepartment - read offer",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{READ_OFFER}}/test-offer-pdbi-performance-10",
+					"host": [
+						"{{READ_OFFER}}"
+					],
+					"path": [
+						"test-offer-pdbi-performance-10"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mimasroledepartment - create offer",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"id\": \"test-offer-pdbi-performance-50\",\n\t\"url\": \"http://localhost:8374/mgm-cosmo/AngebotView.xhtml?id=test-offer-pdbi-performance-20\",\n\t\"status\": \"ANGEBOT_IN_BEARBEITUNG\",\n\t\"bindingFlag\": true,\n\t\"offerRecipient\": \"test-broker-1\",\n\t\"submissionId\": \"test-submission-pdbi-2\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{CREATE_OFFERS}}",
+					"host": [
+						"{{CREATE_OFFERS}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mimasroledepartment - update offer",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"id\": \"test-offer-pdbi-performance-10\",\n\t\"url\": \"http://localhost:8374/mgm-cosmo/AngebotView.xhtml?id=test-offer-pdbi-performance-10\",\n\t\"status\": \"ANGEBOT_IN_BEARBEITUNG\",\n\t\"bindingFlag\": true,\n\t\"offerRecipient\": \"test-broker-1\",\n\t\"submissionId\": \"test-submission-pdbi-3\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{UPDATE_OFFER}}/test-offer-pdbi-performance-10",
+					"host": [
+						"{{UPDATE_OFFER}}"
+					],
+					"path": [
+						"test-offer-pdbi-performance-10"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mimasroledepartment - find all offers",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{FIND_ALL_OFFERS}}",
+					"host": [
+						"{{FIND_ALL_OFFERS}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

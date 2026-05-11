@@ -1,0 +1,248 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+[[APIKeyAuthentication]]
+=== API Key
+
+An Api Key is used for the authentication. It can be useful for backend jobs. Such jobs are executed just in the backend without user interaction (any credentials).
+The strategy will avoid creating technical users in a IDP or somewhere else.
+
+The api key will be issued by Root Certificate (CA) and contains some information likes system's name and system's roles.
+
+[[apikey-sequence]]
+==== Sequence Diagram
+image:assets/images/apikey_sequence.png[apikey,title="APIKey authentication flow"]
+
+==== Preparing Steps
+
+[[addRoleInfo]]
+===== Generate X.509 key
+
+For API Key generation. It's recommended to install https://www.openssl.org/[OpenSSL] tool.
+
+Two keys are generated. One for server and second for client.
+
+====== Create a custom openSSL configuration
+In order to add new key attributes, do the following steps:
+
+Create a configuration for server key `openssl_server.cnf`.
+
+[source,properties]
+-----
+[req]
+distinguished_name = req_distinguished_name
+prompt = no        # Stop confirmation prompts. All information is contained below.
+
+
+[ req_distinguished_name ]
+
+stateOrProvinceName = Some-State
+localityName = Munich
+organizationName = MGM
+organizationalUnitName = Development
+commonName = UAA-Server
+-----
+
+
+Create a configuration for client key `openssl_client.cnf`. In the client key it's required to have custom attributes:
+
+. Roles (OID=1.2.276.128) - Required
+. Country (OID=1.2.276.256) - Optional
+
+Those properties are identified by its own unique OID(s). They are put to key extension.
+
+[NOTE]
+====
+The `username` is taken from `commonName` in distinguished name section.
+====
+
+[source,properties]
+-----
+oid_section = new_oids
+
+[req]
+distinguished_name = req_distinguished_name
+prompt = no        # Stop confirmation prompts. All information is contained below.
+req_extensions = uaa_extension
+
+
+[ new_oids ]
+UserRoles=1.2.276.128       # 2=country,276=DE
+Country=1.2.276.256
+
+
+[ req_distinguished_name ]
+stateOrProvinceName = Some-State
+localityName = Munich
+organizationName = MGM
+organizationalUnitName = Development
+commonName = admin
+
+
+[ uaa_extension ]
+#UserRoles = ASN1:UTF8String:Admin,Manager
+1.2.276.128=ASN1:UTF8String:Admin,Manager
+1.2.276.256=ASN1:UTF8String:VN
+
+-----
+
+[[ca_generate]]
+====== API Key Generation
+
+. *Generate rootCA (private) key:*
+
+[source,shell]
+-----
+openssl genpkey -out rootCA.key -algorithm RSA -pkeyopt rsa_keygen_bits:4096
+-----
+
+* *Generate rootCA certificate:*
+
+[source,shell]
+-----
+openssl req -new -x509 -key rootCA.key -out rootCA.crt -days 4096 -config ./openssl_server.cnf
+-----
+
+* *Generate client key:*
+
+[source,shell]
+-----
+openssl req -newkey rsa:4096 -keyout client.key -out client.csr -config ./openssl_client.cnf -extensions uaa_extension
+-----
+
+It will request creates a new key request and a new private key. You must type in 4 to 1023 characters.
+
+
+* *Sign the client key with our root CA authority:*
+
+[source,shell]
+-----
+openssl x509 -req -CA rootCA.crt -CAkey rootCA.key -in client.csr -out client.crt -days 4096 -CAcreateserial -extfile ./openssl_client.cnf -extensions uaa_extension
+-----
+
+
+[TIP]
+====
+In order to print generated key you can use following command:
+
+[source,shell]
+-----
+openssl x509 -in <name>.crt -text -noout
+-----
+====
+
+[NOTE]
+====
+The rootCA.crt (Step 2) is used by UAA Server to verify the client.crt (Step 4).
+====
+
+
+[[OpenSSL]]
+*Example:*
+image:assets/images/uaa_apikey.png[open ssl,title="Gennerate key"]
+
+[[APIKeyValidator]]
+===== APIKey Validator
+UAA provides default implementation to check the time to live and was correct signature.
+In case you want to change this default validator you can create a custom `APIKeyValidator` implementation.
+
+Below is an example:
+
+[source, java,subs="verbatim,attributes"]
+----
+@Component
+public class ProjectAPIKeyValidator implements APIKeyValidator {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ProjectAPIKeyValidator.class);
+
+	@Override
+	public boolean validate(X509Certificate certToVerify, List<X509Certificate> rootCAs) {
+		// Your custom code here.
+	}
+}
+----
+
+[[APIKeyPrincipalCreator]]
+===== API Key Converter (principal)
+
+API Key needs to be converted to the principal object.
+
+Below is example. We will get the name, country and userRole attribute from the key for user principal creating.
+
+[source, java,subs="verbatim,attributes"]
+----
+@Component
+public class APIKeyPrincipalConverter implements CertificateConverter {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ProjectAPIKeyPrincipalCreator.class);
+
+	private static final String COMMON_NAME = "CN"; // standard certificate attribute
+	private static final String COUNTRY = "1.2.276.256"; // standard certificate attribute
+	private static final String USER_ROLE = "1.2.276.128"; // our custom attribute
+
+	@Inject
+	private PrincipalProcessor principalProcessor;
+
+	@Override
+	public UserDetails convert(X509Certificate certificate) {
+		String userNameValue = getAttributeValueFromCertificatePrincipal(certificate, COMMON_NAME);
+		String roles = CertificateUtils.getAttributeValueFromCertificateExtension(certificate, USER_ROLE);
+		String country = CertificateUtils.getAttributeValueFromCertificateExtension(certificate, COUNTRY);
+
+		Set<GrantedAuthority> grantedAuthorities = Arrays.asList(roles.split(",")).stream()
+			.map(roleName -> new SimpleGrantedAuthority(roleName))
+			.collect(Collectors.toSet());
+		AbstractExtendedPrincipal<?> user = principalProcessor.createPrincipal(userNameValue, grantedAuthorities, certificate);
+		return user;
+
+	}
+
+
+	private String getAttributeValueFromCertificatePrincipal(X509Certificate certificate, String attributeName) {
+		try {
+			String subjectName = certificate.getSubjectX500Principal().getName();
+			LdapName ldapName = new LdapName(subjectName);
+			return ldapName.getRdns()
+				.stream()
+				.filter(rdn -> rdn.getType().equals(attributeName))
+				.findFirst().get().getValue().toString();
+		} catch (InvalidNameException e) {
+			LOGGER.error("Has error when get attribute value from certificate subject name", e);
+		}
+		return null;
+	}
+
+}
+----
+
+[[apikey-authentication-getting-started-configuration]]
+==== Configuration
+[%autowidth.stretch,options="header"]
+|================================================================================
+|Configuration property |Default value |Usage |Remark
+|`mgmtp.a12.uaa.authentication.api-key-authority-resources` | | This is rootCA which is generated <<ca_generate,here>> (step 2) by project (For example: classpath:/certificate/rootCA.crt or 'file:///absolute_path/rootCA.crt') | You can provide one or multiple resources separated by commas.
+|`mgmtp.a12.uaa.authentication.api-key-white-list-access-url-patterns` | | Define what are urls pattern can be use the certificate authentication.| The url should be specific as the security advise. There is no default value so that it must be provided by project, you can provide one or multiple urls pattern separated by commas.
+|`mgmtp.a12.uaa.authentication.principal.apiKeyConfig.user-name-field` |`/**` | Define field where to find username in distinguished names.|
+|`mgmtp.a12.uaa.authentication.principal.apiKeyConfig.user-role-field` |`/**` | Define field where to find user roles. Comma separated list.|
+|================================================================================
+
+[WARNING]
+====
+* API Key authentication is intended for service-to-service communication (e.g., technical users). It is not recommended for authenticating real end users.
+* The attributed user role(s) within the API Key should be specific for its purpose and follow the principle of least privilege.
+* Keep the API Key confidential. If the key is disclosed, you must recreate the root CA and client key.
+* Always configure mgmtp.a12.uaa.authentication.api-key-white-list-access-url-patterns to specify the dedicated endpoints that support API Key-based authentication.
+====

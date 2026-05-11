@@ -1,0 +1,409 @@
+{
+  "header": {
+    "id": "User-FM",
+    "modelType": "form",
+    "modelVersion": "37.1.1",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "User Details"
+      },
+      {
+        "locale": "de",
+        "text": "Benutzerdetails"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "savedAt",
+        "value": "2022-09-14T17:53:49.352825"
+      },
+      {
+        "name": "roles",
+        "value": "userManagementAdmin"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "DomainUserManagement",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "DomainUserManagement"
+      }
+    ]
+  },
+  "content": {
+    "subHeaderBox": {
+      "id": "subHeaderBox1"
+    },
+    "footerBox": {
+      "id": "footerBox1",
+      "majorButtons": {
+        "button": [
+          {
+            "type": "EVENT",
+            "id": "button-e96c3",
+            "name": "Cancel",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Cancel"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Abbrechen"
+                    }
+                  ]
+                }
+              },
+              "priority": "SECONDARY",
+              "destructive": true
+            },
+            "event": "event_cancel",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "EVENT",
+            "id": "button-7cb63",
+            "name": "Submit",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Save"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Speichern"
+                    }
+                  ]
+                }
+              },
+              "priority": "PRIMARY"
+            },
+            "event": "event_save",
+            "validation": "full",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "screens": [
+      {
+        "id": "screen-37dbc",
+        "name": "general data",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "General Data"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "Section",
+            "id": "section-63359",
+            "name": "User",
+            "screenElements": [
+              {
+                "type": "MultiColumnSection",
+                "id": "multicolumnsection-5fb9d",
+                "name": "Detail",
+                "title": {
+                  "type": "Multilingual",
+                  "multilingualText": {
+                    "text": [
+                      {
+                        "locale": "en",
+                        "text": "Details"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Benutzerdetails"
+                      }
+                    ]
+                  }
+                },
+                "layout": {
+                  "lg": "2-10",
+                  "md": "3-9"
+                },
+                "screenElements": [
+                  {
+                    "type": "ControlGrid",
+                    "id": "controlgrid-5815d",
+                    "name": "cg-avatar",
+                    "row": [
+                      {
+                        "type": "Row",
+                        "id": "row-1d592",
+                        "cell": [
+                          {
+                            "type": "Control",
+                            "id": "control-2d3a5",
+                            "elementRef": "group_93477"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Row",
+                        "id": "row-655ca",
+                        "cell": [
+                          {
+                            "type": "Control",
+                            "id": "control-24596",
+                            "elementRef": "field_8a12f"
+                          }
+                        ]
+                      }
+                    ],
+                    "verticalAlignment": "TOP"
+                  },
+                  {
+                    "type": "ControlGrid",
+                    "id": "controlgrid-f9c5b",
+                    "name": "cg-detail",
+                    "layout": {
+                      "lg": "6-6"
+                    },
+                    "row": [
+                      {
+                        "type": "Row",
+                        "id": "row-e8750",
+                        "cell": [
+                          {
+                            "type": "Control",
+                            "id": "control-50f70",
+                            "elementRef": "field_8a86d"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Row",
+                        "id": "row-50d7e",
+                        "cell": [
+                          {
+                            "type": "Control",
+                            "id": "control-42b92",
+                            "elementRef": "field_70393"
+                          },
+                          {
+                            "type": "Control",
+                            "id": "control-14204",
+                            "elementRef": "field_31bc7"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Row",
+                        "id": "row-bc16d",
+                        "cell": [
+                          {
+                            "type": "Control",
+                            "id": "control-f868f",
+                            "elementRef": "field_d33c5"
+                          },
+                          {
+                            "type": "Control",
+                            "id": "control-53683",
+                            "elementRef": "field_b95d0"
+                          }
+                        ]
+                      }
+                    ],
+                    "verticalAlignment": "TOP"
+                  }
+                ]
+              },
+              {
+                "type": "Section",
+                "id": "section-d9abd",
+                "name": "OrganizationUnitRole",
+                "title": {
+                  "type": "Multilingual",
+                  "multilingualText": {
+                    "text": [
+                      {
+                        "locale": "en",
+                        "text": "Organization Unit Roles"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Organisationseinheiten und Rollen"
+                      }
+                    ]
+                  }
+                },
+                "screenElements": [
+                  {
+                    "type": "InlineRepeat",
+                    "id": "inlinerepeat-d9fda",
+                    "name": "inline-repeat-organizationUnitRole",
+                    "repeatOverviewColumn": [
+                      {
+                        "type": "FieldBasedRepeatOverviewColumn",
+                        "id": "fieldbasedrepeatoverviewcolumn-1e02a",
+                        "width": 1,
+                        "sortable": false,
+                        "filterable": false,
+                        "preferredSorting": "ASC",
+                        "elementRef": "field_b5e0c"
+                      },
+                      {
+                        "type": "FieldBasedRepeatOverviewColumn",
+                        "id": "fieldbasedrepeatoverviewcolumn-00681",
+                        "width": 1,
+                        "sortable": false,
+                        "filterable": false,
+                        "preferredSorting": "ASC",
+                        "elementRef": "field_394a0"
+                      }
+                    ],
+                    "groupRef": "group_cb3c1",
+                    "enableAdd": true,
+                    "enableRemove": true
+                  }
+                ]
+              },
+              {
+                "type": "Section",
+                "id": "section-60589",
+                "name": "Extension",
+                "title": {
+                  "type": "Multilingual",
+                  "multilingualText": {
+                    "text": [
+                      {
+                        "locale": "en",
+                        "text": "Additional Data"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Zusätzlich Informationen"
+                      }
+                    ]
+                  }
+                },
+                "screenElements": [
+                  {
+                    "type": "ControlGrid",
+                    "id": "controlgrid-3e1b0",
+                    "name": "cg-extension",
+                    "layout": {
+                      "lg": "6-6"
+                    },
+                    "row": [
+                      {
+                        "type": "Row",
+                        "id": "row-3a750",
+                        "cell": [
+                          {
+                            "type": "Control",
+                            "id": "control_95bef",
+                            "elementRef": "include_7f34d_field_e2760"
+                          },
+                          {
+                            "type": "Control",
+                            "id": "control_b7269",
+                            "elementRef": "include_7f34d_field_0bee7"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Row",
+                        "id": "row-45ef5",
+                        "cell": [
+                          {
+                            "type": "Control",
+                            "id": "control_2b165",
+                            "elementRef": "include_7f34d_field_9ad1f"
+                          },
+                          {
+                            "type": "Control",
+                            "id": "control_da619",
+                            "elementRef": "include_7f34d_field_300ad"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Row",
+                        "id": "row-ad1cf",
+                        "cell": [
+                          {
+                            "type": "Control",
+                            "id": "control_82abb",
+                            "elementRef": "include_7f34d_field_0be37"
+                          }
+                        ]
+                      }
+                    ],
+                    "verticalAlignment": "BOTTOM"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {
+      "field": [
+        {
+          "hint": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Please be aware that upper and lower case is treated equally."
+              },
+              {
+                "locale": "de",
+                "text": "Bitte beachten Sie, dass Groß- und Kleinschreibung gleich behandelt wird."
+              }
+            ]
+          },
+          "elementRef": "field_70393"
+        },
+        {
+          "initialValue": "true",
+          "exposition": "CHECKBOX",
+          "elementRef": "field_8a12f"
+        },
+        {
+          "exposition": "AUTOCOMPLETE",
+          "externalEnumeration": {
+            "src": "organizationUnit"
+          },
+          "elementRef": "field_b5e0c"
+        },
+        {
+          "exposition": "AUTOCOMPLETE",
+          "externalEnumeration": {
+            "src": "role"
+          },
+          "elementRef": "field_394a0"
+        }
+      ]
+    },
+    "groupConfiguration": {},
+    "defaults": {}
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "missing policies",
+  "permissions": [
+    {
+      "name": "Permission 1",
+      "policies": [
+        "true"
+      ],
+      "scopes": [
+        "Scope 1"
+      ]
+    }
+  ],
+  "propertyPermissions": [
+    {
+      "name": "Property Permissions 1",
+      "policy-refs": [
+        "property permissions policy ref"
+      ]
+    }
+  ]
+}

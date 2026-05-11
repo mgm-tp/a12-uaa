@@ -1,0 +1,192 @@
+{
+  "header": {
+    "id": "Role-FM",
+    "modelType": "form",
+    "modelVersion": "37.1.1",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "bindingConfiguration",
+        "value": "[{\"type\":\"relationship\",\"details\":{\"name\":\"AccessRight\",\"metaInformation\":{\"version\":\"1.0.0\"},\"relationshipName\":\"Role-AccessRight-RM\",\"targetRole\":\"AccessRight\",\"components\":[{\"id\":\"-1\",\"name\":\"DualPaneSelection\",\"candidatePageSize\":50,\"linkPageSize\":50,\"props\":{\"availableItemsTable\":{\"label\":[{\"locale\":\"en\",\"text\":\"Available Access Right\"},{\"locale\":\"de\",\"text\":\"Verfügbare Berechtigungen\"}]},\"selectedItemsTable\":{\"label\":[{\"locale\":\"en\",\"text\":\"Selected Access Right\"},{\"locale\":\"de\",\"text\":\"Ausgewählte Berechtigungen\"}]}},\"models\":[{\"name\":\"Role-AccessRight-RM_AccessRight_AvailableItemsOverview\",\"use\":\"candidate\"},{\"name\":\"Role-AccessRight-RM_AccessRight_SelectedItemsOverview\",\"use\":\"link\"}]}]},\"elementId\":\"customscreenelement_a1316\"}]"
+      },
+      {
+        "name": "roles",
+        "value": "userManagementAdmin"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "Role-DM",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "Role-DM"
+      },
+      {
+        "alias": "Role-AccessRight-RM_AccessRight_AvailableItemsOverview",
+        "modelType": "overview",
+        "purpose": "bindingReference",
+        "reference": "Role-AccessRight-RM_AccessRight_AvailableItemsOverview"
+      },
+      {
+        "alias": "Role-AccessRight-RM_AccessRight_SelectedItemsOverview",
+        "modelType": "overview",
+        "purpose": "bindingReference",
+        "reference": "Role-AccessRight-RM_AccessRight_SelectedItemsOverview"
+      }
+    ]
+  },
+  "content": {
+    "subHeaderBox": {
+      "id": "subHeaderBox1"
+    },
+    "footerBox": {
+      "id": "footerBox1",
+      "majorButtons": {
+        "button": [
+          {
+            "type": "EVENT",
+            "id": "button-e96c3",
+            "name": "Cancel",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Cancel"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Abbrechen"
+                    }
+                  ]
+                }
+              },
+              "priority": "SECONDARY",
+              "destructive": true
+            },
+            "event": "event_cancel",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "EVENT",
+            "id": "button-7cb63",
+            "name": "Submit",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Save"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Speichern"
+                    }
+                  ]
+                }
+              },
+              "priority": "PRIMARY"
+            },
+            "event": "event_save",
+            "validation": "full",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "screens": [
+      {
+        "id": "screen1",
+        "name": "Role_Screen",
+        "screenElements": [
+          {
+            "type": "Section",
+            "id": "section-56d24",
+            "name": "Role",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Role"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Rolle"
+                  }
+                ]
+              }
+            },
+            "screenElements": [
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid-92368",
+                "name": "ControlGrid",
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row-91936",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control-9d8aa",
+                        "elementRef": "field_1680e"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "id": "row-5b2eb",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control-5be9a",
+                        "elementRef": "field_6c9ad"
+                      }
+                    ]
+                  }
+                ],
+                "verticalAlignment": "TOP"
+              }
+            ]
+          },
+          {
+            "type": "CustomScreenElement",
+            "id": "customscreenelement_a1316",
+            "name": "AccessRight",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "AccessRight"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "AccessRight"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {},
+    "groupConfiguration": {},
+    "defaults": {}
+  }
+}

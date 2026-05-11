@@ -1,0 +1,111 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+==== Redirection
+UAA has possibility to trigger redirects after successful and failure login. The configuration is unified for each authentication type where it's possible.
+Each redirect URL is validated by respective validation pattern. The `pattern` configuration is only required when respective redirect is validated. 
+
+NOTE: OAUTH2 is not supported because the `login/logout` flow is independent on UAA. 
+
+The redirection can be triggered in two ways:  
+
+* statically  - by the <<redirect-configuration,configuration>>.
+* dynamically - enclose parameters `uaa_success` and `uaa_failure` within login/logout Http request using either query parameters or cookies.
+For example, with SAML, you can set the login redirect URL as a query parameter by appending those parameters to the login URL (self-configuration):
+
++
+[source, properties]
+----
+mgmtp.a12.uaa.authentication.client-selfconfiguration.saml.login-relative.url=saml2/authenticate/uaa?uaa_success=http://localhost:3000&uaa_failure=http://localhost:3000/silent_renew
+----
+
+===== SameSite setting
+The cookie needs to set `SameSite` parameter. This `SameSite` value can be configured by the properties.
+
+Overview how `SameSite` cookie is working in a browser with combination of secured/un-secured connection and `Secured` attribute.
+The below tables illustrate cookie values how it's handled by a browser.
+ 
+ Application running on a domain (http://test.xx) over HTTP connection
+ 
+[%autowidth.stretch,options="header"]
+|================================================================================
+|SameSite |Secured |Remark
+|`UNSET` | ` ` |  Working.
+|`NONE` | ` ` | NOT Working.
+|`NONE` | `Secured` | NOT Working.
+
+|================================================================================
+ 
+ Application running on a localhost (http://localhost) over HTTP connection
+ 
+[%autowidth.stretch,options="header"]
+|================================================================================
+|SameSite |Secured |Remark
+|`UNSET` | ` ` |  Working.
+|`NONE` | ` ` | NOT Working.
+|`NONE` | `Secured` | Working.
+
+|================================================================================
+
+
+ Application running on a domain (https://test.xx) over HTTPS connection
+ 
+[%autowidth.stretch,options="header"]
+|================================================================================
+|SameSite |Secured |Remark
+|`NONE` | `Secured` | Working.
+
+|================================================================================
+
+NOTE: When the `SameSite` and `Secured` flag is not set browser keeps the cookies about 2 minutes and then drop them.
+
+===== Enable property
+This can be configured in two ways:
+
+* If client application uses the online self-configuration
+
+[%autowidth.stretch,options="header"]
+|================================================================================
+|Configuration property |Value
+|`mgmtp.a12.uaa.authentication.cors.allow-credentials` | `true`
+
+|================================================================================
+
+* If client application uses the offline self-configuration
+** <<offline-self-config,From UAABEARER token add new field `allowCredentials` with value `true`>>
+
+[[redirect-configuration]]
+===== Configuration
+
+
+See in the following example:
+
+[%autowidth.stretch,options="header"]
+|================================================================================
+|Configuration property |Default value |Usage |Remark
+|`mgmtp.a12.uaa.authentication.logout.redirect.success.url` |`` | URL which will be redirected to after successful logout.  | Optional
+|`mgmtp.a12.uaa.authentication.logout.redirect.url-pattern` | | Validation pattern for success and failure logout redirect URLs  |You need to change this default empty value
+|`mgmtp.a12.uaa.authentication.login.redirect.success.url` |`` | URL which will be redirected to after successful login.  | Optional
+|`mgmtp.a12.uaa.authentication.login.redirect.failure.url` |`` | URL which will be redirected to after failed login.  | Optional. Only available with Saml authentication
+|`mgmtp.a12.uaa.authentication.login.redirect.url-pattern` | | Validation pattern for success and failure login redirect URLs  |You need to change this default empty value
+|`mgmtp.a12.uaa.authentication.cookie.http-only.enabled` |`false` | Configure HttpOnly for SAML cookies.|
+|`mgmtp.a12.uaa.authentication.cookie.same-site` |`NONE` | Configure Same site option for SAML cookies. Available values  `NONE, UNSET, LAX, STRICT` |
+|`mgmtp.a12.uaa.authentication.cookie.secured.enabled` |`false` | Configure secured for SAML cookies.|
+|`mgmtp.a12.uaa.authentication.cookie.lifetime-seconds` |`180` | Define the lifetime for `redirect url` SAML cookie for after login success or failure.| If the login process might take time from the IDP login page (e.g, using ID card login method) then this value should be increase.
+
+|================================================================================
+

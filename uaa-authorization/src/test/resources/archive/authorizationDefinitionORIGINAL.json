@@ -1,0 +1,150 @@
+{
+	"name": "Policy Authorization Object",
+	"secures": [
+		{
+			"name": "Admin",
+			"rules": [
+				"#user.role='userAdmin' && #user.department='CARGO'",
+				"#user.role='admin' && #user.department='LOGICTIC'"
+			],
+			"rights": [
+				"READ",
+				"WRITE",
+				"EXPORT"
+			]
+		},
+		{
+			"name": "User Manager",
+			"rules": [
+				"#user.role='user manager' && #user.department='BOARD_MEMBER'",
+				"#user.role='admin' && #user.department='LOGICTIC'"
+			],
+			"rights": [
+				"DELETE",
+				"UPDATE_USER"
+			]
+		}
+	],
+	"repository": [
+		{
+			"name": "Insurance policy",
+			"object": [
+				{
+					"name": "Insurance Policy Type",
+					"content": {
+						"rules": [
+							"#user.role='Policy Manager'",
+							"#policy.type != null"
+						],
+						"rights": [
+							"READ",
+							"DELETE"
+						],
+						"template": "policy.country=env.country AND policy.department=#user.dept"
+					}
+				},
+				{
+					"name": "Insurance Policy Period",
+					"content": {
+						"rules": [
+							"#policy.period > 1year",
+							"#policy.timeline inrange (2010, 2020)"
+						],
+						"rights": [
+							"READ",
+							"READ-ONLY"
+						],
+						"template": "policy.period < 1year AND policy.timeline IN (2010, 2020)"
+					}
+				},
+				{
+					"name": "Insurance Policy Contract",
+					"content": {
+						"rules": [
+							"#policy.contract != null & #policy.contract.period == '30days'",
+							"#contract.type == '2 years' & #contract.timeline in (2010,2015)"
+						],
+						"rights": [
+							"ACCESS",
+							"VIEW"
+						],
+						"template": "policy.contract IS NOT EMPTY AND policy.contract in (SELECT contract_id FROM Contract where contract.employee = #user.username)"
+					}
+				}
+			],
+			"property": [
+				{
+					"name": "Policy Tax Verification",
+					"content": {
+						"rules": [
+							"#policy.tax>1000 && #user.department contains ('CARGO')"
+						],
+						"rights": [
+							"REPORT",
+							"EXPORT"
+						],
+						"path": [
+							"#policy.contract.type",
+							"#policy.type",
+							"#policy.period"
+						]
+					}
+				},
+				{
+					"name": "Policy Period Verification",
+					"content": {
+						"rules": [
+							"#policy.period>1000 && #user.department contains ('CAR')"
+						],
+						"rights": [
+							"STATISTIC",
+							"REPORT"
+						],
+						"path": [
+							"#policy.period"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Insurance policy Children",
+			"parent": "Insurance policy",
+			"object": [
+				{
+					"name": "Insurance Policy Type",
+					"content": {
+						"rules": [
+							"#user.role='Policy Manager'",
+							"#policy.type != null"
+						],
+						"rights": [
+							"READ",
+							"DELETE"
+						],
+						"template": "policy.country=env.country AND policy.department=#user.dept"
+					}
+				}
+			],
+			"property": [
+				{
+					"name": "Policy Tax Verification",
+					"content": {
+						"rules": [
+							"#policy.tax>1000 && #user.department contains ('CARGO')"
+						],
+						"rights": [
+							"READ",
+							"EXPORT"
+						],
+						"path": [
+							"#policy.contract.type",
+							"#policy.type",
+							"#policy.period"
+						]
+					}
+				}
+			]
+		}
+	]
+}

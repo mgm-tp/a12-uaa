@@ -1,0 +1,73 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+== Production-ready
+This is the guide to build production-ready apps with UAA.
+It proposes the best practices and explains things you can do for secure and reliable applications, therefore, read this early and often especially when you consider going live a production.
+
+[[production-ready-auth-type]]
+=== Authentication type
+Although UAA supports authentication type `LOCAL` but it is just mainly intended for development purposes, not for production usage!
+
+By that, please only use these authentication types for production:
+
+* <<active-directory-ldap,Active Directory LDAP>>
+* <<saml,SAML>>
+* <<uaa-access-token-auth,UAA_ACCESS_TOKEN>>
+* <<oauth2,OAUTH2>>
+* <<CertificateAuthentication,Certificate>>
+* <<anonymous,Anonymous>>
+* Custom (your own implementation along with UAA extension points)
+
+[[production-ready-cors]]
+=== Cross-Origin Resource Sharing (CORS)
+Uaa supports configurations for CORS mechanism, let check this <<cross_origin,section>>.
+
+These are some notable points for production deployment:
+
+* When turning on CORS feature, the property `mgmtp.a12.uaa.authentication.cors.allowed-origins` should *NOT* be set to `\*` or empty (all origins are allowed).
+Instead, for security please specify all the origins it's allowed to go through.
+In generally, please avoid using wild card (`*`) as much as possible, all possibilities should be mentioned explicitly.
+* In case you use any Proxy in your production setup,
+you should pay attention to check the CORS on Proxy settings.
+In case you use Nginx for that then follow https://enable-cors.org/server_nginx.html[CORS on Nginx].
+
+[[production-ready-request-headers]]
+=== HTTP Request headers
+* UAA token is generated with signing, encryption and UserDetails serialization.
+Therefore, it’s possible that the generated token will reach beyond the limit of header size of web server (Eg: nginx: 4k-8k, Apache: 8k,...).
+Please configure your web server in case you encounter the issue of header size is too big (HTTP Error 431).
+
+[NOTE]
+====
+Please also consider configuring the header size in your application Eg: Spring Header size for requests and responses.
+====
+* Some HTTP headers are resolved by UAA for security aspects:
+** <<http-headers-mime,MIME Sniffing>>
+** <<http-headers-click,Click Jacking>>
+** <<http-headers-csp,Content Security Policy>>
+
+[[production-ready-cluster-support]]
+=== Cluster support
+Normally there are multiple instances of application running on production environment.
+It's highly recommended to configure caching mechanism for fulfilling cluster support.
+Let have look at <<clustering-support,cluster support>> section for further details.
+
+UAA has no cluster support for:
+
+* <<reload-authorization-rules,Reload Authorization rules>>
+* <<role-mapping-yaml,YAML Role Mapping>>

@@ -1,0 +1,11 @@
+roles:
+  - name: guest
+    description: Guest role
+    accessRights:
+      - right1
+      - right2
+  - name: admin
+    description: Admin role
+    accessRights:
+      - right1
+      - right2

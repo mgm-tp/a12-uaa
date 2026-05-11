@@ -1,0 +1,53 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+[[idp-token-handling]]
+===== Token handling
+
+The token is retrieved in the request from a header and verified. It contains a base data to reconstruct the principal for Spring `SecurityContext`.
+We support 2 types of token validation by <<oauth2-rs-sequence-jwt-token-support, JWTDecode>> or <<oauth2-rs-sequence-token-introspection-support, TokenIntrospector>>.
+
+The extraction is processed by the Spring Security.
+Due to an Authorization paradigm we need to convert the principal which is based on the `UserDetails` interface.
+
+ 
+
+====== Principal Conversion
+*To convert Access Token to required principal we need converters.*
+
+* *Oauth2ClaimsExtractor* - Convert Access Token to `UserDetails` principal. 
+* *Oauth2GrantedAuthorityConverter* - Extract collection of `GrantedAuthority` from the access token.
+
+
+
+====== Oauth2ClaimsExtractor
+The `Oauth2ClaimsExtractor` must be implemented by the client project because only the project knows how to convert data stored in Access Token into the principal based on `UserDetails`.
+
+
+
+====== Oauth2GrantedAuthorityConverter
+UAA provides a default implementation of `Oauth2GrantedAuthorityConverter`. The implementation just delegates to a Spring implementation  which extract roles stored in well-known claims:
+
+* scope
+* scp
+
+[NOTE]
+====
+The <<uaa-principal-extension, Principal Extension>> provides complete OAUTH2 access token conversion logic out of the box.
+====
+
+

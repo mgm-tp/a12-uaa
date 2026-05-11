@@ -1,0 +1,98 @@
+diff --git a/node_modules/oidc-client-ts/dist/esm/oidc-client-ts.js b/node_modules/oidc-client-ts/dist/esm/oidc-client-ts.js
+index d6a88cd..7951e82 100644
+--- a/node_modules/oidc-client-ts/dist/esm/oidc-client-ts.js
++++ b/node_modules/oidc-client-ts/dist/esm/oidc-client-ts.js
+@@ -2838,15 +2838,30 @@ var SilentRenewService = class {
+     this._logger = new Logger("SilentRenewService");
+     this._isStarted = false;
+     this._retryTimer = new Timer("Retry Silent Renew");
++
++    this._maxRetryAttempts = 3;
++    this._retryAttempts = 0;
++
+     this._tokenExpiring = async () => {
+       const logger2 = this._logger.create("_tokenExpiring");
+       try {
+         await this._userManager.signinSilent();
+         logger2.debug("silent token renewal successful");
++        this._retryAttempts = 0;
+       } catch (err) {
+         if (err instanceof ErrorTimeout) {
+-          logger2.warn("ErrorTimeout from signinSilent:", err, "retry in 5s");
+-          this._retryTimer.init(5);
++          if (this._retryAttempts < this._maxRetryAttempts) {
++            this._retryAttempts++;
++            logger2.warn(
++                "ErrorTimeout from signinSilent:",
++                err,
++                `retry in 5s (attempt ${this._retryAttempts}/${this._maxRetryAttempts})`
++            );
++            this._retryTimer.init(5);
++          } else {
++            logger2.error("Silent renew reached max attempts. Stopping further retries.");
++            this._retryTimer.cancel();
++          }
+           return;
+         }
+         logger2.error("Error from signinSilent:", err);
+@@ -2854,9 +2869,11 @@ var SilentRenewService = class {
+       }
+     };
+   }
++
+   async start() {
+     const logger2 = this._logger.create("start");
+     if (!this._isStarted) {
++      this._retryAttempts = 0;
+       this._isStarted = true;
+       this._userManager.events.addAccessTokenExpiring(this._tokenExpiring);
+       this._retryTimer.addHandler(this._tokenExpiring);
+diff --git a/node_modules/oidc-client-ts/dist/umd/oidc-client-ts.js b/node_modules/oidc-client-ts/dist/umd/oidc-client-ts.js
+index b895094..ae8180b 100644
+--- a/node_modules/oidc-client-ts/dist/umd/oidc-client-ts.js
++++ b/node_modules/oidc-client-ts/dist/umd/oidc-client-ts.js
+@@ -2885,15 +2885,30 @@ var SilentRenewService = class {
+     this._logger = new Logger("SilentRenewService");
+     this._isStarted = false;
+     this._retryTimer = new Timer("Retry Silent Renew");
++
++    this._maxRetryAttempts = 3;
++    this._retryAttempts = 0;
++
+     this._tokenExpiring = async () => {
+       const logger2 = this._logger.create("_tokenExpiring");
+       try {
+         await this._userManager.signinSilent();
+         logger2.debug("silent token renewal successful");
++        this._retryAttempts = 0;
+       } catch (err) {
+         if (err instanceof ErrorTimeout) {
+-          logger2.warn("ErrorTimeout from signinSilent:", err, "retry in 5s");
+-          this._retryTimer.init(5);
++          if (this._retryAttempts < this._maxRetryAttempts) {
++            this._retryAttempts++;
++            logger2.warn(
++                "ErrorTimeout from signinSilent:",
++                err,
++                `retry in 5s (attempt ${this._retryAttempts}/${this._maxRetryAttempts})`
++            );
++            this._retryTimer.init(5);
++          } else {
++            logger2.error("Silent renew reached max attempts. Stopping further retries.");
++            this._retryTimer.cancel();
++          }
+           return;
+         }
+         logger2.error("Error from signinSilent:", err);
+@@ -2901,9 +2916,11 @@ var SilentRenewService = class {
+       }
+     };
+   }
++
+   async start() {
+     const logger2 = this._logger.create("start");
+     if (!this._isStarted) {
++      this._retryAttempts = 0;
+       this._isStarted = true;
+       this._userManager.events.addAccessTokenExpiring(this._tokenExpiring);
+       this._retryTimer.addHandler(this._tokenExpiring);

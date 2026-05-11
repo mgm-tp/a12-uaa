@@ -1,0 +1,27 @@
+{
+	"name": "Test Permission Definition",
+	"description": "",
+	"permissions": [
+		{
+			"name": "Success",
+			"description": "",
+			"policies": [
+				"true",
+				"T(com.mgmtp.a12.uaa.authorization.integration.Waiter).sleep()"
+			],
+			"scopes": [
+				"Success"
+			]
+		},
+		{
+			"name": "Failure",
+			"description": "",
+			"policies": [
+				"false"
+			],
+			"scopes": [
+				"Failure"
+			]
+		}
+	]
+}

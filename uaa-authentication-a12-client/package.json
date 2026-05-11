@@ -1,0 +1,77 @@
+{
+  "name": "@com.mgmtp.a12.uaa/uaa-authentication-a12-client",
+  "type": "module",
+  "description": "A12 UAA Authentication Client",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "keywords": [
+    "UAA",
+    "Authentication",
+    "Client"
+  ],
+  "author": "mgm",
+  "license": "(EUPL-1.2 OR LicenseRef-commercial)",
+  "browserslist": [
+    "last 1 chrome version",
+    "last 1 edge version",
+    "last 1 safari version",
+    "last 1 firefox version",
+    "firefox esr",
+    "node 22"
+  ],
+  "scripts": {
+    "compile": "tsc -b",
+    "clean": "rimraf lib target build",
+    "start": "tsc -b --watch",
+    "assemble": "npm run typedoc",
+    "typedoc": "typedoc",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "@com.mgmtp.a12.client/client-core": "^16.2.0",
+    "react": "^19.0.0",
+    "react-redux": "^7.2.0",
+    "redux": "^4.0.5"
+  },
+  "dependencies": {
+    "@com.mgmtp.a12.uaa/uaa-authentication-client": "9.3.2"
+  },
+  "devDependencies": {
+    "@com.mgmtp.a12.base/base-model-api": "29.3.0",
+    "@com.mgmtp.a12.client/client-core": "16.2.1",
+    "@com.mgmtp.a12.dataservices/dataservices-access": "38.4.0",
+    "@com.mgmtp.a12.kernel/kernel-core-runtime-api-ts": "30.8.1",
+    "@com.mgmtp.a12.kernel/kernel-md-facade": "30.8.1",
+    "@com.mgmtp.a12.utils/utils-collections": "^6.2.0",
+    "@com.mgmtp.a12.utils/utils-connector": "^8.2.1",
+    "@com.mgmtp.a12.utils/utils-localization": "^7.2.0",
+    "@com.mgmtp.a12.utils/utils-localization-react": "^7.2.0",
+    "@com.mgmtp.a12.utils/utils-logging": "^6.2.0",
+    "@com.mgmtp.a12.widgets/widgets-core": "^38.3.0",
+    "@types/react": "^19.0.0",
+    "@types/react-redux": "7.1.34",
+    "jsdom": "^24.0.0",
+    "redux": "4.2.1",
+    "redux-saga": "1.2.3",
+    "typedoc": "0.28.18",
+    "typescript": "5.8.2",
+    "vitest": "3.2.4",
+    "yjs": "^13.6.27"
+  },
+  "files": [
+    "resources",
+    "lib",
+    "src",
+    "cyclonedx.json",
+    "LICENSE",
+    "NOTICE",
+    "THIRD_PARTY_NOTICES",
+    "licenses"
+  ],
+  "overrides": {
+    "react-redux": {
+      "react": "^19"
+    }
+  },
+  "version": "9.3.2-SNAPSHOT"
+}

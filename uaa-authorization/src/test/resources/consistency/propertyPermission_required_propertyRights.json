@@ -1,0 +1,9 @@
+{
+  "name": "require property rights",
+  "propertyPermissions": [
+    {
+      "name": "property permission 1",
+      "rights-refs": ["rights 1"]
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+[[keycloak]]
+== Keycloak
+
+*Keycloak* is an Open Source Identity and Access Management solution for modern Applications and Services.
+
+Add authentication to applications and secure services with minimum fuss.
+No need to deal with storing users or authenticating users.
+It is all available out of the box.
+
+You will even get advanced features such as User Federation, Identity Brokering and Social Login.
+
+=== Getting Started
+
+Keycloak getting started documentation can be found in https://www.keycloak.org/guides#getting-started.
+
+If you are running the Keycloak with docker.
+The Keycloak will use the *standalone-ha.xml* file instead of *standalone.xml* file that why all the modifications from *standalone.xml* will not apply.
+
+=== Configuration
+
+- Basic configuration:
+* Client ID: The alphanumeric ID string that is used in OIDC requests and in the Keycloak database to identify the client.
+* Valid redirect URIs: Required field.
+Valid URI pattern a browser can redirect to after a successful login.
+You can use wildcards at the end of the URL pattern.
+For example http://host.com/*
+* Valid post logout redirect URIs: Valid URI pattern a browser can redirect to after a successful logout.
+
+You can find more information basic configure in link:https://www.keycloak.org/docs/latest/server_admin/#con-basic-settings_server_administration_guide[]
+
+- Advanced configuration:
+* Assertion Consumer Service POST Binding URL: POST Binding URL for the Assertion Consumer Service.
+* Logout Service POST Binding URL: POST Binding URL for the Logout Service.
+
+You can find more information advanced configure in link:https://www.keycloak.org/docs/latest/server_admin/#con-advanced-settings_server_administration_guide[]
+
+[[keycloak-setup]]
+include::keycloak/keycloak_setup.adoc[]
+
+=== Open Security issues
+You should take care about this session because attacker can attack your website.
+
+include::keycloak/keycloak_security_relevance.adoc[]
+
+=== Keycloak Upgrade
+
+==== Version 20.0.1
+
+- From version 20.0.0. They fixed this issue (https://github.com/keycloak/keycloak/issues/14184/[link]).
+
+- This makes the application that uses the OAuth2 Client mode has a problem when doing the login flow with keycloak.
+
+- To fix this problem, either added the default scope with name *openid* into the client by Keycloak setting (https://www.keycloak.org/docs/latest/authorization_services/index.html#_resource_server_create_client/[link]) or by spring configuration <<oauth2-ssr-required-property, (link)>>
+

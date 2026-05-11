@@ -1,0 +1,20 @@
+plugins {
+    id 'java-library'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding 'UTF-8'
+    options.compilerArgs.add("-parameters")
+}
+
+dependencies {
+    api project(':uaa-authentication')
+    
+    api libs.jacksonDataFormat
+    
+    testImplementation libs.bundles.springTest
+}
+
+description = 'UAA:: Authentication:: Principal Extension'
+
+

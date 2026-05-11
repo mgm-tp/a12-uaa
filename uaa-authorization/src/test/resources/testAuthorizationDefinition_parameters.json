@@ -1,0 +1,108 @@
+{
+	"name": "Test Permission Definition",
+	"description": "",
+	"policies": [
+		{
+			"name": "Success",
+			"description": "Return always true",
+			"rules": [
+				"true"
+			]
+		},
+		{
+			"name": "DataPreloadPolicy",
+			"description": "Check data preload resource",
+			"dataPreload": [
+				"print('Resource: ' + #resource)",
+				"#variable = #resource"
+			],
+			"rules": [
+				"#variable == 'TestValue'"
+			]
+		},
+		{
+			"name": "Domain_Business_Policy_Ref",
+			"description": "",
+			"rules": [
+				"principal.username == 'test'"
+			]
+		}
+	],
+	"repositoryPolicies": [
+		{
+			"name": "RepositoryPolicy",
+			"description": "Repos",
+			"templates": [
+				"#parameter + ' ' + principal.username"
+			]
+		},
+		{
+			"name": "RepositoryPolicyPlain",
+			"description": "Repos",
+			"templates": [
+				"'parameter ' + principal.username"
+			]
+		},
+		{
+			"name": "Repository_Policy_Ref",
+			"description": "Repos",
+			"templates": [
+				"@createService.aMethodCallByRepository()"
+			]
+		}
+	],
+	"permissions": [
+		{
+			"name": "Repository Permission",
+			"description": "Repo Permission",
+			"policy-refs": [
+				"Success"
+			],
+			"repository-refs": [
+				"RepositoryPolicy"
+			],
+			"policies": [
+				"print('Still alive')"
+			],
+			"scopes": [
+				"Test Scope"
+			]
+		},
+		{
+			"name": "Service Permission",
+			"description": "Service Permission",
+			"repository-refs": [
+				"RepositoryPolicyPlain"
+			],
+			"policies": [
+				"print('Still alive')"
+			],
+			"scopes": [
+				"Test Scope Service"
+			]
+		},
+		{
+			"name": "Data Preload Permission",
+			"description": "Service Permission",
+			"policy-refs": [
+				"DataPreloadPolicy"
+			],
+			"scopes": [
+				"Test Data Preload"
+			]
+		},
+		{
+			"name": "Repository_Auto_Execute_By_Scope",
+			"description": "",
+			"policy-refs": [
+				"Domain_Business_Policy_Ref"
+			],
+			"repository-refs": [
+				"Repository_Policy_Ref"
+			],
+			"scopes": [
+				"Check Repository Auto Execute By Scope"
+			]
+		}
+	]
+}

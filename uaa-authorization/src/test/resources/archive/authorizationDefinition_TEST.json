@@ -1,0 +1,78 @@
+[
+	{
+		"name": "Submission",
+		"description": "Authorization for accessing Submission data (structured by user role)",
+		"Note - limitation": "Have to list all the roles in projects",
+		"authorization": [
+			{
+				"name": "Admin role",
+				"description": "the Admin has all permission on Submission data",
+				"rules": [
+					"hasRole(Admin)"
+				],
+				"rights": [
+					"view",
+					"create",
+					"edit"
+				]
+			},
+			{
+				"name": "Underwriter and NoUnderwriter role",
+				"description": "the Underwriter/NoUnderwriter has permission only on department in which he/she is in charged.",
+				"rules": [
+					"hasRole('underwrite_#submission.department') || hasRole(noUnderwrite_#submision.department)"
+				],
+				"rights": [
+					"view",
+					"create",
+					"edit"
+				]
+			},
+			{
+				"name": "The user roles which don't have permission on Submission data: underwriter system_admin, business_admin, guest, underwrite of other department",
+				"description": "This rule can be skipped, because all accessible rules are listed down in above (white box)",
+				"rules": [
+					"hasRole(system_admin) || hasRole(business_admin) || hasRole(guest) || !hasRole(#submission.department)"
+				],
+				"rights": [
+				]
+			}
+		]
+	},
+	{
+		"name": "Submission 2",
+		"description": "Just express the same concern as above but in different way (structured by ACTION)",
+		"authorization": [
+			{
+				"name": "VIEW Submission rule",
+				"description": "List all user which can VIEW submission",
+				"rules": [
+					"hasRole(admin) || principal.user.department.contains('#submission.department')"
+				],
+				"rights": [
+					"view"
+				]
+			},
+			{
+				"name": "CREATE Submission rule",
+				"description": "List all user which can CREATE submission",
+				"rules": [
+					"hasRole(admin) || principal.user.department.contains('#submission.department')"
+				],
+				"rights": [
+					"create"
+				]
+			},
+			{
+				"name": "EDIT Submission rule",
+				"description": "List all user which can EDIT submission",
+				"rules": [
+					"hasRole(admin) || principal.user.department.contains('#submission.department')"
+				],
+				"rights": [
+					"edit"
+				]
+			}
+		]
+	}
+]

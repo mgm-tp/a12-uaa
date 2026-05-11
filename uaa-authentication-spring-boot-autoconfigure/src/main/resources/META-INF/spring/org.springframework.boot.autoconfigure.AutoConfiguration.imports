@@ -1,0 +1,2 @@
+com.mgmtp.a12.uaa.authentication.autoconfigure.AuthenticationAutoConfiguration
+com.mgmtp.a12.uaa.authentication.autoconfigure.Oauth2SecurityAutoConfiguration

@@ -1,0 +1,89 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema",
+	"type": "object",
+	"contentMediaType": "application/json",
+	"examples": [
+		{
+			"name": "",
+			"description": "",
+			"call-parent-scope": true,
+			"policy-refs": [],
+			"policies": [],
+			"repository-refs": [],
+			"scopes": []
+		}
+	],
+	"required": ["name", "scopes"],
+	"identityProperty": "name",
+	"properties": {
+		"name": {
+			"description": "The identifier of Permission.",
+			"type": "string",
+			"minLength": 1
+		},
+		"description": {
+			"type": "string"
+		},
+		"call-parent-scope": {
+			"description": "This flag indicates whether parent permissions with the same scope as those in the parent authorization definition file should be executed, the default value is true.",
+			"type": "boolean",
+			"default": true
+		},
+		"policy-refs": {
+			"description": "An array of Policy name (identifier) references.",
+			"type": "array",
+			"uniqueItems": true,
+			"minItems": 1,
+			"items": {
+				"type": "string",
+				"minLength": 1,
+				"expressionType": "UAAExpression",
+				"$uaa-ref-in": "/policies"
+			}
+		},
+		"policies": {
+			"description": "An array of inline policy template definition.",
+			"type": "array",
+			"uniqueItems": true,
+			"minItems": 1,
+			"items": {
+				"type": "string",
+				"minLength": 1,
+				"expressionType": "SpEL"
+			}
+		},
+		"repository-refs": {
+			"description": "An array of RepositoryPolicy name (identifier) references.",
+			"type": "array",
+			"uniqueItems": true,
+			"minItems": 1,
+			"items": {
+				"type": "string",
+				"minLength": 1,
+				"$uaa-ref-in": "/repositoryPolicies"
+			}
+		},
+		"scopes": {
+			"description": "An array of scope names that can be referenced from the business code.",
+			"type": "array",
+			"uniqueItems": true,
+			"minItems": 1,
+			"items": {
+				"type": "string",
+				"minLength": 1
+			}
+		}
+	},
+	"anyOf": [
+		{
+			"required": ["policy-refs"]
+		},
+		{
+			"required": ["policies"]
+		},
+		{
+			"required": ["repository-refs"]
+		}
+	],
+	"additionalProperties": false
+}

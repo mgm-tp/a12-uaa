@@ -1,0 +1,51 @@
+{
+	"name": "Test Permission Definition",
+	"description": "",
+	"permissions": [
+		{
+			"name": "Permission",
+			"description": "Permission",
+			"policies": [
+				"false"
+			],
+			"scopes": [
+				"Test Scope"
+			]
+		},
+		{
+			"name": "Outer Permission",
+			"description": "Outer",
+			"policies": [
+				"print('outer principal:' + principal)",
+				"principal.username == 'test'",
+				"containsAnyRole({'ROLE_USER'})"
+			],
+			"scopes": [
+				"Outer Scope"
+			]
+		},
+		{
+			"name": "Java Permission",
+			"description": "Java",
+			"policies": [
+				"print('java principal:' + principal)",
+				"principal.username == 'test'",
+				"containsAnyRole({'ROLE_USER'})"
+			],
+			"scopes": [
+				"Java Scope"
+			]
+		},
+		{
+			"name": "Elevated Permission",
+			"description": "Elevated",
+			"policies": [
+				"print('elevated principal:' + principal)",
+				"principal.username == 'elevated'"
+			],
+			"scopes": [
+				"Elevated Scope"
+			]
+		}
+	]
+}

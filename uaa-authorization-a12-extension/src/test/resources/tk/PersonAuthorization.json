@@ -1,0 +1,311 @@
+{
+  "header": {
+    "id": "PersonAuthorization",
+    "modelType": "document",
+    "modelVersion": "28.0.2",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [],
+    "modelReferences": [
+      {
+        "alias": "Resource_Person",
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "Resource_Person"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "PersonAuthorization",
+      "immutable": false
+    },
+    "modelConfig": {
+      "decimalSeparator": ".",
+      "timeZone": "UTC",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "typeDefinitions": [
+      {
+        "id": "typedef_e45078e7-ca80-4ce9-9a14-39bf135a1c1c",
+        "name": "Department",
+        "fieldType": {
+          "type": "EnumerationType",
+          "EnumerationType": {
+            "values": [
+              {
+                "value": "PROPERTY"
+              },
+              {
+                "value": "CREDIT"
+              },
+              {
+                "value": "ACCIDENT"
+              },
+              {
+                "value": "SPECIALITY"
+              },
+              {
+                "value": "MARINE"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "typedef_89aae070-9d1f-4f4f-9859-191fec932e33",
+        "name": "Role",
+        "fieldType": {
+          "type": "EnumerationType",
+          "EnumerationType": {
+            "values": [
+              {
+                "value": "ADMIN"
+              },
+              {
+                "value": "TECHNICAL_ADMIN"
+              },
+              {
+                "value": "BUSINESS_ADMIN"
+              },
+              {
+                "value": "LOCAL_ADMIN"
+              },
+              {
+                "value": "GUEST"
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_a4a9a",
+          "name": "Authorization",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Group",
+                "id": "group_7741e",
+                "name": "user",
+                "Group": {
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_886d1",
+                      "name": "userName",
+                      "annotations": [
+                        {
+                          "name": "path",
+                          "value": "#user/username"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": ""
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_4e18d",
+                      "name": "firstName",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": ""
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_ed6bb",
+                      "name": "lastName",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": ""
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Group",
+                      "id": "group_5096f",
+                      "name": "roles",
+                      "annotations": [
+                        {
+                          "name": "path",
+                          "value": "#user/roles[]"
+                        }
+                      ],
+                      "Group": {
+                        "repeatability": 5,
+                        "elements": [
+                          {
+                            "type": "Field",
+                            "id": "field_f797e",
+                            "name": "name",
+                            "annotations": [
+                              {
+                                "name": "path",
+                                "value": "#user/roles[]/authority"
+                              }
+                            ],
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              },
+                              "label": [
+                                {
+                                  "locale": "en",
+                                  "text": ""
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Group",
+                      "id": "group_62eb5",
+                      "name": "organization",
+                      "Group": {
+                        "repeatability": 1,
+                        "elements": [
+                          {
+                            "type": "Field",
+                            "id": "field_3ad66",
+                            "name": "countryCode",
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              },
+                              "label": [
+                                {
+                                  "locale": "en",
+                                  "text": ""
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Rule",
+                "id": "rule_14a91",
+                "name": "User_validation",
+                "Rule": {
+                  "errorEntityRelPath": "../user/roles/name",
+                  "errorCode": "Error rule_14a91",
+                  "errorCondition": "NoGroupFilled(user/roles*)",
+                  "severity": "ERROR",
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "No Roles"
+                    }
+                  ],
+                  "guiPatterns": {
+                    "dynamicEnumerationRule": "false"
+                  }
+                }
+              },
+              {
+                "type": "Group",
+                "id": "include_57c84",
+                "name": "person",
+                "Group": {
+                  "repeatability": 1,
+                  "modelAlias": "Resource_Person"
+                }
+              },
+              {
+                "type": "Rule",
+                "id": "rule_a6f47",
+                "name": "Admin",
+                "Rule": {
+                  "errorEntityRelPath": "../user/roles/name",
+                  "errorCode": "Error rule_a6f47",
+                  "errorCondition": "NumberOfValueInFields(\"admin\"  in  user/roles*/name) == 0",
+                  "severity": "ERROR",
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "Pajemalos maladec ent niet admin"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Rule",
+                "id": "rule_f80a2",
+                "name": "AddressesFilled",
+                "Rule": {
+                  "errorEntityRelPath": "../person/addresses/firstName",
+                  "errorCode": "Error rule_f80a2",
+                  "errorCondition": "NoGroupFilled(person/addresses*)",
+                  "severity": "ERROR",
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "NIma adresa"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Rule",
+                "id": "rule_6f9fc",
+                "name": "Failing",
+                "Rule": {
+                  "errorEntityRelPath": "../user/userName",
+                  "errorCode": "Error rule_6f9fc",
+                  "errorCondition": "[user/userName] == \"1\"",
+                  "severity": "ERROR",
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "Fail"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

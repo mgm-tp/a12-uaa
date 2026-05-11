@@ -1,0 +1,707 @@
+{
+  "header": {
+    "id": "DomainUserManagement",
+    "modelType": "document",
+    "modelVersion": "28.1.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "savedAt",
+        "value": "2021-07-20T00:00:00.000+07:00"
+      },
+      {
+        "name": "roles",
+        "value": "userManagementAdmin,guest"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "DomainUserExtensionExample",
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "DomainUserExtensionExample"
+      },
+      {
+        "alias": "DomainUserManagementNested",
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "DomainUserManagementNested"
+      },
+      {
+        "alias": "DomainUserManagemenExtension1",
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "DomainUserManagemenExtension1"
+      },
+      {
+        "alias": "DomainUserManagemenExtension2",
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "DomainUserManagemenExtension2"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "DomainUserManagement",
+      "immutable": false
+    },
+    "modelConfig": {
+      "decimalSeparator": ".",
+      "timeZone": "UTC",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_6804b",
+          "name": "user",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Field",
+                "id": "field_8a86d",
+                "name": "id",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType",
+                    "StringType": {
+                      "maxLength": 255
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "ID"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "ID"
+                    }
+                  ],
+                  "requirednessConfig": {
+                    "mode": "absoluteOrRelativeToNextRepAncestor"
+                  }
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_70393",
+                "name": "username",
+                "annotations": [
+                  {
+                    "name": "enable_approximate_match_search",
+                    "value": "true"
+                  },
+                  {
+                    "name": "enable_case_insensitive_search",
+                    "value": "true"
+                  }
+                ],
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType",
+                    "StringType": {
+                      "errorMessage": [
+                        {
+                          "locale": "en",
+                          "text": "Characters >,<,/,\\ are forbidden in username"
+                        },
+                        {
+                          "locale": "de",
+                          "text": "Die Zeichen >,<,/,\\ sind nicht erlaubt"
+                        }
+                      ],
+                      "maxLength": 255,
+                      "pattern": "^[^\\<\\>\\\\\\/]*$"
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Username"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Benutzername"
+                    }
+                  ],
+                  "requirednessConfig": {
+                    "mode": "absoluteOrRelativeToNextRepAncestor"
+                  }
+                }
+              },
+              {
+                "type": "Field",
+                "id": "F10",
+                "name": "password",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "password"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Passwort"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "F15",
+                "name": "salt",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  }
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_d33c5",
+                "name": "firstName",
+                "annotations": [
+                  {
+                    "name": "enable_approximate_match_search",
+                    "value": "true"
+                  },
+                  {
+                    "name": "enable_case_insensitive_search",
+                    "value": "true"
+                  }
+                ],
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType",
+                    "StringType": {
+                      "maxLength": 255
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "First name"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Vorname"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_b95d0",
+                "name": "lastName",
+                "annotations": [
+                  {
+                    "name": "enable_approximate_match_search",
+                    "value": "true"
+                  },
+                  {
+                    "name": "enable_case_insensitive_search",
+                    "value": "true"
+                  }
+                ],
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType",
+                    "StringType": {
+                      "maxLength": 255
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Last name"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Nachname"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_31bc7",
+                "name": "email",
+                "annotations": [
+                  {
+                    "name": "enable_approximate_match_search",
+                    "value": "true"
+                  },
+                  {
+                    "name": "enable_case_insensitive_search",
+                    "value": "true"
+                  }
+                ],
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType",
+                    "StringType": {
+                      "errorMessage": [
+                        {
+                          "locale": "en",
+                          "text": "Please enter valid email address"
+                        },
+                        {
+                          "locale": "de",
+                          "text": "Bitte geben Sie eine gültige Email Adresse ein"
+                        }
+                      ],
+                      "maxLength": 255,
+                      "pattern": "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+"
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Email"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Email"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_8a12f",
+                "name": "enabled",
+                "Field": {
+                  "fieldType": {
+                    "type": "BooleanType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Enabled"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Aktiv"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_93477",
+                "name": "avatar",
+                "Group": {
+                  "repeatability": 1,
+                  "usageType": "attachment",
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_cc909",
+                      "name": "original_filename",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_2b803",
+                      "name": "internal_filename",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_ee11f",
+                      "name": "content",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType",
+                          "StringType": {
+                            "lineBreaksPermitted": true,
+                            "noValueValidation": true
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_126c2",
+                      "name": "attachment_id",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_de292",
+                      "name": "size",
+                      "Field": {
+                        "fieldType": {
+                          "type": "NumberType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_4c127",
+                      "name": "mime_type",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_8ac6c",
+                      "name": "category",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_ff1e4",
+                      "name": "description",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_33e4b",
+                      "name": "AttachmentInternalFilenameRequired",
+                      "Rule": {
+                        "errorEntityRelPath": "../internal_filename",
+                        "errorCode": "Error rule_33e4b",
+                        "errorCondition": "GroupFilled(RuleGroup) and FieldNotFilled(internal_filename)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "Internal Error: Field $internal_filename$ of customType attachment is not filled."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Internal Error: Field $internal_filename$ of customType attachment is not filled."
+                          }
+                        ],
+                        "guiPatterns": {
+                          "dynamicEnumeration": "false"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_77ec2",
+                      "name": "AttachmentMimeTypeRequired",
+                      "Rule": {
+                        "errorEntityRelPath": "../mime_type",
+                        "errorCode": "Error rule_77ec2",
+                        "errorCondition": "GroupFilled(RuleGroup) and FieldNotFilled(mime_type)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "Internal Error: Field $mime_type$ of customType attachment is not filled."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Internal Error: Field $mime_type$ of customType attachment is not filled."
+                          }
+                        ],
+                        "guiPatterns": {
+                          "dynamicEnumeration": "false"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_4722d",
+                      "name": "AttachmentIdOrContentFilled",
+                      "Rule": {
+                        "errorEntityRelPath": "../content",
+                        "errorCode": "Error rule_4722d",
+                        "errorCondition": "GroupFilled(RuleGroup) and NotExactlyOneFieldFilled(attachment_id, content)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "Internal Error: Either attachment_id or content must be filled in a customType attachment, but not both."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Internal Error: Either attachment_id or content must be filled in a customType attachment, but not both."
+                          }
+                        ],
+                        "guiPatterns": {
+                          "dynamicEnumeration": "false"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_faf49",
+                      "name": "SizeOfContentFilled",
+                      "Rule": {
+                        "errorEntityRelPath": "../content",
+                        "errorCode": "Error rule_faf49",
+                        "errorCondition": "FieldFilled(content) and FieldNotFilled(size)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "Internal Error: If the content is filled, the size must be also filled."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Internal Error: If the content is filled, the size must be also filled."
+                          }
+                        ],
+                        "guiPatterns": {
+                          "dynamicEnumeration": "false"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_e267a",
+                "name": "role",
+                "Group": {
+                  "repeatability": 99,
+                  "indexFieldName": "name",
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_477c6",
+                      "name": "name",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType",
+                          "StringType": {
+                            "maxLength": 255
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_cb3c1",
+                "name": "organizationUnitRole",
+                "Group": {
+                  "repeatability": 100,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_b5e0c",
+                      "name": "organizationUnit",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Organization Unit"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Organisationseinheit"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_394a0",
+                      "name": "role",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Role"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Rolle"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_3b15b",
+                      "name": "AtLeastRoleIsFilled",
+                      "Rule": {
+                        "errorEntityRelPath": "../role",
+                        "errorCode": "Error rule_3b15b",
+                        "errorCondition": "NumberOfFilledFields(organizationUnit,role) == 0 AND GroupFilled(RuleGroup)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "Please assign at least one role"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Es muss mindestens eine Rolle zugewiesen sein"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_144ba",
+                      "name": "RoleShouldBeAssignedAsWell",
+                      "Rule": {
+                        "errorEntityRelPath": "../role",
+                        "errorCode": "Error rule_144ba",
+                        "errorCondition": "FieldFilled(organizationUnit) AND FieldNotFilled(role)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "Role should be assigned as well"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Es muss ebenfalls eine Rolle zugewiesen sein"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Rule",
+                "id": "rule_cb5da",
+                "name": "OrgAndRoleMustBeUnique",
+                "Rule": {
+                  "errorEntityRelPath": "../organizationUnitRole/organizationUnit",
+                  "errorCode": "Error rule_cb5da",
+                  "errorCondition": "RepetitionNotUnique(organizationUnitRole/organizationUnit,organizationUnitRole/role) AND GroupFilled(organizationUnitRole)",
+                  "severity": "ERROR",
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "Organization Unit and Role are already assigned to this user"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Organisationseinheit und Rolle sind bereits zugewiesen"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Rule",
+                "id": "rule_e2c84",
+                "name": "RoleMustBeUnique",
+                "Rule": {
+                  "errorEntityRelPath": "../organizationUnitRole/role",
+                  "errorCode": "Error rule_e2c84",
+                  "errorCondition": "FieldNotFilled(organizationUnitRole/organizationUnit) AND RepetitionNotUnique(organizationUnitRole/organizationUnit,organizationUnitRole/role) AND GroupFilled(organizationUnitRole)",
+                  "severity": "ERROR",
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "Role already assigned to this user"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Die Rolle ist bereits zugewiesen"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "include_7f34d",
+                "name": "extension",
+                "Group": {
+                  "repeatability": 1,
+                  "modelAlias": "DomainUserExtensionExample"
+                }
+              },
+              {
+                "type": "Group",
+                "id": "include_930b7",
+                "name": "user_nested",
+                "Group": {
+                  "repeatability": 1,
+                  "modelAlias": "DomainUserManagementNested"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "Group",
+          "id": "group_d0da6",
+          "name": "test",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Group",
+                "id": "include_d6681",
+                "name": "extend1",
+                "Group": {
+                  "repeatability": 1,
+                  "modelAlias": "DomainUserManagemenExtension1"
+                }
+              },
+              {
+                "type": "Group",
+                "id": "include_88b4e",
+                "name": "extend2",
+                "Group": {
+                  "repeatability": 1,
+                  "modelAlias": "DomainUserManagemenExtension2"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

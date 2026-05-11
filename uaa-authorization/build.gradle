@@ -1,0 +1,36 @@
+plugins {
+	id 'java-library'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding 'UTF-8'
+    options.compilerArgs.add("-parameters")
+}
+
+dependencies {
+	api libs.inject
+	api libs.springSecurityCore
+	api libs.springSecurityConfig
+	api libs.jacksonCore
+	api libs.jacksondataBind
+	api libs.jacksonAnnotations
+	api libs.annotationApi
+	api libs.validationApi
+	api(libs.javersCore) {
+		exclude group: 'org.slf4j', module: 'slf4j-api'
+	}
+	api libs.slf
+	api libs.beanUtils
+	api libs.commonsLang
+	api libs.aspectJWeaver
+	api libs.commonsCollection
+	api libs.jsonSchemaValidator
+	api libs.persistenceApi
+	api libs.reflections
+
+	testImplementation libs.bundles.springTest
+	testImplementation project(':uaa-authentication-principal-extension')
+}
+
+description = 'UAA:: Authorization'
+

@@ -1,0 +1,338 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+[[uaa-principal-extension]]
+== Principal Extension
+
+IDP maintains `users` and (usually) roles assigned to the user.
+UAA provides a universal *Principal Extension* which provides coherent functionality for converting data from IDP response into a principal stored in `SpringSecurityContext`
+The extension provides an abstraction in principal processing which is independent of authentication type.
+UAA supports principals containing `roles` with `ACCESS RIGHT(s)` assigned to the role.
+The mapping between role and access right(s) can be defined in the file and it's managed by the *Principal Extension*
+
+
+[[user-overview]]
+=== Overview
+The Principal Extension module provides complete structure of User object. On top of the user object it also provides a `Role` which represents an `GrantedAuthority` with set of `AccessRight(s)`.
+
+Following class diagram illustrates inheritance and all properties. 
+
+image::assets/images/user_classes.png[User class diagram,title="Principal class diagram",link="assets/images/user_classes.png" ]
+
+The principal object can be further extended. When it's necessary to extend it's recommended to extend from `AbstractExtendedPrincipal<T>`.
+
+
+[NOTE]
+====
+When it's required to serialize the extended principal type into JWT token please add the `@UAAJsonSerialization` annotation to a new type.
+====
+
+[[principal-getting-started]]
+=== Getting Started
+
+Add following dependencies to your POM:
+
+Maven:
+[source, xml,subs="verbatim,attributes"]
+----
+<dependency>
+	<groupId>com.mgmtp.a12.uaa</groupId>
+	<artifactId>uaa-authentication-principal-extension-spring-boot-autoconfigure</artifactId>
+	<version>{version}</version>
+</dependency>
+----
+
+Gradle:
+[source,css,options="nowrap"]
+----
+dependencies {
+    implementation "com.mgmtp.a12.uaa:uaa-authentication-principal-extension-spring-boot-autoconfigure:{version}"
+}
+
+----
+
+Based on authentication type the Spring boot configuration module will register proper beans for principal processing.
+
+
+=== Principal Processing
+The principal processing contains several steps. Each section below will describe the step in details. Most of the steps contain extension points and standard behaviours can be changed.
+The process is usually started after data is received from IDP after login. The result of the process is a principal object which is put to `SpringSecurityContext`.
+The flow is implemented in the `PrincipalProcessor` class.
+
+=== Extended Data Loading
+A principal object can contain an extended data. The data object is a generic data type so it can be any data.
+An implementation of the `UAAExtendedPrincipalDataLoader` must is provided by an implementation.
+[NOTE]
+====
+The loader is optional and it's not required to implement it.
+====   
+
+=== Create Principal
+Principal creation is abstracted by the interface `PrincipalFactory`. It contains few convenient methods for principal creation. The *Principal Extension* provides a standard implementation which create a principal object of a type `ExtendedPrincipal`.
+In order to provide different implementation just instantiate a Spring bean implementing the `PrincipalFactory`.
+
+[NOTE]
+====
+Authorities are required for the principal and created beforehand because they strongly depend on the used authentication type.
+====
+
+=== Authority Mapping
+As stated in previous step the authorities are created beforehand. Based on the data from IDP authorities might be complete (with AccessRights) or just authority names.
+This section is only interesting for incomplete authority objects which can be populated with remaining data.
+
+image::assets/images/authority_mapping.png[Authority mapping diagram,title="Authority mapping diagram",link="assets/images/authority_mapping.png" ]
+
+The granted authority object is first converted to a `Role` object. After that AccessRight for that role is loaded. 
+The mapping between `Role` and `AccessRight` is loaded by a mapper which is an implementation of `RoleMappingLoader<T>` interface. 
+
+The principal extension provides two implementations. First is a default implementation which is fallback when no implementation for concrete payload is found.
+The implementation loads mapping from a YAML file.
+
+`RoleMappingLoader<T>` is an interface which provides a way to load role mapping to access right. A mapper loads a mapping based on the payload type (depending on authentication type).  
+
+Principal Extension provides two different role mapping loaders. First is specific to <<role-mapping-jwt, OAUTH2 JWT>> token and second is <<role-mapping-yaml, generic file-based>> for all authentication types.
+
+[NOTE]
+====
+Specific role mapping loader has precedence over generic one.
+====    
+
+[[role-mapping-jwt]]
+==== JWT Token Role Mapping (Support for Oauth2 only)
+
+Role mapping can be also stored (encoded) as a property in OAUTH2 claims.
+
+The format is 
+[source, properties,subs="verbatim,attributes"]
+----
+<Role Name_1>:<Access Right Name_1>,<Access Right Name_2>;...
+----
+
+
+The example definition is:
+[source,properties,subs="verbatim,attributes"]
+----
+ Role1:Right1,Right2;Role2:Right1,Right2
+----
+
+
+The implementation is activated by a configuration where the field name is specified.
+[source,properties,subs="verbatim,attributes"]
+
+----
+mgmtp.a12.uaa.authentication.principal.oauth2Config.role-mapping-from-token.field-name=<name>
+----
+
+[[role-mapping-yaml]]
+==== YAML Role Mapping (fallback implementation all authentication types)
+
+YAML file based role mapping is generic fallback implementation where role mapping is defined in YAML file.
+The initial mapping is configured on startup.
+Later on it can be changed by using the endpoint `<UAA context>/principal-extension/roleMapping`.
+The endpoint is a simple POST which accepts YAML in the body.
+
+[NOTE]
+====
+The endpoint `/principal-extension/roleMapping` is bound to the scope `Upload Role Access Rights Mapping Rule`
+====
+
+[WARNING]
+====
+*UAA has no cluster support!*  When an application is running in a cluster it's an application responsibility to reload the authorization file in each cluster node.
+====
+
+[WARNING]
+====
+This endpoint will accept the role access right mapping as yaml string format then update the whole role mapping data holder object in the memory.
+====
+
+[WARNING]
+====
+It's highly recommended to use system user with higher privileges to change Access Right file.
+====
+
+The implementation is activated by a configuration where a YAML file is referenced.
+
+[source,properties,subs="verbatim,attributes"]
+----
+mgmtp.a12.uaa.authentication.principal.access-rights-resource=classpath:/access_rights.yaml
+----
+
+Example Data File:
+[source,yaml,subs="verbatim,attributes"]
+----
+roles:
+  - name: Reviewer
+    description: Reviewer role
+    accessRights:
+      - right1
+      - right2
+  - name: Admin
+    description: Admin role
+    accessRights:
+      - READ
+      - WRITE
+  - name: Manager
+    description: Manager role
+    accessRights:
+      - READ
+      - WRITE
+
+----
+
+[NOTE]
+====
+. Once the access-rights-resource property is configured, the application will fail to start if in these cases:
+
+* invalid resource loading (Path is empty or wrong path)
+* invalid resource parsing
+
+. Once the access-rights-resource property is configured, the original roles will be removed if these roles have no access rights for mapping
+====
+
+
+=== Add Custom Attributes
+
+This is the very last step which allows to map a data received from an IDP into created principal object without modifying the principal object. The module provides an interface `PropertyExtractor<T>` and dedicated implementation for each authentication type.
+In order to customize the implementation it's possible to provide specific implementation of the above interface into spring container. In this case the default implementation is ignored.
+
+The properties which will be extracted are specified in the configuration.
+
+When the property is extracted from IDP response there are two possibilities where it's stored in the principal object.
+
+* Custom principal type is provided which contains the property
+* Property is store into default `additionalProperties` map.
+
+==== Configuration:
+[source, properties,subs="verbatim,attributes"]
+----
+mgmtp.a12.uaa.authentication.principal.additional-properties=<list of property names>
+----
+
+
+=== Local User (UAA Acts as IDP)
+In case of `LOCAL` authentication type there is no IDP and it's required to store user data with credentials locally.
+The user is then converted to a proper principal. The users are loaded from a file system resource(s).
+There are several steps needed to use local users.
+
+Local user is defined by a type `LocalUser` which contains basic set of properties.
+In the default implementation it's enough to define data files and reference them by a configuration.  
+
+Please see a configuration and data file example.
+
+==== Configuration
+[source, properties,subs="verbatim,attributes"]
+----
+mgmtp.a12.uaa.authentication.principal.local-config.user-resources=classpath:/users/admin.yaml,classpath:/users/tom.yaml
+----
+
+[NOTE]
+====
+Currently, we do not support to provide list of user in single yaml file, you need to keep it in separate files.
+In-case you have a lot of user files then you can use the wildcard for loading.
+Below is an example:
+
+mgmtp.a12.uaa.authentication.principal.local-config.user-resources=classpath:users/*.yaml
+====
+
+Example Data File:
+[source, yaml,subs="verbatim,attributes"]
+----
+username: "admin"
+password: "admin"
+authorities:
+- "Reviewer"
+- "Admin"
+- "Manager"
+email: admin@a.com
+firstname: Ad
+lastname: Min
+
+----
+
+[WARNING]
+====
+Password is not encoded because LOCAL authentication type is intended just for development use.
+====
+
+
+
+For other authentication type(s) it's not needed because the user is loaded form IDP.
+
+=== Custom Attributes for Local User
+==== LOCAL
+Local user also provides a way to load custom attributes into a `principal`
+
+It's needed to provide an custom type which contains all the attributes and instantiate a loader with that type.
+
+In the following example we use a `nationality` property.
+
+First it's needed to provide a custom local user type:
+[source, java,subs="verbatim,attributes"]
+----
+public class ExampleLocalUser extends LocalUser {
+
+	private String nationality;
+
+	public String getNationality() {
+		return nationality;
+	}
+
+	public void setNationality(String nationality) {
+		this.nationality = nationality;
+	}
+
+}
+
+----
+
+Next step is to instantiate a loaded with proper type into Spring container:
+[source, java,subs="verbatim,attributes"]
+----
+@Bean
+@ConditionalOnAuthentication(AuthenticationType.LOCAL)
+public LocalUserLoader<ExampleLocalUser> userLoader() {
+    return new UAALocalUserLoader<ExampleLocalUser>(ExampleLocalUser.class);
+}
+----
+
+From now it' possible to use the new structure in the YAML file
+[source, yaml,subs="verbatim,attributes"]
+----
+username: "admin"
+password: "admin"
+authorities:
+- "Reviewer"
+- "Admin"
+- "Manager"
+email: admin@a.com
+firstname: Ad
+lastname: Min
+nationality: VN
+----  
+ 
+With the following configuration the `nationality` property will be transferred into user object.
+   
+[source, properties,subs="verbatim,attributes"]
+----
+mgmtp.a12.uaa.authentication.principal.additional-properties=nationality
+----
+
+==== LDAP
+LDAP response extraction is not yet implemented
+
+

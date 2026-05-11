@@ -1,0 +1,76 @@
+{
+  "header": {
+    "id": "Role-AccessRight-RM_AccessRight_AvailableItemsOverview",
+    "modelType": "overview",
+    "modelVersion": "37.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "userManagementAdmin"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "AccessRight-DM"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "enableFilter": true,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "all_columns"
+      },
+      "showFullTextSearch": false,
+      "pagingSize": 10
+    },
+    "subHeaderBox": {
+      "majorElements": [
+        {
+          "type": "filter"
+        }
+      ],
+      "minorElements": []
+    },
+    "columns": [
+      {
+        "id": "column-1ad7d",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Name"
+          },
+          {
+            "locale": "de",
+            "text": "Name"
+          }
+        ],
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_e7eb8",
+        "sortable": false
+      }
+    ],
+    "footerBox": {
+      "majorElements": [],
+      "minorElements": []
+    },
+    "rowActionGroup": {
+      "actions": []
+    }
+  }
+}

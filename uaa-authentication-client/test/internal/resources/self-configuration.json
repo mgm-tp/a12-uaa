@@ -1,0 +1,72 @@
+{
+	"applicationBaseUrl": "http://localhost:8080",
+	"uaaBaseUrl": "http://localhost:8080",
+	"authorizationDataStore": "",
+	"excludedDelegatedContexts": null,
+	"local": {
+		"loginRelativeUrl": "user/local/login",
+		"logoutRelativeUrl": "user/logout",
+		"tokenType": "UAABEARER"
+	},
+	"activeDirectoryLdap": {
+		"loginRelativeUrl": "user/active_directory_ldap/login",
+		"logoutRelativeUrl": "user/logout",
+		"tokenType": "UAABEARER"
+	},
+	"saml": {
+		"loginRelativeUrl": "saml2/authenticate/uaa",
+		"logoutRelativeUrl": "user/logout",
+		"tokenType": "UAABEARER",
+		"ssoConfiguration": {
+			"userNameXpath": "//input[@name='username']",
+			"passwordXpath": "//input[@name='password']",
+			"loginButtonXpath": "//button[@name='login']"
+		}
+	},
+	"oidc": {
+		"tokenType": "BEARER",
+		"confidentialClient": {
+			"loginRelativeUrl": "token",
+			"clientId": "uaa-auth-client",
+			"realmName": "UAARealm",
+			"idpBaseUrl": "http://localhost:9090"
+		},
+		"publicClient": {
+			"loginRelativeUrl": "auth",
+			"clientId": "uaa-spa-client",
+			"realmName": "UAARealm",
+			"idpBaseUrl": "http://localhost:9090",
+			"tokenExchangeRelativeUrl": "token",
+			"loginRedirectRelativeUrl": "callback",
+			"logoutRedirectRelativeUrl": "logout",
+			"silentRedirectRelativeUrl": "silent_renew.html",
+			"tokenRenewThresholdInSeconds": 60,
+			"enableRefreshTokenGrant": false,
+			"ssoConfiguration": {
+				"userNameXpath": "//input[@name='username']",
+				"passwordXpath": "//input[@name='password']",
+				"loginButtonXpath": "//button[@name='login']"
+			}
+		},
+		"logoutIdp": true,
+		"loginType": ""
+	},
+	"tokens": [
+		{
+			"authorizationHeaderName": "Authorization",
+			"tokenType": "UAABEARER",
+			"generatedTokenHeaderName": "access_token",
+			"generatedTokenExpirationHeaderName": "access_token_expiration",
+			"allowCredentials": true
+		},
+		{
+			"authorizationHeaderName": "Authorization",
+			"tokenType": "BEARER",
+			"allowCredentials": false
+		},
+		{
+			"authorizationHeaderName": "Authorization",
+			"tokenType": "CERT"
+		}
+	]
+}

@@ -1,0 +1,402 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+[[CertificateAuthentication]]
+=== Certificate
+
+Certificate is used for the authentication.
+It can be useful for backend jobs.
+Such jobs are executed just in the backend without user interaction (any credentials).
+The strategy will avoid creating technical users in a IDP or somewhere else.
+
+Each system or service is issued an X.509 certificate by our Root Certificate Authority (CA), which contains relevant information such as the system’s name and roles.
+During authentication, the server verifies the client’s certificate (the “certificate”) to confirm its identity and permissions.
+
+[[certificate-sequence]]
+==== Sequence Diagram
+
+image:resources/images/certificate_sequence.png[certificate,title="Certificate authentication flow"]
+
+==== Preparing Steps
+
+[[addRoleInfo]]
+It's recommended to install https://www.openssl.org/[OpenSSL] tool.
+
+* Certificate Authority (CA)
+
+** Create a configuration for CA certificate `openssl_ca.cnf`.
++
+[source,properties]
+-----
+[ req ]
+distinguished_name = req_distinguished_name
+prompt = no
+
+[ req_distinguished_name ]
+countryName             = AB
+stateOrProvinceName     = CD
+localityName            = EFG_HIJ
+organizationName        = MyOrg
+organizationalUnitName  = MyOrgUnit
+commonName              = mycommname
+emailAddress            = emailaddress@myemail.com
+
+[ v3_ca ]
+basicConstraints = critical,CA:true,pathlen:0
+keyUsage         = critical,keyCertSign,cRLSign
+-----
++
+** Generate rootCA (private) key:
++
+[source,shell]
+-----
+openssl genrsa -out ca.key 2048
+-----
++
+. Generates a 2048-bit RSA private key named ca.key
+. This private key is used later to sign client/server certificates.
++
+** Create a self-signed CA certificate
++
+[source,shell]
+-----
+openssl req -x509 -new -nodes -key ca.key -sha256 -days 365 -out ca.pem -config openssl_ca.cnf -extensions v3_ca
+-----
++
+. Creates a new certificate request and immediately self-signs it (-x509).
+. Uses the CA’s private key (ca.key) to sign.
+. Valid for 365 days.
+. Outputs the CA’s certificate as ca.pem.
++
+** Import the CA certificate into a Truststore (If you only use one CA certificate)
++
+[source,shell]
+-----
+keytool -import -file ca.pem -alias "ca" -keystore truststore.p12 -storetype PKCS12
+-----
++
+. Imports the ca.pem certificate into a Java-compatible .p12 truststore.
+. You must enter the password and keep it secret (Example: `kspassword`).
+. The truststore is what your application (or other applications) will use to trust this CA when validating certificates.
++
+** Import the CA certificates into a Truststore (If you use more than one CA certificates)
++
+*** Merge all CA certificates into one file
++
+[source,shell]
+-----
+cat ca1.pem ca2.pem > mergedCAs.pem
+-----
++
+. Simply concatenates multiple PEM files into a single mergedCAs.pem file.
++
+*** Create a temporary Java KeyStore (.jks)
++
+[source,shell]
+-----
+keytool -genkey -alias temp \
+  -keystore truststore.jks \
+  -storepass tspassword \
+  -keyalg RSA \
+  -dname "CN=dname"
+-----
++
+. Generates a new (temporary) private key entry in a .jks keystore named truststore.jks and the password is tspassword.
+. We’ll remove this entry immediately afterward.
+The purpose here is just to initialize an empty keystore file in .jks format.
++
+*** Remove the temporary alias
++
+[source,shell]
+-----
+keytool -delete -alias temp \
+  -keystore truststore.jks \
+  -storepass tspassword
+-----
++
+*** Import the merged CA certificates
++
+[source,shell]
+-----
+keytool -import -trustcacerts \
+  -alias rootCAs \
+  -file mergedCAs.pem \
+  -keystore truststore.jks \
+  -storepass tspassword \
+  -noprompt
+-----
++
+. Imports all the CA certificates contained in mergedCAs.pem into truststore.jks.
++
+*** Convert the .jks truststore to PKCS12
++
+[source,shell]
+-----
+keytool -importkeystore \
+  -srckeystore truststore.jks \
+  -srcstorepass tspassword \
+  -destkeystore truststore.p12 \
+  -deststorepass tspassword \
+  -deststoretype pkcs12
+-----
++
+. Converts truststore.jks to a PKCS12 file named truststore.p12.
+
+* Client Certificate
+
+** Create a configuration for CA certificate `openssl_client.cnf`.
+In the client certificate it's required to have custom attributes (those properties are identified by it's own unique OID(s)):
+
+. Roles (OID=1.2.276.128) - Required
+. Country (OID=1.2.276.256) - Optional
++
+[source,properties]
+-----
+oid_section = new_oids
+
+[req]
+distinguished_name = req_distinguished_name
+prompt = no        # Stop confirmation prompts. All information is contained below.
+eq_extensions = uaa_extension
+
+
+[ new_oids ]
+UserRoles=1.2.276.128       # 2=country,276=DE
+Country=1.2.276.256
+
+
+[ req_distinguished_name ]
+stateOrProvinceName = Some-State
+localityName = Munich
+organizationName = MGM
+organizationalUnitName = Development
+commonName = admin
+
+[ uaa_extension ]
+#UserRoles = ASN1:UTF8String:Admin,Manager
+1.2.276.128=ASN1:UTF8String:Admin,Manager
+1.2.276.256=ASN1:UTF8String:VN
+-----
++
+** Generate the client’s private key:
++
+[source,shell]
+-----
+openssl genrsa -out client.key 2048
+-----
++
+. Creates a 2048-bit RSA private key for the client.
++
+** Create the client’s CSR (Certificate Signing Request):
++
+[source,shell]
+-----
+openssl req -new -key client.key -out client.csr -config openssl_client.cnf -extensions uaa_extension
+-----
++
+. Generates a CSR named client.csr using client.key.
+. Reads additional certificate details/fields from openssl_client.cnf and uses the extension named uaa_extension.
++
+** Sign the client’s certificate with the CA:
++
+[source,shell]
+-----
+openssl x509 -req -in client.csr -CA ca.pem -CAkey ca.key -CAcreateserial -out client.crt -days 365 -extfile openssl_client.cnf -extensions uaa_extension
+-----
++
+. Uses the CA’s key (ca.key) and certificate (ca.pem) to sign the client CSR.
+. Creates client.crt, valid for 365 days.
+. Adds extra extensions defined under uaa_extension in your openssl_client.cnf.
++
+** Export the client key and certificate to PKCS12
++
+[source,shell]
+-----
+openssl pkcs12 -export -out client.p12 -name "client" -inkey client.key -in client.crt -certfile ca.pem
+-----
++
+. You must enter the password and keep it secret (Example: `clpassword`).
+. Bundles the client’s private key and certificate (plus the CA certificate for the chain) into a single .p12 file.
+. This .p12 can be used by your client-side application to present its certificate to the server.
+
+* Server Certificate
+
+** Create a configuration for CA certificate `openssl_server.cnf`.
++
+[source,properties]
+-----
+[req]
+distinguished_name = req_distinguished_name
+req_extensions = v3_req
+prompt = no
+
+[req_distinguished_name]
+CN = localhost  # Set Common Name as localhost
+
+[v3_req]
+keyUsage = keyEncipherment, dataEncipherment, digitalSignature
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.0 = myexampleclient.com  # Include myexampleclient.com as a valid domain
+DNS.1 = localhost  # Include localhost as a valid domain
+-----
++
+** Generate the server’s private key:
++
+[source,shell]
+-----
+openssl genrsa -out server.key 2048
+-----
++
+. Creates a 2048-bit RSA private key for the server.
++
+** Create the server’s CSR
++
+[source,shell]
+-----
+openssl req -new -key server.key -out server.csr -config openssl_server.cnf -extensions v3_req
+-----
++
+. Generates a CSR named server.csr using server.key.
+. Reads certificate details/fields from openssl_server.cnf and uses the v3_req extension.
++
+** Sign the server’s certificate with the CA
++
+[source,shell]
+-----
+openssl x509 -req -in server.csr -CA ca.pem -CAkey ca.key -CAcreateserial -out server.crt -days 365 -extfile openssl_server.cnf -extensions v3_req
+-----
++
+. Uses the CA’s key (ca.key) and certificate (ca.pem) to sign the server CSR.
+. Creates server.crt, valid for 365 days.
+. Includes your specified SAN (Subject Alternative Name) and Extended Key Usage
++
+** Export the server key and certificate to PKCS12
++
+[source,shell]
+-----
+openssl pkcs12 -export -out server.p12 -name "server" -inkey server.key -in server.crt -certfile ca.pem
+-----
++
+. You must enter the password and keep it secret (Example: `svpassword`).
+. Packages the server’s private key and certificate (plus the CA certificate) into one .p12 file.
+. You can use this .p12 in a Spring Boot application as your server keystore for TLS.
+
+[[CertificateValidator]]
+===== Certificate Validator
+
+In case you want to validate your own business you can implement `CertificateValidator` interface.
+
+Below is an example:
+
+[source,java,subs="verbatim,attributes"]
+----
+@Component
+public class ProjectCertificateValidator implements CertificateValidator {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ProjectCertificateValidator.class);
+
+	@Override
+	public boolean validate(X509Certificate certificateToVerify) {
+		// Your custom code here.
+	}
+
+}
+----
+
+[[CertificatePrincipalConverter]]
+===== Certificate Converter (principal)
+
+Certificate needs to be converted to the principal object.
+
+Below is example.
+We will get the name, country and userRole attribute from the certificate for user principal creating.
+
+[source,java,subs="verbatim,attributes"]
+----
+public class CertificatePrincipalConverter implements CertificateConverter {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(CertificatePrincipalConverter.class);
+
+	private static final String COMMON_NAME = "CN"; // standard certificate attribute
+	private static final String COUNTRY = "1.2.276.256"; // standard certificate attribute
+	private static final String USER_ROLE = "1.2.276.128"; // our custom attribute
+
+	@Inject
+	private PrincipalProcessor principalProcessor;
+
+	@Override
+	public UserDetails convert(X509Certificate certificate) {
+		String userNameValue = getAttributeValueFromCertificatePrincipal(certificate, COMMON_NAME);
+		String roles = CertificateUtils.getAttributeValueFromCertificateExtension(certificate, USER_ROLE);
+		String country = CertificateUtils.getAttributeValueFromCertificateExtension(certificate, COUNTRY);
+
+		Set<GrantedAuthority> grantedAuthorities = Arrays.asList(roles.split(",")).stream()
+			.map(roleName -> new SimpleGrantedAuthority(roleName))
+			.collect(Collectors.toSet());
+		AbstractExtendedPrincipal<?> user = principalProcessor.createPrincipal(userNameValue, grantedAuthorities, certificate);
+		return user;
+
+	}
+
+
+	private String getAttributeValueFromCertificatePrincipal(X509Certificate certificate, String attributeName) {
+		try {
+			String subjectName = certificate.getSubjectX500Principal().getName();
+			LdapName ldapName = new LdapName(subjectName);
+			return ldapName.getRdns()
+				.stream()
+				.filter(rdn -> rdn.getType().equals(attributeName))
+				.findFirst().get().getValue().toString();
+		} catch (InvalidNameException e) {
+			LOGGER.error("Has error when get attribute value from certificate subject name", e);
+		}
+		return null;
+	}
+
+}
+----
+
+[[certificate-authentication-getting-started-configuration]]
+==== Configuration
+
+[%autowidth.stretch,options="header"]
+|================================================================================
+|Configuration property |Default value |Usage |Remark
+|`server.ssl.key-store` | | Path to the KeyStore (.p12 file) containing the server’s own private key and certificate chain. | The server must present this certificate to prove its identity to clients.
+|`server.ssl.key-store-password` | | Password used to unlock the KeyStore file.| Without it, Spring Boot cannot load the server’s private key at startup.
+|`server.ssl.key-store-type` | | Lets Spring Boot know how to parse the keystore file.|
+|`server.ssl.client-auth` | | Determines whether the server requires, wants, or disables client authentication. Values: NEED, WANT, NONE.| - NONE (just TLS): The server doesn’t ask for a client certificate at all. One-way TLS; any browser or app can connect. +
+- WANT (optional mTLS): The server requests a client certificate but won’t fail the handshake if it’s missing. If the client sends one, the server verifies it; if not, the connection still works. +
+- NEED (strict mTLS): A valid client certificate is mandatory. If the client can’t present one that chains to the server’s trust-store, the handshake is terminated.
+|`server.ssl.trust-store` | | Path to the TrustStore containing CA certificates that the server trusts for validating client certs.| Without a trust store, the server cannot verify incoming client certificates during the TLS handshake.
+|`server.ssl.trust-store-password` | | Password to unlock the TrustStore.| Required if the trust‑store file is password‑protected.
+|`server.ssl.trust-store-type` | | Format of the TrustStore.| Ensures Spring Boot reads the trust‑store correctly so it can validate client certs.
+|`mgmtp.a12.uaa.authentication.principal.certificateConfig.user-name-field` |`/**` | Define field where to find username in distinguished names.|
+|`mgmtp.a12.uaa.authentication.principal.certificateConfig.user-role-field` |`/**` | Define field where to find user roles. Comma separated list.|
+|`mgmtp.a12.uaa.authentication.certificate-white-list-access-url-patterns` | | Define what are urls pattern can be use the Certificate authentication.| The url should be specific as the security advise. Then this default configure should be changed by project, you can provide one or multiple urls pattern separated by commas.
+|================================================================================
+
+[WARNING]
+====
+* Certificate authentication is meant to be used as communication between services e.g.: technical users.
+We don't recommend to it for real users.
+* The attributed user role(s) within the client certificate should be specific for its purpose and follow the principle of least privilege.
+* Keep certificates secret and be aware that disclosure of the certificates would require recreation of a new rootCA and client certificates.
+* Always configure mgmtp.a12.uaa.authentication.certificate-white-list-access-url-patterns for the dedicated endpoints supporting certificate-based authentication.
+====

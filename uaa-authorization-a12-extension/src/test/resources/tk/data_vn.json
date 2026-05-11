@@ -1,0 +1,26 @@
+{
+	"Authorization": {
+		"user": {
+			"userName": "kuba",
+			"firstName": "Mistr",
+			"lastName": "Kuba",
+			"organization": {
+				"countryCode": "VN"
+			},
+			"roles": [
+				{
+					"name": "admin"
+				},
+				{
+					"name": "guest"
+				}
+			]
+		},
+		"country": {
+			"id": "2",
+			"code": "VN",
+			"name": "Vietnam",
+			"continent": null
+		}
+	}
+}

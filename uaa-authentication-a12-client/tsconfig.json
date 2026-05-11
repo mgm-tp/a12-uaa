@@ -1,0 +1,14 @@
+{
+	"extends": "../tsconfig.src.json",
+	"references": [
+		{ "path": "../uaa-authentication-client" }
+	],
+	"typedoc": {
+		"name": "UAA Authentication A12 Client",
+		"excludeExternals": true,
+		"excludeInternal": false,
+		"out": "build/docs/typedoc",
+		"theme": "default"
+	}
+
+}

@@ -1,0 +1,217 @@
+{
+	"name": "Test Permission Definition",
+	"description": "",
+	"permissions": [
+		{
+			"name": "Admin from Vietnam",
+			"description": "All rules for admin user from Vietnam",
+			"policies": [
+				"hasRole('Manager') && principal.user.organization.country == 'Vietnam' &&  "
+			],
+			"scopes": [
+				"View Output",
+				"Report"
+			]
+		},
+		{
+			"name": "User from Czech",
+			"description": "All rules for admin from Czech",
+			"policies": [
+				"hasRole('Reviewer') && principal.user.organization.country == 'Czech'"
+			],
+			"scopes": [
+				"Report"
+			]
+		},
+		{
+			"name": "Access External Country Data",
+			"description": "",
+			"policies": [
+				"#extLoaderContext.userName == principal.userName && #country == 'CZ'"
+			],
+			"scopes": [
+				"Access external country"
+			]
+		},
+		{
+			"name": "Country Manager",
+			"description": "",
+			"policies": [
+				"hasRole('Admin') && principal.user.organization.countryCode == #countryCode && #entityType == 'com.mgmtp.a12.uaa.authorization.entity.Country'"
+			],
+			"scopes": [
+				"CountryUpdate"
+			]
+		},
+		
+		{
+			"name": "Just Admin Name",
+			"description": "",
+			"policies": [
+				"hasRole('Admin') principal.roles.size == 1 && #resource == 'OfferService.getInactivePolicy'"
+			],
+			"scopes": [
+				"READ_POLICY"
+			]
+		},
+		{
+			"name": "Admin & BusinessAdmin Name",
+			"description": "",
+			"policies": [
+				"hasRole('Admin', 'BusinessAdmin') && #resource == 'OfferService2.getActivePolicy'"
+			],
+			"scopes": [
+				"READ_POLICY"
+			]
+		}
+		
+		
+		
+	],
+	"propertyPermission": [
+		{
+			"name": "com.mgmtp.a12.uaa.authorization.entity.Country",
+			"description": "",
+			"policies": [
+				"hasRole('Admin') && principal.user.organization.countryCode == #countryCode" 
+			],
+			"properties": {
+				"READ": [
+					"id"
+				],
+				"WRITE": [
+					"name",
+					"continent"
+				]
+			}
+		}
+	],
+	"repository": [
+		{
+			"name": "com.mgmtp.a12.uaa.authorization.entity.Country",
+			"query": "name = principal.country"
+		},
+		{
+			"name": "com.mgmtp.a12.uaa.authorization.entity.Offer",
+			"query": "offerCountry = principal.country"
+		}
+	],
+	"dataPermissions": [
+		{
+			"name": "com.mgmtp.a12.uaa.authorization.entity.Country",
+			"description": "",
+			"policies": [
+				"(#domainObject.name == 'Vietnam' || #domainObject.name == 'Japan')"
+			],
+			"scopes": [
+				"CountryUpdate"
+			]
+		},
+		{
+			"name": "com.mgmtp.uaa.authorization.entity.Country",
+			"description": "",
+			"policies": [
+				"#domainObject.name == 'Germany'"
+			],
+			"rights": [
+				"READ"
+			],
+			"properties": {
+				"rights": {
+					"READ": [
+						"id",
+						"name"
+					],
+					"WRITE": [
+					]
+				}
+			}
+		},
+		{
+			"name": "com.mgmtp.uaa.authorization.entity.Offer",
+			"description": "",
+			"policies": [
+				"#domainObject.name = 'Vietnam' || #domainObject.name = 'Japan'",
+				"#right = 'Report'"
+			],
+			"rights": [
+				"READ"
+			],
+			"properties": {
+				"rights": {
+					"READ": [
+						"type"
+					],
+					"WRITE": [
+						"contract.type",
+						"period"
+					]
+				}
+			}
+		},
+		{
+			"name": "com.mgmtp.uaa.authorization.entity.Offer",
+			"description": "",
+			"policies": [
+				"#domainObject.name = 'Vietnam' || #domainObject.name = 'China'",
+				"#right = 'View Output'"
+			],
+			"rights": [
+				"READ"
+			],
+			"properties": {
+				"rights": {
+					"READ": [
+					],
+					"WRITE": [
+						"contract.type",
+						"type",
+						"period"
+					]
+				}
+			}
+		},
+		{
+			"name": "com.mgmtp.a12.uaa.authorization.entity.Country",
+			"description": "",
+			"policies": [
+				"hasRole('Reviewer')",
+				"#domainObject.name == 'Czech'"
+			],
+			"rights": [
+				"READ"
+			],
+			"properties": {
+				"rights": {
+					"READ": [
+						"id",
+						"name"
+					],
+					"WRITE": [
+					]
+				}
+			}
+		},
+		{
+			"name": "com.mgmtp.a12.uaa.authorization.entity.Country",
+			"description": "",
+			"policies": [
+				"#domainObject.name == 'Austria'"
+			],
+			"rights": [
+				"READ"
+			],
+			"properties": {
+				"rights": {
+					"READ": [
+						"contract.type",
+						"type",
+						"period"
+					],
+					"WRITE": [
+					]
+				}
+			}
+		}
+	]
+}

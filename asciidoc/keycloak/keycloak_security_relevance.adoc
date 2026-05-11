@@ -1,0 +1,50 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+==== Host header Injection
+
+===== What is the Host Header injection?
+Host header injection is a web attack where the attacker provides a false Host header to the web application.
+In an incoming HTTP request, web servers often dispatch the request to the target virtual host based on the value supplied in the Host header.
+Without proper validation of the header value, the attacker can supply invalid input to cause the web server to:
+
+* Cause a redirect to an attacker-controlled domain.
+* Perform web cache poisoning.
+* Manipulate password reset functionality.
+
+===== How dangerous are Host Header Injection?
+Host header injection can be used for these attack above. An attacker can abuse it to redirect an attacker-controller domain. Web cache poisoning lets an attacker serve poisoned content to anyone who requests pages.
+Using password reset poisoning, the attacker can obtain a password reset token and reset another user’s password leak to take over the user account.
+
+===== How to avoid Host Header Injection?
+
+* Refer to the below link for proper keycloak hostname setup:
+** link:https://www.keycloak.org/server/hostname[Configuring the hostname,window=_blank].
+
+==== SMTP Server
+Please aware of SMTP server data exported via Keycloak return plain text if you don't configure anything.
+
+Please follow document: https://www.keycloak.org/docs/latest/server_admin/index.html#_vault-administration.
+
+For other security problems, you can see more here: link:https://www.keycloak.org/docs/latest/server_admin/index.html#mitigating-security-threats[Mitigating security threats].
+
+[[keycloak-revoke-refresh-token]]
+==== Enable Revoke Refresh Token
+
+Choose the realm in Keycloak -> Realm settings -> Tokens -> Enable Revoke Refresh Token -> Set `Refresh Token Max Reuse` = 0
+
+image:assets/images/revoke_refresh_token.png[Enable Revoke Refresh Token,title="Enable Revoke Refresh Token"]

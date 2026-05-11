@@ -1,0 +1,7 @@
+com.mgmtp.a12.uaa.authentication.principal.autoconfigure.AuthenticationUserAutoConfiguration
+com.mgmtp.a12.uaa.authentication.principal.autoconfigure.ActiveDirectoryLdapUserAutoConfiguration
+com.mgmtp.a12.uaa.authentication.principal.autoconfigure.LocalUserAutoConfiguration
+com.mgmtp.a12.uaa.authentication.principal.autoconfigure.Oauth2UserAutoConfiguration
+com.mgmtp.a12.uaa.authentication.principal.autoconfigure.SamlUserAutoConfiguration
+com.mgmtp.a12.uaa.authentication.principal.autoconfigure.CertificateAutoConfiguration
+com.mgmtp.a12.uaa.authentication.principal.autoconfigure.APIKeyAutoConfiguration

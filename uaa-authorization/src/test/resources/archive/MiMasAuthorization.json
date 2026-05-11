@@ -1,0 +1,136 @@
+{
+	"name": "Mimas authorization definition",
+	"description": "",
+	"policies": [
+		{
+			"name": "submission reading rule",
+			"description": "User is allowed to read an submission when he doesn't have role 'no_access' on that submission",
+			"target": "print('Preload for:' + #resource)",
+			"dataPreload": [
+				"#department = @departmentRepository.findById(#resource.departmentId).get()"
+			],
+			"rules": [
+				"principal.user.departmentActions.?[action.name == 'NO_ACCESS' and department.id == #department.id].empty"
+			]
+		},
+		{
+			"name": "submission writing rule",
+			"description": "User is allowed to write submission when he has role  'write' on current submission",
+			"target": "print('Preload for:' + #resource)",
+			"dataPreload": [
+				"#department = @departmentRepository.findById(#resource.departmentId).get()"
+			],
+			"rules": [
+				"!principal.user.departmentActions.?[action.name == 'WRITE' and department.id == #department.id].empty || !principal.user.departmentActions.?[action.name == 'FULL_ACCESS' and department.id == #department.id].empty"
+			]
+		},
+		{
+			"name": "offer reading rule",
+			"description": "User is allowed to read an offer when he doesn't have role 'no_access' on that offer",
+			"target": "print('Preload for:' + #resource)",
+			"dataPreload": [
+				"#submission = @submissionRepository.findById(#resource.submissionId).get()",
+				"#department = @departmentRepository.findById(#submission.departmentId).get()"
+			],
+			"rules": [
+				"principal.user.departmentActions.?[action.name == 'NO_ACCESS' and department.id == #department.id].empty"
+			]
+		},
+		{
+			"name": "offer writing rule",
+			"description": "User is allowed to write offer when he has role 'write' on that offer",
+			"target": "print('Preload for:' + #resource)",
+			"dataPreload": [
+				"#submission = @submissionRepository.findById(#resource.submissionId).get()",
+				"#department = @departmentRepository.findById(#submission.departmentId).get()"
+			],
+			"rules": [
+				"!principal.user.departmentActions.?[action.name == 'WRITE' and department.id == #department.id].empty || !principal.user.departmentActions.?[action.name == 'FULL_ACCESS' and department.id == #department.id].empty"
+			]
+		},
+		{
+			"name": "administrator",
+			"description": "",
+			"rules": [
+				"hasRole('Admin')"
+			]
+		},
+		{
+			"name": "business admin",
+			"description": "",
+			"rules": [
+				"hasRole('business_admin')"
+			]
+		},
+		{
+			"name": "system admin",
+			"description": "",
+			"rules": [
+				"hasRole('system_admin')"
+			]
+		},
+		{
+			"name": "premium roles",
+			"description": "",
+			"rules": [
+				"hasRole('Admin') || hasRole('technical') || hasRole('batch_job')"
+			]
+		}
+	],
+	"permissions": [
+		{
+			"name": "allow read submission",
+			"description": "",
+			"policy-refs": ["premium roles || submission reading rule"],
+			"policies": [],
+			"scopes": [
+				"read_submission"
+			]
+		},
+		{
+			"name": "allow write submission",
+			"description": "",
+			"policy-refs": ["premium roles || submission writing rule"],
+			"policies": [],
+			"scopes": [
+				"write_submission"
+			]
+		},
+		{
+			"name": "allow read offer",
+			"description": "",
+			"policy-refs": [
+				"premium roles || offer reading rule"
+			],
+			"policies": [
+			],
+			"scopes": [
+				"read_offer"
+			]
+		},
+		{
+			"name": "allow write offer",
+			"description": "",
+			"policy-refs": [
+				"premium roles || offer writing rule"
+			],
+			"policies": [
+			],
+			"scopes": [
+				"write_offer"
+			]
+		},
+		{
+			"name": "edit underwriter",
+			"description": "",
+			"policies": [
+				"principal.user.departments.contains(#input_department)",
+				"principal.user.departmentActions(#input_department) == 'write' || principal.user.departmentActions(#input_department) == 'full_access'"
+			],
+			"scopes": []
+		}
+	],
+	"repository": [],
+	"propertyPermission": [],
+	"propertyRights": []
+}

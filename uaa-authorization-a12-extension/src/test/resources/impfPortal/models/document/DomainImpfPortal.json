@@ -1,0 +1,164 @@
+{
+  "header": {
+    "id": "DomainImpfPortal",
+    "modelType": "document",
+    "modelVersion": "28.0.2",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "DomainImpfPortal",
+      "immutable": false
+    },
+    "modelConfig": {
+      "decimalSeparator": ".",
+      "timeZone": "UTC",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "typeDefinitions": [
+      {
+        "id": "typedef_7a956f3c-7126-4cbe-be76-a1ebaf6009c7",
+        "name": "Region",
+        "fieldType": {
+          "type": "EnumerationType",
+          "EnumerationType": {
+            "values": [
+              {
+                "value": "BAVARIA"
+              },
+              {
+                "value": "HAMBURG"
+              },
+              {
+                "value": "BERLIN"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "typedef_cd4f2ef1-eb5c-4d58-b19b-38161544b6e7",
+        "name": "Role",
+        "fieldType": {
+          "type": "EnumerationType",
+          "EnumerationType": {
+            "values": [
+              {
+                "value": "REGION_MANAGER"
+              },
+              {
+                "value": "ADMIN"
+              },
+              {
+                "value": "GUEST"
+              }
+            ],
+            "alphabeticalSorting": true
+          }
+        }
+      }
+    ],
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_3253c",
+          "name": "Application",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Field",
+                "id": "field_8d519",
+                "name": "id",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": ""
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_544c4",
+                "name": "name",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": ""
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_5e963",
+                "name": "region",
+                "annotations": [
+                  {
+                    "name": "path",
+                    "value": "#user/region"
+                  }
+                ],
+                "Field": {
+                  "fieldType": {
+                    "type": "TypeDefType",
+                    "TypeDefType": {
+                      "typeDefinitionId": "typedef_7a956f3c-7126-4cbe-be76-a1ebaf6009c7"
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": ""
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_a470d",
+                "name": "createdBy",
+                "annotations": [
+                  {
+                    "name": "path",
+                    "value": "#user/username"
+                  }
+                ],
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": ""
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

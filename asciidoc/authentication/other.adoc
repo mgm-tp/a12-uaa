@@ -1,0 +1,188 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+=== Other Security Aspects
+Authentication module covers also security aspects which are not tightly bound to the Authentication
+
+[[unsecured-uls]]
+==== Unsecured for Urls support
+Ignore the security check from UAA for any matching endpoints.
+
+These endpoints will not go through any security filters, including Cors filter, meanwhile the `permitAll` (security matcher of Spring Framework) endpoints are still affected by security filters
+
+Configuration:
+
+[%autowidth.stretch,options="header"]
+|================================================================================
+|Configuration property |Default value |Usage |Remark
+|`mgmtp.a12.uaa.authentication.unsecured.urls` | | List of unsecured urls that Spring security would completely ignore all security filters, headers, CSRF,... | Example: /actuator/health,/user/**. Note: By specifying this property, Spring will give you some warning logs, please configure your log system to ignore them if you don't want to see
+|================================================================================
+
+[[authentication-actuator]]
+==== Actuator support
+Actuator shares authentication type with other endpoints. In order to access actuator endpoints you need to authenticate and then it's possible to use authorization in the scope `RelativePath`.
+Other option is to add actuator endpoint to unsecured URLs and keep them open.
+
+[[cross_origin]]
+==== Cross-Origin Resource Sharing (CORS)
+Cross-Origin Resource Sharing (CORS) is a mechanism that uses additional HTTP headers to tell browsers to give a web application running at one origin, access to selected resources from a different origin.
+A web application executes a cross-origin HTTP request when it requests a resource that has a different origin (domain, protocol, or port) from its own.
+
+For security reasons, browsers prohibit AJAX calls to resources residing outside the current origin.
+
+UAA support global CORS configuration based on Spring Framework out-of-the-box, giving you an easier and more powerful way to configure it than typical filter based solutions.
+
+By default, all origins and GET, HEAD and POST methods are allowed.
+
+Configuration:
+
+[%autowidth.stretch,options="header"]
+|================================================================================
+|Configuration property|Default value|Description
+
+
+|`mgmtp.a12.uaa.authentication.cors.*enabled*`
+|true
+|Turn on or off CORS.
+
+- CORS is on. you can control the cross resource requests with configurations and default value configurations are taken into account.
+
+- CORS is off, default security is applied in browser that means cross-origin requests are prohibited.
+
+|`mgmtp.a12.uaa.authentication.cors.*allowed-origins*`
+|http://localhost:3000
+|List of origin parameters specifying URIs that may access the resource.
+Its value is placed in the Access-Control-Allow-Origin header of both the pre-flight response and the actual response.
+
+- `"*"` means that all origins are allowed.
+
+- If undefined, all origins are allowed.
+
+- If you want all the three origins to be set, then you need to pass them as comma separated strings.
+
+|`mgmtp.a12.uaa.authentication.cors.*allowed-methods*`
+|GET,POST,OPTIONS,DELETE,PUT,PATCH
+|List of method parameters indicating which HTTP methods can be used when making the actual request.
+
+- If undefined, methods defined by RequestMapping annotation are used.
+
+|`mgmtp.a12.uaa.authentication.cors.*allowed-headers*`
+|X-Requested-With,Origin,Content-Type,Accept,Authorization
+|List of request headers that can be used during the actual request.
+Value is used in preflight’s response header Access-Control-Allow-Headers.
+
+- `"*"` – means that all headers requested by the client are allowed.
+
+- If undefined, all requested headers are allowed.
+
+- The name of a supported request header.
+The header may list any number of headers, separated by commas.
+
+|`mgmtp.a12.uaa.authentication.cors.*exposed-headers*`
+|access_token, token_renew_in_seconds
+|List of header parameters indicating request headers that browsers are allowed to access.
+Value is set in actual response header Access-Control-Expose-Headers.
+
+
+- If undefined, an empty exposed header list is used.
+|`mgmtp.a12.uaa.authentication.cors.*allow-credentials*`
+|
+|Define if user credentials are supported.
+By default, it's `null` which means that user credentials are not supported.
+
+- If you configure origin to `"\*"` then *allow-credentials* setting is not allowed to be `true`.
+
+
+|================================================================================
+
+NOTE: In case you use any Proxy in your production setup,
+you should pay attention to check the CORS on Proxy settings.
+In case you use Nginx for that then follow https://enable-cors.org/server_nginx.html[CORS on Nginx].
+
+[[http-headers]]
+==== Headers
+UAA supports a common security aspect which is solved by HTTP headers. Header values are added into each and every response. Their value are based on configuration - see below.
+
+[[http-headers-mime]]
+===== MIME Sniffing
+The X-Content-Type-Options response HTTP header is a marker used by the server to indicate that the MIME types advertised in the Content-Type headers should not be changed and be followed. This is a way to opt out of MIME type sniffing, or, in other words, to say that the MIME types are deliberately configured.
+
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options[See documentation]
+
+[[http-headers-click]]
+===== Click Jacking 
+The X-Frame-Options HTTP response header can be used to indicate whether or not a browser should be allowed to render a page in a <frame>, <iframe>, <embed> or <object>. Sites can use this to avoid click-jacking attacks, by ensuring that their content is not embedded into other sites.
+
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options[See documentation]
+
+[[http-headers-csp]]
+===== Content Security Policy
+The HTTP Content-Security-Policy response header allows website administrators to control resources the user agent is allowed to load for a given page. With a few exceptions, policies mostly involve specifying server origins and script endpoints. This helps guard against cross-site scripting attacks (XSS).
+
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy[See documentation]
+
+UAA supports just `frame-ancestors <source1> <source2>...` which is used in case when frames from other origins are allowed. This means that  <<http-headers-click, X-Frame-Options>> is empty.
+
+[[http-headers-configuration]]
+===== Configuration
+
+[%autowidth.stretch,options="header"]
+|================================================================================
+|Configuration property |Default value |Usage |Remark
+|`mgmtp.a12.uaa.authentication.header-configuration.x-content-type` |`nosniff` |  Value of the `X-Content-Type-Options` response header |
+|`mgmtp.a12.uaa.authentication.header-configuration.x-frame-options` |`DENY` |  Value of the `X-Frame-Options` response header |
+|`mgmtp.a12.uaa.authentication.header-configuration.content-security-policy-sources` |`` |  Value of the `Content-Security-Policy` response header.|
+
+|================================================================================
+
+[[token-logging]]
+==== JWT token logging
+In some cases complete JWT token is written to the log. This is only in the situations when the application unable to unpack the token. 
+This means that the token is arbitrary string for the application. Since the token is encrypted it might happen that the token might be a valid token for a different application or server/environment.
+This is corner case and it's better to log it because it might be used to attack the system. When the token itself would not be logged it would be hard to detect attack(s).
+
+Here it's the example of the log message:
+[source, text]
+----  
+2021-01-08 23:14:59,893 [http-nio-9090-exec-1][INFO ][wt.internal.JwtTokenAuthenticationFilter][u:] - Invalid token
+org.springframework.security.authentication.BadCredentialsException: Invalid JWT token: <token>
+	at com.mgmtp.a12.uaa.authentication.jwt.internal.JwtTokenPrincipalCreator.createPrincipal(JwtTokenPrincipalCreator.java:31)
+----  
+
+[[clustering-support]]
+==== Cluster support
+UAA requires much information depending on how you configure your application especially Authentication Types.
+For each data we need we always provide:
+
+- memory data which is suitable for single instance running application.
+- cache region using Spring caching abstraction (default cache manager) for Production, Cluster environment.
+
+It's responsibility of the project to configure caching correctly so that UAA can work across different instances. UAA does not provide any persistence layer.
+
+Here is the example for JSR-107 cache implementation in spring boot application. 
+
+Configure following properties.
+[source, properties]
+----
+spring.cache.type=jcache
+spring.cache.jcache.provider=org.ehcache.jsr107.EhcacheCachingProvider
+spring.cache.cache-names=tokenCache,authorizationCodeCache,samlLogoutRequestCache,roleMapping,codeChallengeCache,codeCache,tokenHintCache,samlAuthenticationRequestCache,samlJwtTokenCache
+mgmtp.a12.uaa.authentication.cached-token-storage.enabled=true
+---- 
+  
+https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-caching[Spring boot documentation]
+  

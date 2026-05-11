@@ -1,0 +1,34 @@
+plugins {
+    id 'java-library'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding 'UTF-8'
+    options.compilerArgs.add("-parameters")
+}
+
+configurations.all {
+    exclude group: 'org.htmlunit', module: 'htmlunit-websocket-client'
+}
+
+dependencies {
+    api libs.annotationApi
+    api libs.validationApi
+    api (libs.serverConnector) {
+        exclude group: "org.springframework", module: "spring-web"
+    }
+    api libs.springWeb
+    api libs.springContext
+    api libs.htmlUnit
+    api libs.httpclient5
+    api libs.jacksonDatabind
+    api libs.jacksonJsr310
+    api libs.jacksonParameterNames
+    api libs.inject
+    api libs.okhttp
+    implementation libs.servletApi
+    
+    testImplementation libs.bundles.springTest
+}
+
+description = 'UAA:: REST Client'

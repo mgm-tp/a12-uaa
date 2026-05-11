@@ -1,0 +1,50 @@
+{
+  "name": "Impf Portal Authorization Definition",
+  "description": "Example from Impf Portal",
+  "policies": [
+    {
+      "name": "Admin_Guest_RegionManager",
+      "description": "",
+      "type": "A12Model",
+      "dataPreload": [
+        "#localName = 'local Name'",
+        "#region = (hasRole('REGION_MANAGER') ? principal.region : '')",
+        "#testValue = 'TEST'",
+        "#username = (hasRole('REGION_MANAGER') || hasRole('GUEST') ? principal.username : '')"
+      ],
+      "rules": [
+        "impfPortal/models/authorization/AuthorizationImpfPortal_TK.json"
+      ]
+    }
+  ],
+  "repositoryPolicies": [
+    {
+      "name": "Repository_Admin_Guest_RegionManager_Policy",
+      "description": "Repos",
+      "dataPreload": [
+        "#username = (true ? 'nothing' : principal.username)",
+        "#testValue = 'ABC'",
+        "#region = (hasRole('REGION_MANAGER') ? principal.region : '')",
+        "#username = (hasRole('REGION_MANAGER') || hasRole('GUEST') ? principal.username : '')"
+      ],
+      "template-refs": [
+        "Admin_Guest_RegionManager"
+      ]
+    }
+  ],
+  "permissions": [
+    {
+      "name": "View all application",
+      "description": "Users can view all applications with role 'ADMIN' or 'REGION_MANAGER' or 'GUEST' with specific rules.",
+      "policy-refs": [
+      ],
+      "repository-refs" : [
+        "Repository_Admin_Guest_RegionManager_Policy"
+      ],
+      "policies": [],
+      "scopes": [
+        "Document Read"
+      ]
+    }
+  ]
+}

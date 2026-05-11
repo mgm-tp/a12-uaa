@@ -1,0 +1,29 @@
+{
+	"name": "Test Permission Definition",
+	"description": "",
+	"policies": [
+		{
+			"name": "SpEl_Policy",
+			"description": "",
+			"rules": [
+				"#resource.resource.id != null",
+				"#resource.resource.code != null",
+				"#resource.resource.name != null",
+				"#resource.resource.code == 'VN'",
+				"#resource.principal.roles.size() > 0"
+			]
+		}
+	],
+	"permissions": [
+		{
+			"name": "Model permission SpEl",
+			"description": "Inline Permissions",
+			"policy-refs": [
+				"SpEl_Policy"
+			],
+			"scopes": [
+				"SpEl"
+			]
+		}
+	]
+}

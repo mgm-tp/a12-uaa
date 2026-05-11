@@ -1,0 +1,58 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+[[uaa-token-processing]]
+===== Token processing
+
+The overview flow:
+
+image:assets/images/uaa_token_processing.png[UAA Token processing,title="UAA Token processing and extension points",link="assets/images/uaa_token_processing.png"]
+
+UAA has standard token processing which supports several extension points where implementors can hook their code and provide required data.
+When the token is retrieved in the request by a header, it is a base data to reconstruct the principal for Spring `SecurityContext`.
+
+====== Token Location
+
+First step is to locate the token.
+An implementation of the `JwtTokenLocator` is used.
+
+UAA provides the default implementation which lookups the token in the request header.
+
+====== Principal Creation
+
+The Second step is to create a principal.
+The principal object must implement Spring Security interface `UserDetails`.
+The `principal` is created by an implementation of a `PrincipalCreator` interface. The implementation is responsible for converting a `token` string into `UserDetails` object.
+
+UAA provides default implementation which handles principal creation from <<uaa-token,UAA access token>>.
+It has several steps which will be processed.
+
+* *Token Validation:* Check encrypted JWT pattern, the token signature to make sure that token wasn't changed by public key, the token is still valid by the expiration date/time encoded in the token, and token's blacklist.
+
+* *Unpack Token:* Load all data from a token. Locate standard `subject` field which contains `userName` and `authorities` field which contains list of granted authorities.
+Check if the token contains complete serialized *userDetails* object.
+If the object is present, then deserialize and use it as the `principal`, the extraction is finished.
+
+* *Create Principal:* This step is skipped if the `pricipal` from previous one is present, otherwise it is used to create standard `UAAPrincipal` object.
+The final principal contains username and an empty list of roles and extended data if provided.
+The extended data is loaded by implementation of the interface `UAAExtendedPrincipalDataLoader`.
+You also can implement `PrincipalAdapter` to create principal on your own.
+
+[NOTE]
+====
+Principal creation can be customized, but please ensure you use @org.springframework.context.annotation.Primary together with @org.springframework.stereotype.Component to override it.
+====

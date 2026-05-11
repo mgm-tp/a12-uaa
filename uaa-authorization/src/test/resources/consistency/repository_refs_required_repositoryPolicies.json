@@ -1,0 +1,14 @@
+{
+  "name": "require repository policies",
+  "permissions": [
+    {
+      "name": "permission 1",
+      "scopes": [
+        "Scope 1"
+      ],
+      "repository-refs": [
+        "permission repository refs"
+      ]
+    }
+  ]
+}

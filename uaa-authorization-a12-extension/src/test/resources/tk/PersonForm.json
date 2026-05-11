@@ -1,0 +1,206 @@
+{
+  "header": {
+    "id": "PersonForm",
+    "modelType": "form",
+    "modelVersion": "36.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "admin"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "person",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "person"
+      }
+    ]
+  },
+  "content": {
+    "subHeaderBox": {
+      "id": "subHeaderBox1"
+    },
+    "footerBox": {
+      "id": "footerBox1"
+    },
+    "screens": [
+      {
+        "id": "screen_984a3",
+        "name": "Screen 1",
+        "screenElements": [
+          {
+            "type": "Section",
+            "id": "section_8abf3",
+            "name": "Section 1",
+            "screenElements": [
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid_6fd13",
+                "name": "Grid",
+                "layout": {
+                  "lg": "6-6"
+                },
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row_54e4c",
+                    "name": "Person",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_103bf",
+                        "elementRef": "field_8d4d7"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control_2316d",
+                        "elementRef": "field_4a29d"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "id": "row_59538",
+                    "name": "Address"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Section",
+            "id": "section_f79af",
+            "name": "Address",
+            "screenElements": [
+              {
+                "type": "InlineRepeat",
+                "id": "inlinerepeat_1aed4",
+                "name": "repeat-addresses",
+                "repeatOverviewColumn": [
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn_59a9e",
+                    "elementRef": "include_b95ab_field_4a29d"
+                  },
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn_f8e35",
+                    "elementRef": "include_b95ab_field_8c708"
+                  },
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn_57bc5",
+                    "elementRef": "include_b95ab_field_181a6"
+                  },
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn_fff83",
+                    "elementRef": "include_b95ab_field_54e9a"
+                  },
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn_df58b",
+                    "elementRef": "include_b95ab_field_e1e9a"
+                  }
+                ],
+                "groupRef": "include_b95ab",
+                "enableAdd": true,
+                "enableRemove": true
+              }
+            ]
+          },
+          {
+            "type": "Section",
+            "id": "section_0de0b",
+            "name": "Job",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Job"
+                  }
+                ]
+              }
+            },
+            "screenElements": [
+              {
+                "type": "DetachedRepeat",
+                "id": "detachedrepeat_08576",
+                "name": "repeat-job",
+                "groupRef": "group_b5213",
+                "enableAdd": true,
+                "enableRemove": true,
+                "detailScreen": {
+                  "id": "screen_38d05",
+                  "name": "repeat-job-detail-screen",
+                  "screenElements": [
+                    {
+                      "type": "ControlGrid",
+                      "id": "controlgrid_df34e",
+                      "name": "cg",
+                      "row": [
+                        {
+                          "type": "Row",
+                          "id": "row_ac674",
+                          "cell": [
+                            {
+                              "type": "Control",
+                              "id": "control_c1b49",
+                              "elementRef": "field_1d903"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "InlineRepeat",
+                      "id": "inlinerepeat_afb97",
+                      "name": "repeat-companies",
+                      "repeatOverviewColumn": [
+                        {
+                          "type": "FieldBasedRepeatOverviewColumn",
+                          "id": "fieldbasedrepeatoverviewcolumn_13f3f",
+                          "elementRef": "field_6f04c"
+                        },
+                        {
+                          "type": "FieldBasedRepeatOverviewColumn",
+                          "id": "fieldbasedrepeatoverviewcolumn_717fc",
+                          "elementRef": "field_91f16"
+                        },
+                        {
+                          "type": "FieldBasedRepeatOverviewColumn",
+                          "id": "fieldbasedrepeatoverviewcolumn_2758a",
+                          "elementRef": "field_b0055"
+                        },
+                        {
+                          "type": "FieldBasedRepeatOverviewColumn",
+                          "id": "fieldbasedrepeatoverviewcolumn_a4480",
+                          "elementRef": "field_78dd4"
+                        }
+                      ],
+                      "groupRef": "group_9de2d",
+                      "enableAdd": true,
+                      "enableRemove": true
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {},
+    "groupConfiguration": {},
+    "defaults": {}
+  }
+}

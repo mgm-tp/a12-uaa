@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model xmlns="http://www.mgm-tp.com/a12/picus/model/v2">
+    <metadata>
+        <name>DomainDepartmentAuthorization</name>
+        <languages>en</languages>
+        <comment/>
+        <savedAt>2020-08-14T06:41:51.401+02:00</savedAt>
+        <schemaVersion>22.6.0</schemaVersion>
+    </metadata>
+    <fieldDataTypeDefinition id="typedefinition_a6592" name="Department">
+        <enumeration>
+            <value code="PROPERTY">
+                <text lang="en"/>
+            </value>
+            <value code="CREDIT">
+                <text lang="en"/>
+            </value>
+            <value code="ACCIDENT">
+                <text lang="en"/>
+            </value>
+            <value code="SPECIALITY">
+                <text lang="en"/>
+            </value>
+            <value code="MARINE">
+                <text lang="en"/>
+            </value>
+        </enumeration>
+    </fieldDataTypeDefinition>
+    <fieldDataTypeDefinition id="typedefinition_f8569" name="Role">
+        <enumeration>
+            <value code="ADMIN">
+                <text lang="en"/>
+            </value>
+            <value code="TECHNICAL_ADMIN">
+                <text lang="en"/>
+            </value>
+            <value code="BUSINESS_ADMIN">
+                <text lang="en"/>
+            </value>
+            <value code="LOCAL_ADMIN">
+                <text lang="en"/>
+            </value>
+            <value code="GUEST">
+                <text lang="en"/>
+            </value>
+        </enumeration>
+    </fieldDataTypeDefinition>
+    <group max="1" id="group_a4a9a" name="Authorization">
+        <group max="1" id="group_7741e" name="user">
+            <group max="5" id="group_dc6ee" name="department_actions">
+                <indexField>field_d501e</indexField>
+                <field id="field_d501e" name="departmentName">
+                    <annotation name="object-path">user.departmentActions[i].department.id</annotation>
+                    <annotation name="actor">MAIN_USER</annotation>
+                    <type datatypeDefinitionIdRef="typedefinition_a6592"/>
+                </field>
+                <field id="field_7133e" name="action">
+                    <annotation name="object-path">user.departmentActions[i].action.name</annotation>
+                    <annotation name="actor">MAIN_USER</annotation>
+                    <enumeration>
+                        <value code="NO_ACCESS">
+                            <text lang="en">no access</text>
+                        </value>
+                        <value code="FULL_ACCESS">
+                            <text lang="en">full access</text>
+                        </value>
+                        <value code="READ">
+                            <text lang="en"/>
+                        </value>
+                    </enumeration>
+                </field>
+            </group>
+            <group max="5" id="group_5096f" name="roles">
+                <field id="field_f797e" name="name">
+                    <type datatypeDefinitionIdRef="typedefinition_f8569"/>
+                </field>
+            </group>
+        </group>
+        <group max="1" id="group_3253c" name="offer">
+            <field id="field_5e963" name="department">
+                <annotation name="object-path">departmentId</annotation>
+                <annotation name="actor">MAIN_RESOURCE</annotation>
+                <type datatypeDefinitionIdRef="typedefinition_a6592"/>
+            </field>
+        </group>
+        <group max="1" id="group_1645b" name="environment">
+            <field id="field_319bb" name="country">
+                <string/>
+            </field>
+        </group>
+        <rule id="rule_14a91" name="Department_User_has_NO_ACCESS">
+            <fieldIdRef>field_5e963</fieldIdRef>
+            <errorCode>Error rule_14a91</errorCode>
+            <errorCondition>FieldFilled(offer/department) and [user/department_actions/action For offer/department] == "NO_ACCESS"</errorCondition>
+            <errorMessage>
+                <text lang="en">User with NO_ACCESS should not see this offer</text>
+            </errorMessage>
+            <severity>error</severity>
+            <dynamicEnumerationRule>false</dynamicEnumerationRule>
+        </rule>
+    </group>
+</model>

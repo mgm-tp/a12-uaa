@@ -1,0 +1,94 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+:source-language: javascript
+==== Self configuration
+
+The main idea when implementing the self-configuration is to simplify the way to integrate UAA. 
+
+===== Flow diagram
+image:assets/images/javascript-client/selfConfigure.png[Basic flow diagram,title="Basic flow diagram",link="assets/images/javascript-client/selfConfigure.png" ]
+
+===== Initialization
+With this new feature, the client is able to initiate all authenticate types through the *SelfConfigure* that get from:
+
+[[offline-self-config]]
+- Local JSON file system +
+Example
+[source,javascript]
+// Initial offlineSelfConfigure to contain all configure for all authenticate types
+const offlineSelfConfigure: SelfConfigure = {
+	"tokens": [
+		{
+			"authorizationHeaderName": "Authorization",
+			"tokenType": "UAABEARER",
+			"generatedTokenHeaderName": "access_token",
+			"allowCredentials": true
+		},
+		{
+			"authorizationHeaderName": "Authorization",
+			"tokenType": "BEARER"
+        }
+	],
+	"local": {
+		"loginRelativeUrl": "user/local/login",
+		"logoutRelativeUrl": "user/logout",
+		"logoutMethod": "POST",
+		"tokenType": "UAABEARER"
+	},
+	"activeDirectoryLdap": {
+		"loginRelativeUrl": "user/active_directory_ldap/login",
+		"logoutRelativeUrl": "user/logout",
+		"logoutMethod": "POST",
+		"tokenType": "UAABEARER"
+	},
+	"saml": {
+		"loginRelativeUrl": "saml2/authenticate/uaa?uaa_success=http://localhost:3000",
+		"logoutRelativeUrl": "user/logout?uaa_success=http://localhost:3000",
+		"logoutMethod": "POST",
+		"tokenType": "UAABEARER"
+	},
+	"oidc": {
+		"tokenType": "BEARER",
+		"clientId": "uaa-spa-client",
+		"realmName": "UAARealm",
+		"idpBaseUrl": "http://localhost:9090",
+        "enableRefreshTokenGrant": false,
+		"loginRedirectRelativeUrl": "callback",
+		"logoutRedirectRelativeUrl": "logout",
+		"silentRedirectRelativeUrl": "silent_renew.html"
+	}
+}
+const uaaClientConfigure: UaaClientConfiguration =
+{
+	serverURL: `{your_server_url}`,
+	offlineSelfConfigure: offlineSelfConfigure,
+	automaticallyLogin: true,
+}
+
+If you set `enableRefreshTokenGrant` property is `true`, you must follow <<using-oidc-refresh-token, Using OIDC Refresh Token>>
+
+- Fetching from serve (the UAA server that have an endpoint /selfConfigure to get self-configure) +
+Example
+[source,javascript]
+import { UaaClient, UaaClientConfiguration, SelfConfigure } from '@com.mgmtp.a12.uaa/uaa-authentication-client';
+const uaaClientConfigure: UaaClientConfiguration =
+{
+    serverURL: `{your_server_url}`,
+    serverConfigureUrl: `{your_server_configure_url}`,
+    automaticallyLogin: true,
+}

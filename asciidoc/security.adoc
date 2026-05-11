@@ -1,0 +1,42 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+[[security]]
+== Introduction
+User Authentication Authorization (UAA) is a library for handling security aspects of your application. It can be used as a standalone library or inside Spring Boot application. See respective parts for detailed documentation.
+The library is divided to separated modules. 
+ 
+*Security is divided into several modules*
+
+* <<authentication,Authentication>> - Authenticating users with various protocols and providing user principal.
+* <<authorization,Authorization>> - Resource, property and repository authorization.
+* <<backend-authentication,Backend Authentication>> - Authentication for back-end jobs.
+* <<uaa-principal-extension,Principal Extension>> - Authentication extension module providing customizable principal handling with many default implementations.
+* <<rest-client,Rest Client>> - Extensible JAVA REST client with UAA stack and support for UAA end-points.  
+* <<javascript-client,Javascript Client>> - Client library for java-script applications.
+
+There are two usage scenarios of the libraries:
+
+* *A12 full stack*: The libraries are integrated in the A12 client (A12 client) and server component (A12 DataServices) in order to enable authentication and authorization in the A12 stack. 
+* *Project specific*: The libraries can also be used separate in custom client or server implementations. 
+
+UAA is providing mainly libraries and therefore no standalone server. The Java libraries have to be integrated in a Spring based application. The server side modules are tightly integrated with Spring Security.
+
+
+include::authentication/authentication.adoc[]
+
+

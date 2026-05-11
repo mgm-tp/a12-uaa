@@ -1,0 +1,13 @@
+{
+  "applicationBaseUrl" : "application_base_url",
+  "uaaBaseUrl" : "uaa_base_url",
+  "authorizationDataStore" : "authorization_data_store",
+  "excludedDelegatedContexts" : [ "context1", "context2" ],
+  "activeDirectoryLdap" : {
+    "loginRelativeUrl" : "user/active_directory_ldap/login",
+    "logoutRelativeUrl" : "user/logout",
+    "logoutMethod" : "POST",
+    "tokenType" : "UAABEARER"
+  },
+  "tokens" : [ ]
+}

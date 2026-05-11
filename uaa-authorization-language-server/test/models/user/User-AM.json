@@ -1,0 +1,170 @@
+{
+  "header": {
+    "id": "User-AM",
+    "modelType": "application",
+    "modelVersion": "5.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "userManagementAdmin"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "region": {
+      "name": "User Management",
+      "layout": {
+        "name": "ApplicationFrame"
+      },
+      "subRegions": [
+        {
+          "layout": {
+            "name": "MasterDetail"
+          },
+          "name": "CONTENT"
+        },
+        {
+          "layout": {
+            "name": "Null"
+          },
+          "name": "SIDEBAR"
+        },
+        {
+          "layout": {
+            "name": "Stack"
+          },
+          "name": "MODAL"
+        }
+      ]
+    },
+    "modules": [
+      {
+        "name": "User Management",
+        "menu": {
+          "name": "User Management",
+          "label": [
+            {
+              "locale": "en",
+              "text": "User Management"
+            }
+          ]
+        },
+        "flows": [
+          {
+            "name": "default",
+            "scenes": [
+              {
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "OverviewEngine",
+                      "models": [
+                        {
+                          "modelType": "overview",
+                          "name": "User-OM"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "name": "User Management Overview",
+                "matchConditions": [
+                  {
+                    "key": "view",
+                    "mustEqual": "user-overview"
+                  }
+                ]
+              },
+              {
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "FormEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 8
+                      },
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "User-FM",
+                          "dataModel": "DomainUserManagement"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "name": "User Form Update",
+                "matchConditions": [
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "model",
+                    "mustEqual": "DomainUserManagement"
+                  },
+                  {
+                    "key": "action",
+                    "mustEqual": "update"
+                  }
+                ]
+              },
+              {
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "FormEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 8
+                      },
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "User_Create-FM",
+                          "dataModel": "DomainUserManagement"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "name": "User Form Create",
+                "matchConditions": [
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "model",
+                    "mustEqual": "DomainUserManagement"
+                  },
+                  {
+                    "key": "action",
+                    "mustEqual": "create"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "defaultRegion": ["CONTENT"]
+  }
+}

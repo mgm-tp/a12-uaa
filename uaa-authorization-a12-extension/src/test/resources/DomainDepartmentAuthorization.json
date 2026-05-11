@@ -1,0 +1,287 @@
+{
+  "header": {
+    "id": "DomainDepartmentAuthorization",
+    "modelType": "document",
+    "modelVersion": "28.0.2",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "DomainDepartmentAuthorization",
+      "immutable": false
+    },
+    "modelConfig": {
+      "decimalSeparator": ".",
+      "timeZone": "UTC",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "typeDefinitions": [
+      {
+        "id": "typedef_07e548cf-fbae-4e0a-b8d5-49ade03a9e61",
+        "name": "Department",
+        "fieldType": {
+          "type": "EnumerationType",
+          "EnumerationType": {
+            "values": [
+              {
+                "value": "PROPERTY"
+              },
+              {
+                "value": "CREDIT"
+              },
+              {
+                "value": "ACCIDENT"
+              },
+              {
+                "value": "SPECIALITY"
+              },
+              {
+                "value": "MARINE"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "typedef_b82c39a6-8274-4745-912e-1dfe088592eb",
+        "name": "Role",
+        "fieldType": {
+          "type": "EnumerationType",
+          "EnumerationType": {
+            "values": [
+              {
+                "value": "ADMIN"
+              },
+              {
+                "value": "TECHNICAL_ADMIN"
+              },
+              {
+                "value": "BUSINESS_ADMIN"
+              },
+              {
+                "value": "LOCAL_ADMIN"
+              },
+              {
+                "value": "GUEST"
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_a4a9a",
+          "name": "Authorization",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Group",
+                "id": "group_7741e",
+                "name": "user",
+                "Group": {
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Group",
+                      "id": "group_dc6ee",
+                      "name": "department_actions",
+                      "Group": {
+                        "repeatability": 13,
+                        "indexFieldName": "departmentName",
+                        "elements": [
+                          {
+                            "type": "Field",
+                            "id": "field_d501e",
+                            "name": "departmentName",
+                            "annotations": [
+                              {
+                                "name": "object-path",
+                                "value": "user.departmentActions[i].department.id"
+                              },
+                              {
+                                "name": "actor",
+                                "value": "MAIN_USER"
+                              }
+                            ],
+                            "Field": {
+                              "fieldType": {
+                                "type": "TypeDefType",
+                                "TypeDefType": {
+                                  "typeDefinitionId": "typedef_07e548cf-fbae-4e0a-b8d5-49ade03a9e61"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_7133e",
+                            "name": "action",
+                            "annotations": [
+                              {
+                                "name": "object-path",
+                                "value": "user.departmentActions[i].action.name"
+                              },
+                              {
+                                "name": "actor",
+                                "value": "MAIN_USER"
+                              }
+                            ],
+                            "Field": {
+                              "fieldType": {
+                                "type": "EnumerationType",
+                                "EnumerationType": {
+                                  "values": [
+                                    {
+                                      "value": "NO_ACCESS",
+                                      "label": [
+                                        {
+                                          "locale": "en",
+                                          "text": "no access"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "value": "FULL_ACCESS",
+                                      "label": [
+                                        {
+                                          "locale": "en",
+                                          "text": "full access"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "value": "READ",
+                                      "label": [
+                                        {
+                                          "locale": "en",
+                                          "text": "READ"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Group",
+                      "id": "group_5096f",
+                      "name": "roles",
+                      "Group": {
+                        "repeatability": 5,
+                        "elements": [
+                          {
+                            "type": "Field",
+                            "id": "field_f797e",
+                            "name": "name",
+                            "Field": {
+                              "fieldType": {
+                                "type": "TypeDefType",
+                                "TypeDefType": {
+                                  "typeDefinitionId": "typedef_b82c39a6-8274-4745-912e-1dfe088592eb"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_3253c",
+                "name": "submission",
+                "Group": {
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_5e963",
+                      "name": "department",
+                      "annotations": [
+                        {
+                          "name": "object-path",
+                          "value": "departmentId"
+                        },
+                        {
+                          "name": "actor",
+                          "value": "MAIN_RESOURCE"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "TypeDefType",
+                          "TypeDefType": {
+                            "typeDefinitionId": "typedef_07e548cf-fbae-4e0a-b8d5-49ade03a9e61"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_1645b",
+                "name": "environment",
+                "Group": {
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_319bb",
+                      "name": "country",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Rule",
+                "id": "rule_14a91",
+                "name": "Department_User_has_NO_ACCESS",
+                "Rule": {
+                  "errorEntityRelPath": "../submission/department",
+                  "errorCode": "Error rule_14a91",
+                  "errorCondition": "FieldFilled(submission/department) and [user/department_actions/action For submission/department] == \"NO_ACCESS\"",
+                  "severity": "ERROR",
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "User with NO_ACCESS should not see this offer"
+                    }
+                  ],
+                  "guiPatterns": {
+                    "dynamicEnumerationRule": "false"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

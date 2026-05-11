@@ -1,0 +1,277 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+[[oauth2]]
+=== Oauth2
+
+From the definition https://openid.net/connect/
+OpenID Connect 1.0 is a simple identity layer on top of the OAuth 2.0 protocol. It allows Clients to verify the identity of the End-User based on the authentication performed by an Authorization Server (IDP),
+as well as to obtain basic profile information about the End-User in an interoperable and REST-like manner.
+
+OpenID Connect allows clients of all types, including Web-based, mobile, and JavaScript clients, to request and receive information about authenticated sessions and end-users.
+The specification suite is extensible, allowing participants to use optional features such as encryption of identity data, discovery of OpenID Providers, and session management, when it makes sense for them.
+
+For developers, it provides a secure and verifiable answer to the question “What is the identity of the person currently using the browser or mobile app that is connected?”
+Best of all, it removes the responsibility of setting, storing, and managing passwords which is frequently associated with credential-based data breaches.
+
+==== Get An OAuth2 Access Token
+
+OAuth defines two client types, based on their ability to authenticate securely with the IDP
+
+[[oauth2-public-flow]]
+===== Public
+The OAUTH2 Public Login flow starts with GET request directly to the IDP server. After filling a credentials in a form the flow proceed to several call-backs which result is a access token.
+
+For more details see following diagram:
+
+image::assets/images/flow_oauth2_public.png[OAUTH2 Login Flow,title="Oauth2 public Login Flow",align="center"]
+
+[[oauth2-confidential-flow]]
+===== Confidential
+The OAUTH2 Confidential login flow is simpler than public, because with initial request the *client secret* is sent to the server.
+
+For more details see following diagram:
+
+image::assets/images/flow_oauth2_confidential.png[Security,title="Oauth2 confidential authentication flow",align="center"]
+
+==== Oauth2 Resource Server
+
+The Oauth2 Resource Server features provide support for the Resource Server role as defined in the link:https://datatracker.ietf.org/doc/html/rfc6749#section-1.1[OAuth 2.0 Authorization Framework].
+
+There are two types of token verify: JWT or Token Introspection.
+
+These token validation are mutually exclusive and can’t be used simultaneously.
+
+[[oauth2-rs-sequence-jwt-token-support]]
+===== JWT
+
+Server uses the public keys from IDP, and subsequently validate incoming JWTs.
+
+For complete flow see following sequence diagram:
+image:assets/images/oauth2_rs.png[OAUTH2 RS sequence diagram,title="OAUTH2 RS sequence diagram",link="assets/images/oauth2_rs.png" ]
+
+[WARNING]
+====
+JWT tokens are typically valid for a set period of time, and there is no built-in mechanism for link:https://datatracker.ietf.org/doc/html/rfc7009[revoking] tokens before they expire, meaning that a compromised token may remain valid until it expires.
+====
+
+[[oauth2-resource-configuration]]
+====== Configuration
+
+Enable Oauth2 authentication type.
+
+[source, properties]
+----
+mgmtp.a12.uaa.authentication.types=OAUTH2
+----
+
+Realm configurations:
+
+====== Single Realm - Spring Based
+
+* Only IssuerUri
+====
+[source, properties]
+----
+spring.security.oauth2.resourceserver.jwt.issuer-uri={baseUrl}/realms/{realmName}
+----
+. Server does not require IDP for startup
+. Server requires IDP for token decoding for the first time
+. From decoding, token will be verified base on signatures, validity and issuer
+====
+
+* Only JwkSetUri
+====
+[source, properties]
+----
+spring.security.oauth2.resourceserver.jwt.jwk-set-uri={baseUrl}/realms/{realmName}/protocol/openid-connect/certs
+spring.security.oauth2.resourceserver.jwt.jws-algorithms=RS256
+----
+. Server does not require IDP for startup
+. Server requires IDP for token decoding for the first time
+. From decoding, token will be verified base on signatures and validity
+====
+
+* Only PublicKey
+====
+[source, properties]
+----
+spring.security.oauth2.resource-server.jwt.public-key-location=classpath:{realmRS256PublicKeyName}.pub
+spring.security.oauth2.resource-server.jwt.jws-algorithms=RS256
+----
+. Server does not require IDP for startup
+. Server does not require IDP for token decoding
+. From decoding, token will be verified base on signatures and validity
+====
+
+* Audience verification
+====
+[source, properties]
+----
+spring.security.oauth2.resourceserver.jwt.audiences={client_id_1},{client_id_2}
+----
+
+It is recommended that resource server should verify all audiences it allows to access
+
+By specifying this property, server will verify the `aud` claim in the upcoming token. At least one audience in the claim needs to be included in configured property so that the verification is success
+
+Make sure IDP is configured to enclose `aud` claim within token
+====
+
+====== Multiple Tenants - UAA based
+====
+[source, properties]
+----
+mgmtp.a12.uaa.authentication.oauth2.resourceserver.tenants[0].jwt.issuer-uri={idpBaseUrl}/realms/{realmName}
+mgmtp.a12.uaa.authentication.oauth2.resourceserver.tenants[0].jwt.jwk-set-uri={idpBaseUrl}/realms/{realmName}/protocol/openid-connect/certs
+mgmtp.a12.uaa.authentication.oauth2.resourceserver.tenants[0].jwt.jws-algorithms=RS256
+mgmtp.a12.uaa.authentication.oauth2.resourceserver.tenants[0].jwt.public-key-location=classpath:{RealmPublicKey}.pub
+mgmtp.a12.uaa.authentication.oauth2.resourceserver.tenants[0].jwt.audiences={client_id}
+mgmtp.a12.uaa.authentication.oauth2.resourceserver.tenants[1].jwt.issuer-uri={idpBaseUrl}/realms/{realmName}
+mgmtp.a12.uaa.authentication.oauth2.resourceserver.tenants[1].jwt.jwk-set-uri={idpBaseUrl}/realms/{realmName}/protocol/openid-connect/certs
+mgmtp.a12.uaa.authentication.oauth2.resourceserver.tenants[1].jwt.jws-algorithms=RS256
+mgmtp.a12.uaa.authentication.oauth2.resourceserver.tenants[1].jwt.public-key-location=classpath:{RealmPublicKey}.pub
+mgmtp.a12.uaa.authentication.oauth2.resourceserver.tenants[1].jwt.audiences={client_id}
+----
+
+If only the issuer-uri is configured, the Resource Server will use this property to further self-configure and discover the authorization server's public keys. This process is triggered at startup.
+
+If the jwk-set-uri is configured, the issuer-uri is used to validate the "iss" claim in the access token if the issuer-uri is configured.
+
+The public-key-location is used if neither issuer-uri nor jwk-set-uri is configured.
+
+It is recommended to enable audience verification by specifying `audiences` property per tenant.
+====
+
+[[oauth2-rs-sequence-token-introspection-support]]
+===== Token Introspection
+Server make a separate call to the introspection endpoint that host by IDP, and subsequently validate incoming JWTs.
+
+Introspection endpoint response to the information that includes whether the token is currently active or not (it has expired or otherwise been link:https://datatracker.ietf.org/doc/html/rfc7009[revoked]),
+what rights of access the token carries (usually conveyed through OAuth 2.0 scopes), and the authorization context in which the token
+was granted (including who authorized the token and which client it was issued to)
+
+For complete flow see following sequence diagram:
+
+image:assets/images/oauth2_rs_online_token_check.png[OAUTH2 RS sequence diagram,title="OAUTH2 RS sequence diagram",link="assets/images/oauth2_rs_online_token_check.png" ]
+
+[WARNING]
+====
+Introspection require additional network calls to the IDP for token validation and user information retrieval, which can affect performance.
+====
+
+====== Configuration
+
+====== Spring Based (single realm)
+====
+[source, properties]
+----
+spring.security.oauth2.resourceserver.opaquetoken.introspection-uri={baseUrl}/realms/{realmName}/protocol/openid-connect/token/introspect
+spring.security.oauth2.resourceserver.opaquetoken.client-id={clientId}
+spring.security.oauth2.resourceserver.opaquetoken.client-secret={clientSecret}
+----
+. Server does not require IDP for startup
+. Server requires IDP for token introspection
+====
+
+====== Multiple Tenants - UAA Based
+====
+[source, properties]
+----
+mgmtp.a12.uaa.authentication.oauth2.resourceserver.tenants[0].opaquetoken.introspection-uri={baseUrl}/realms/{realmNameA}/protocol/openid-connect/token/introspect
+mgmtp.a12.uaa.authentication.oauth2.resourceserver.tenants[0].opaquetoken.client-id={clientId}
+mgmtp.a12.uaa.authentication.oauth2.resourceserver.tenants[0].opaquetoken.client-secret={clientSecret}
+mgmtp.a12.uaa.authentication.oauth2.resourceserver.tenants[1].opaquetoken.introspection-uri={baseUrl}/realms/{realmNameB}/protocol/openid-connect/token/introspect
+mgmtp.a12.uaa.authentication.oauth2.resourceserver.tenants[1].opaquetoken.client-id={clientId}
+mgmtp.a12.uaa.authentication.oauth2.resourceserver.tenants[1].opaquetoken.client-secret={clientSecret}
+----
+. Server does not require IDP for startup
+. Server requires IDP for token introspection
+====
+
+===== Example Local Set-up
+If you don't have Keycloak yet
+
+* Refer <<keycloak-setup, here>> to create a Keycloak
+
+* Refer <<local-oauth2-client-public-login, here>> to create a Public client
+
+* Refer <<local-oauth2-client-confidential-login, here>> to create a Confidential client
+
+==== Oauth2 Client
+
+The OAuth2 Client features provide support for the Client role as defined in the link:https://datatracker.ietf.org/doc/html/rfc6749#section-1.1[OAuth 2.0 Authorization Framework].
+
+It uses the authorization code grant to obtain an access token from IDP when process finished it will insert the user details from the token into the Spring Security context so that you are authenticated.
+
+The cookie will be used for storing the session between the browser and this Client application.
+
+[[oauth2-ssr-sequence]]
+===== Sequence Diagram
+
+For complete flow, see the following sequence diagram:
+
+image:assets/images/oauth2_ssr.png[OAUTH2 SSR sequence diagram,title="OAUTH2 SSR sequence diagram",link="assets/images/oauth2_ssr.png" ]
+
+===== Example Local Set-up
+If you don't have Keycloak yet
+
+* Refer <<keycloak-setup, here>> to create a Keycloak
+
+* Refer <<local-ouath2-client-ssr-login, here>> to create a Confidential client
+
+===== Configuration
+Enable Oauth2 authentication type.
+
+[source, properties]
+----
+mgmtp.a12.uaa.authentication.types=OAUTH2,OAUTH2_CLIENT
+----
+
+[NOTE]
+====
+Due to limitation of extracting JWT-TOKEN in UAA. For Oauth2 Client (OAUTH2_CLIENT) but you have to turn on the Oauth2 Resource Server type (OAUTH2) also.
+It means by default your server always acts as Resource Server. We will keep you updated for further fixes.
+====
+
+Realm(s) configurations for Client or for <<oauth2-resource-configuration,Resource Server>>
+
+====
+[source, properties]
+----
+spring.security.oauth2.client.registration.uaa.client-id={clientId}
+spring.security.oauth2.client.registration.uaa.client-secret={clientSecret}
+spring.security.oauth2.client.registration.uaa.authorization-grant-type=authorization_code
+spring.security.oauth2.client.registration.uaa.client-name={clientName}
+spring.security.oauth2.client.registration.uaa.scope=openid
+spring.security.oauth2.client.provider.uaa.issuer-uri={baseUrl}/realms/{realmName}
+----
+. Server does not require IDP for startup
+. Server requires IDP for grant the access token
+====
+
+Where:
+
+. `uaa` is an arbitrary value that you choose for differentiating between registrations.
+. `clientId`, `clientSecret`, `clientName`, `baseUrl`, `realmName` these value are dependent on IDP setup.
+
+Finally, for the logout
+[source, properties]
+----
+mgmtp.a12.uaa.authentication.oauth2.idp-logout.enabled=true
+mgmtp.a12.uaa.authentication.oauth2.post-logout.url={baseUrl}
+----

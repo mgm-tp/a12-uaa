@@ -1,0 +1,131 @@
+{
+	"name": "Test Permission Definition",
+	"description": "",
+	"policies": [
+		{
+			"name": "Test Resource Object",
+			"description": "",
+			"rules": [
+				"#resource instanceof T(com.mgmtp.a12.uaa.authorization.integration.AuthorizationServiceWithPropertyAuthorizationIntegrationTest.TestResourceObject)"
+			]
+		},
+		{
+			"name": "Admin",
+			"description": "",
+			"rules": [
+				"principal.username == 'admin'"
+			]
+		},
+		{
+			"name": "User",
+			"description": "",
+			"rules": [
+				"principal.username == 'user'"
+			]
+		},
+		{
+			"name": "Guest",
+			"description": "",
+			"rules": [
+				"principal.username == 'guest'"
+			]
+		}
+	],
+	"propertyPermissions": [
+		{
+			"name": "Resource Properties Admin",
+			"description": "",
+			"policy-refs": [
+				"Test Resource Object",
+				"Admin"
+			],
+			"rights-refs": [
+				"Admin Data"
+			]
+		},
+		{
+			"name": "Resource Properties User",
+			"description": "",
+			"policy-refs": [
+				"Test Resource Object",
+				"User"
+			],
+			"rights-refs": [
+				"User Data"
+			]
+		},
+		{
+			"name": "Resource Properties Guest",
+			"description": "",
+			"policy-refs": [
+				"Test Resource Object",
+				"Guest"
+			],
+			"rights-refs": [
+				"Guest Data"
+			]
+		}
+	],
+	"propertyRights": [
+		{
+			"name": "Admin Data",
+			"description": "",
+			"rights": {
+				"READ": [
+					"id",
+					"name",
+					"description",
+					"nested",
+					"nested.id",
+					"nested.nestedName",
+					"nested.nestedDescription",
+					"nestedCollection",
+					"nestedCollection[].id",
+					"nestedCollection[].nestedName",
+					"nestedCollection[].nestedDescription"
+				],
+				"WRITE": [
+					"id",
+					"name",
+					"description",
+					"nested.id",
+					"nested.nestedName",
+					"nested.nestedDescription"
+				]
+			}
+		},
+			{
+			"name": "User Data",
+			"description": "",
+			"rights": {
+				"READ": [
+					"id",
+					"name",
+					"description",
+					"nested",
+					"nested.id",
+					"nestedCollection",
+					"nestedCollection[].id"
+				],
+				"MASK": [
+					"nestedCollection[].nestedName::'Empty'"
+				],
+				"WRITE": [
+					"id",
+					"name",
+					"description"
+				]
+			}
+		},
+		{
+			"name": "Guest Data",
+			"description": "",
+			"rights": {
+				"READ": [
+					"id",
+					"name"
+				]
+			}
+		}
+	]
+}

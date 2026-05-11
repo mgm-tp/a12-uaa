@@ -1,0 +1,62 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+[[uaa-token-renewal]]
+===== Token renewal
+
+For security reasons, it's recommended to keep the access token lifetime short.
+So the question is:
+
+> How can we renew the user’s session without initiating the login flow using their credentials again and again?
+
+To answer this question, UAA Authentication supports a token renewal feature, extending the amount of time it can be used with access tokens nearly expired.
+In other words, it's the token renewal.
+
+====== Renewal mechanism
+
+UAA Authentication uses the Authorization Code Flow with Proof Key for Code Exchange (PKCE) in conjunction with Silent Authentication to renew sessions.
+
+====== How token renewal works
+
+image:assets/images/silent_renew.png[UAA Token renewal,title="UAA Token renewal",link="assets/images/silent_renew.png"]
+
+. The client side creates a cryptographically-random `code_verifier` and from this generates a `code_challenge`.
+. Before redirecting a request to the Authorization Server, have the app generate `state` as a secured random string.
+. Store the `state` and `code_verifier` locally.
+. Request to the Authorization Server (`/uaa-authentication/authorize` <<Authorize user, endpoint>>) with `state`, `code_challenge` and `id_token_hint`.
+. The server side verifies the `id_token_hint`.
+. Store the `code_challenge`, `id_token_hint` and responds back to the application with `state` and `code`, which is good for one use.
+. The client side verifies locally `state` with the `state` (created in step 2).
+. Sends the `code` and the `code_verifier` (created in step 1) to the Authorization Server (`/uaa-authentication/token` <<Request tokens, endpoint>>).
+. The server side verifies the `code` and `code_verifier`.
+. The server side responds with an `access_token` and `token_renew_in_seconds` in the header.
+
+[CAUTION]
+====
+Initial login time remains unchanged after token refresh.
+====
+
+*Response* +
+
+If all goes well, you'll receive an HTTP 200 response with access_token and token_renew_in_seconds in the header:
+
+[source,http request]
+----
+HTTP/1.1 200 OK
+access_token: eyJlbmABcdJBMjU2REfghiwiYWxnIjoiZGlyHn0...
+token_renew_in_seconds: 300
+----

@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DomainReleaseBundle id="-610105296594843366">
+  <releaseBundle>
+    <bundles>
+      <releaseBundleName>Bundle 1 changed</releaseBundleName>
+      <startReleaseBundle>2019-12-03</startReleaseBundle>
+      <endReleaseBundle>2019-12-20</endReleaseBundle>
+      <numberOfReleases>3</numberOfReleases>
+      <comment>Comment bundle 1</comment>
+      <systembranchorTag />
+      <releases>
+        <releaseName>Product 1-1.0.1</releaseName>
+        <comment>Release comment 1</comment>
+        <internalLinkGroup>
+          <internalLink>
+            <specifiedLinkTarget>{"repeatLocation":{"path":[],"locationPath":[{"elementName":"Screen1"}]},"activityDescriptor":{"model":"Release","instance":"DomainRelease/20"}}</specifiedLinkTarget>
+          </internalLink>
+        </internalLinkGroup>
+      </releases>
+      <releases>
+        <releaseName>Release 2</releaseName>
+        <comment>Release comment</comment>
+        <internalLinkGroup>
+          <internalLink />
+        </internalLinkGroup>
+      </releases>
+      <releases>
+        <releaseName>Release 3</releaseName>
+        <comment>Comment for release 3</comment>
+        <internalLinkGroup>
+          <internalLink />
+        </internalLinkGroup>
+      </releases>
+      <ticket>
+        <smartUrl>
+          <prettyUrlName>A12 Ticket</prettyUrlName>
+          <specifiedTitle>A12 Ticket</specifiedTitle>
+          <specifiedUrl>https://jira.mgm-tp.com/jira/browse/A12-10138</specifiedUrl>
+        </smartUrl>
+      </ticket>
+      <wiki>
+        <smartUrl>
+          <prettyUrlName>Wiki URL</prettyUrlName>
+          <specifiedTitle>Wiki URL</specifiedTitle>
+          <specifiedUrl>https://jira.mgm-tp.com/jira/browse/A12-10138</specifiedUrl>
+        </smartUrl>
+      </wiki>
+      <releaseBundleResponsible>
+        <smartUrl>
+          <prettyUrlName>Ngo Quang 123</prettyUrlName>
+          <specifiedTitle>Ngo Quang 123</specifiedTitle>
+          <specifiedUrl>https://jira.mgm-tp.com/jira/browse/A12-10131</specifiedUrl>
+        </smartUrl>
+      </releaseBundleResponsible>
+    </bundles>
+    <bundles>
+      <releaseBundleName>Bundle 2</releaseBundleName>
+      <startReleaseBundle>2019-12-02</startReleaseBundle>
+      <endReleaseBundle>2019-12-03</endReleaseBundle>
+      <numberOfReleases>2</numberOfReleases>
+      <comment>Comment for release</comment>
+      <systembranchorTag>
+        <svnTag>Tag 1</svnTag>
+      </systembranchorTag>
+      <releases>
+        <releaseName>Product 1-1.0.1</releaseName>
+        <internalLinkGroup>
+          <internalLink />
+        </internalLinkGroup>
+      </releases>
+      <releases>
+        <releaseName>Release 2</releaseName>
+        <internalLinkGroup>
+          <internalLink>
+            <specifiedLinkTarget>{"repeatLocation":{"path":[],"locationPath":[{"elementName":"Screen1"}]},"activityDescriptor":{"model":"Release","instance":"DomainRelease/17"}}</specifiedLinkTarget>
+            <internalLinkLabel>Cross-Link</internalLinkLabel>
+          </internalLink>
+        </internalLinkGroup>
+      </releases>
+      <ticket>
+        <smartUrl>
+          <prettyUrlName>A12 Release</prettyUrlName>
+          <specifiedTitle>A12 Release</specifiedTitle>
+          <specifiedUrl>https://wiki.mgm-tp.com/confluence/display/A12/Releases</specifiedUrl>
+        </smartUrl>
+      </ticket>
+      <wiki>
+        <smartUrl>
+          <prettyUrlName>NCB Interest</prettyUrlName>
+          <specifiedTitle>NCB Interest</specifiedTitle>
+          <specifiedUrl>https://webgia.com/lai-suat/ncb</specifiedUrl>
+        </smartUrl>
+      </wiki>
+      <releaseBundleResponsible>
+        <smartUrl>
+          <prettyUrlName>A12 Ticket</prettyUrlName>
+          <specifiedTitle>A12 Ticket</specifiedTitle>
+          <specifiedUrl>https://jira.mgm-tp.com/jira/browse/A12-1013</specifiedUrl>
+        </smartUrl>
+      </releaseBundleResponsible>
+    </bundles>
+    <bundles>
+      <releaseBundleName>Bundle 3</releaseBundleName>
+      <startReleaseBundle>2019-12-26</startReleaseBundle>
+      <endReleaseBundle>2019-12-28</endReleaseBundle>
+      <numberOfReleases>1</numberOfReleases>
+      <systembranchorTag />
+      <releases>
+        <releaseName>Release 1</releaseName>
+        <internalLinkGroup>
+          <internalLink>
+            <specifiedLinkTarget>{"repeatLocation":{"path":[],"locationPath":[{"elementName":"Screen1"}]},"activityDescriptor":{"model":"Release","instance":"DomainRelease/17"}}</specifiedLinkTarget>
+            <internalLinkLabel>Cross-Link</internalLinkLabel>
+          </internalLink>
+        </internalLinkGroup>
+      </releases>
+      <ticket>
+        <smartUrl>
+          <prettyUrlName>A12-10138</prettyUrlName>
+          <specifiedUrl>https://jira.mgm-tp.com/jira/browse/A12-10138</specifiedUrl>
+        </smartUrl>
+      </ticket>
+      <wiki>
+        <smartUrl>
+          <prettyUrlName>Releases</prettyUrlName>
+          <specifiedUrl>https://wiki.mgm-tp.com/confluence/display/A12/Releases</specifiedUrl>
+        </smartUrl>
+      </wiki>
+      <releaseBundleResponsible>
+        <smartUrl>
+          <prettyUrlName>Quang Ngo</prettyUrlName>
+          <specifiedTitle>Quang Ngo</specifiedTitle>
+          <specifiedUrl>https://jira.mgm-tp.com/jira/browse/A12-1234</specifiedUrl>
+        </smartUrl>
+      </releaseBundleResponsible>
+    </bundles>
+    <bundles>
+      <releaseBundleName>Bundle 4</releaseBundleName>
+      <startReleaseBundle>2019-12-01</startReleaseBundle>
+      <endReleaseBundle>2019-12-26</endReleaseBundle>
+      <numberOfReleases>1</numberOfReleases>
+      <systembranchorTag />
+      <releases>
+        <releaseName>Release 2</releaseName>
+        <comment>This is another release</comment>
+        <internalLinkGroup>
+          <internalLink>
+            <specifiedLinkTarget>{"repeatLocation":{"path":[{"elementName":"Projekt","index":1},{"elementName":"Produkte","index":3}],"locationPath":[{"elementName":"Screen1"},{"elementName":"Overview"},{"elementName":"repeat-Produkte"},{"elementName":"repeat-Produkte-detail-screen"}]},"activityDescriptor":{"model":"Projekt","single":true}}</specifiedLinkTarget>
+            <internalLinkLabel>Cross link to release 2</internalLinkLabel>
+            <specifiedLinkName>Cross link to release 2</specifiedLinkName>
+          </internalLink>
+        </internalLinkGroup>
+      </releases>
+      <ticket>
+        <smartUrl>
+          <prettyUrlName>BAP</prettyUrlName>
+          <specifiedUrl>https://wiki.mgm-tp.com/confluence/display/A12/BAP</specifiedUrl>
+        </smartUrl>
+      </ticket>
+      <wiki>
+        <smartUrl>
+          <prettyUrlName>BAP+Engines</prettyUrlName>
+          <specifiedUrl>https://wiki.mgm-tp.com/confluence/display/A12/BAP+Engines</specifiedUrl>
+        </smartUrl>
+      </wiki>
+      <releaseBundleResponsible>
+        <smartUrl>
+          <prettyUrlName>BAPEnginesRelease27.2.1</prettyUrlName>
+          <specifiedUrl>https://wiki.mgm-tp.com/confluence/display/A12/BAPEnginesRelease27.2.1</specifiedUrl>
+        </smartUrl>
+      </releaseBundleResponsible>
+    </bundles>
+    <bundles>
+      <releaseBundleName>Bundle 5.1</releaseBundleName>
+      <startReleaseBundle>2019-12-01</startReleaseBundle>
+      <endReleaseBundle>2019-12-26</endReleaseBundle>
+      <numberOfReleases>1</numberOfReleases>
+      <systembranchorTag />
+      <releases>
+        <releaseName>Product 1-1.0.1</releaseName>
+        <internalLinkGroup>
+          <internalLink />
+        </internalLinkGroup>
+      </releases>
+      <ticket>
+        <smartUrl>
+          <prettyUrlName>BAP Client</prettyUrlName>
+          <specifiedTitle>BAP Client</specifiedTitle>
+          <specifiedUrl>https://wiki.mgm-tp.com/confluence/display/A12/BAP</specifiedUrl>
+        </smartUrl>
+      </ticket>
+      <wiki>
+        <smartUrl>
+          <prettyUrlName>BAP Engines</prettyUrlName>
+          <specifiedTitle>BAP Engines</specifiedTitle>
+          <specifiedUrl>https://wiki.mgm-tp.com/confluence/display/A12/BAP+Engines</specifiedUrl>
+        </smartUrl>
+      </wiki>
+      <releaseBundleResponsible>
+        <smartUrl>
+          <prettyUrlName>BAP Engine Release</prettyUrlName>
+          <specifiedTitle>BAP Engine Release</specifiedTitle>
+          <specifiedUrl>https://wiki.mgm-tp.com/confluence/display/A12/BAPEnginesRelease27.2.1</specifiedUrl>
+        </smartUrl>
+      </releaseBundleResponsible>
+    </bundles>
+    <bundles>
+      <releaseBundleName>Bundle 6</releaseBundleName>
+      <startReleaseBundle>2019-12-01</startReleaseBundle>
+      <endReleaseBundle>2019-12-27</endReleaseBundle>
+      <systembranchorTag>
+        <svnTag>123_tag</svnTag>
+      </systembranchorTag>
+      <ticket>
+        <smartUrl>
+          <prettyUrlName>A12</prettyUrlName>
+          <specifiedUrl>https://wiki.mgm-tp.com/confluence/display/A12</specifiedUrl>
+        </smartUrl>
+      </ticket>
+      <wiki>
+        <smartUrl>
+          <prettyUrlName>NCB</prettyUrlName>
+          <specifiedTitle>NCB</specifiedTitle>
+          <specifiedUrl>https://webgia.com/lai-suat/ncb</specifiedUrl>
+        </smartUrl>
+      </wiki>
+      <releaseBundleResponsible>
+        <smartUrl>
+          <prettyUrlName>A12-1013</prettyUrlName>
+          <specifiedUrl>https://jira.mgm-tp.com/jira/browse/A12-1013</specifiedUrl>
+        </smartUrl>
+      </releaseBundleResponsible>
+    </bundles>
+  </releaseBundle>
+</DomainReleaseBundle>
+

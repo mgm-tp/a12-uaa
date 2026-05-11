@@ -1,0 +1,67 @@
+{
+  "header": {
+    "id": "Role-AccessRight-RM_AccessRight_SelectedItemsOverview",
+    "modelType": "overview",
+    "modelVersion": "37.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "userManagementAdmin"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "Role-AccessRight-RM_AccessRight____generated"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "enableFilter": false,
+      "showFullTextSearch": false,
+      "pagingSize": 10
+    },
+    "columns": [
+      {
+        "id": "column-da5f3",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Name"
+          },
+          {
+            "locale": "de",
+            "text": "Name"
+          }
+        ],
+        "width": 1,
+        "styles": {},
+        "elementRef": "I4_field_e7eb8",
+        "sortable": false
+      }
+    ],
+    "subHeaderBox": {
+      "majorElements": [],
+      "minorElements": []
+    },
+    "footerBox": {
+      "majorElements": [],
+      "minorElements": []
+    },
+    "rowActionGroup": {
+      "actions": []
+    }
+  }
+}

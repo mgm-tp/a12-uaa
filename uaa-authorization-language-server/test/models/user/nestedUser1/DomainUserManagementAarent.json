@@ -1,0 +1,48 @@
+{
+  "header": {
+    "id": "DomainUserManagementAarent",
+    "modelType": "document",
+    "modelVersion": "28.1.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [],
+    "modelReferences": [
+      {
+        "alias": "DomainUserManagementNested",
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "DomainUserManagementNested"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "DomainUserManagementAarent",
+      "immutable": false
+    },
+    "modelConfig": {
+      "decimalSeparator": ".",
+      "timeZone": "UTC",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "include_00a58",
+          "name": "userNested",
+          "Group": {
+            "repeatability": 1,
+            "modelAlias": "DomainUserManagementNested"
+          }
+        }
+      ]
+    }
+  }
+}

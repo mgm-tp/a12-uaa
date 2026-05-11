@@ -1,0 +1,301 @@
+{
+  "header": {
+    "id": "Domain_Authorization_Full",
+    "modelType": "document",
+    "modelVersion": "28.0.2",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "citizen,caseworker,admin,formManager,guest"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "DomainCaseType",
+      "immutable": false
+    },
+    "modelConfig": {
+      "decimalSeparator": ".",
+      "timeZone": "UTC",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "typeDefinitions": [
+      {
+        "id": "typedef_64c95152-a383-4d12-8f46-312404e43d5f",
+        "name": "Roles",
+        "fieldType": {
+          "type": "EnumerationType",
+          "EnumerationType": {
+            "values": [
+              {
+                "value": "citizen"
+              },
+              {
+                "value": "caseworker"
+              },
+              {
+                "value": "admin"
+              },
+              {
+                "value": "formManager"
+              },
+              {
+                "value": "guest"
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_a1c34",
+          "name": "Authorization",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Group",
+                "id": "group_3e434",
+                "name": "User",
+                "Group": {
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_861ad",
+                      "name": "username",
+                      "annotations": [
+                        {
+                          "name": "path",
+                          "value": "#user/username"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": ""
+                          }
+                        ],
+                        "requirednessConfig": {
+                          "mode": "absoluteOrRelativeToNextRepAncestor"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_66c05",
+                      "name": "firstName",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": ""
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_5e929",
+                      "name": "lastName",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": ""
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Group",
+                      "id": "group_f2f48",
+                      "name": "Roles",
+                      "annotations": [
+                        {
+                          "name": "path",
+                          "value": "#user/authorities[]"
+                        }
+                      ],
+                      "Group": {
+                        "repeatability": 5,
+                        "elements": [
+                          {
+                            "type": "Field",
+                            "id": "field_11b6b",
+                            "name": "name",
+                            "annotations": [
+                              {
+                                "name": "path",
+                                "value": "authority"
+                              }
+                            ],
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              },
+                              "label": [
+                                {
+                                  "locale": "en",
+                                  "text": ""
+                                }
+                              ],
+                              "requirednessConfig": {
+                                "mode": "absoluteOrRelativeToNextRepAncestor"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_6acae",
+                "name": "Resource",
+                "Group": {
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Group",
+                      "id": "group_15e46",
+                      "name": "CaseType",
+                      "Group": {
+                        "repeatability": 1,
+                        "elements": [
+                          {
+                            "type": "Group",
+                            "id": "group_5fe15",
+                            "name": "MetaInformation",
+                            "Group": {
+                              "repeatability": 1,
+                              "elements": [
+                                {
+                                  "type": "Field",
+                                  "id": "field_43538",
+                                  "name": "createdBy",
+                                  "annotations": [
+                                    {
+                                      "name": "path",
+                                      "value": "#user/username"
+                                    }
+                                  ],
+                                  "Field": {
+                                    "fieldType": {
+                                      "type": "StringType"
+                                    },
+                                    "label": [
+                                      {
+                                        "locale": "en",
+                                        "text": ""
+                                      }
+                                    ]
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_959c2",
+                "name": "Environment",
+                "Group": {
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_4269e",
+                      "name": "username",
+                      "annotations": [
+                        {
+                          "name": "path",
+                          "value": "#username"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": ""
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Rule",
+                "id": "rule_983b5",
+                "name": "UserValidation",
+                "Rule": {
+                  "errorEntityRelPath": "../User/Roles/name",
+                  "errorCode": "Error rule_983b5",
+                  "errorCondition": "NoFieldValueIncludedInValueList(User/Roles*/name IN \"admin\", \"formManager\")",
+                  "severity": "ERROR",
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "UserValidation failed."
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Rule",
+                "id": "rule_83ea0",
+                "name": "CaseTypeCreateByFilter",
+                "Rule": {
+                  "errorEntityRelPath": "../Resource/CaseType/MetaInformation/createdBy",
+                  "errorCode": "Error rule_83ea0",
+                  "errorCondition": "[Resource/CaseType/MetaInformation/createdBy] != [Environment/username]",
+                  "severity": "ERROR",
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "Filter data by login user."
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

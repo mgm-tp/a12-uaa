@@ -1,0 +1,191 @@
+{
+  "id": "-1766210117238456502",
+  "Offer": {
+    "DposDefaultFields": {
+      "ProductId": "",
+      "ProductName": "",
+      "ScreenId": "screen-65344",
+      "DigPOSOfferStatus": "status-policy-created",
+      "InternalQuotationComment": "",
+      "DposEntityId": ""
+    },
+    "LocalProductData": {
+      "Preconditions": {
+        "NoSanctionCountries": true,
+        "NoSanctionIndustries": true,
+        "NoRestrictedIndustries": true,
+        "Threshold": true,
+        "Threshold_UW": true,
+        "Threshold_US": true,
+        "Threshold_ecommerce": true,
+        "Threshold_PII": true,
+        "Security": true,
+        "Access_Control": true,
+        "BackUp": true,
+        "Domiciled": true,
+        "NoPolicy": true,
+        "NoClaims": true
+      },
+      "UW_Rules": {
+        "TurnoverThreshold": "no"
+      },
+      "CoverageVariants": {
+        "Limit1": "250000",
+        "Limit2": null,
+        "Limit3": null,
+        "Deductible1": "5000",
+        "Deductible2": "2500",
+        "Deductible3": "2500",
+        "CALC_TariffPremium1": 245000,
+        "CALC_TariffPremium2": -2500,
+        "CALC_TariffPremium3": -2500,
+        "SelectOption": "option-1"
+      },
+      "Cyence": {
+        "CyenceId": "",
+        "CyenceScore": null,
+        "QuoteId": "",
+        "CyenceReferralReason": null,
+        "InputFields": {
+          "TypeFI": "6020",
+          "EmployeeCount": 1000,
+          "Website": "",
+          "WebsiteNotAvailable": true,
+          "State": "HaiChau"
+        }
+      },
+      "CyenceData": {
+        "TransactionId": "",
+        "CyenceStartScoringTime": ""
+      }
+    },
+    "OfferData": {
+      "CosmoOfferId": "",
+      "CosmoOfferNumber": "O/001116",
+      "OfferDataConfirmation": true,
+      "OfferValidFrom": null,
+      "OfferValidUntil": null,
+      "ReasonOfRefusal": null,
+      "RefusalDescription": ""
+    },
+    "PolicyData": {
+      "PolicyId": "8019",
+      "PolicyNr": "680.010.039",
+      "PolicyStatus": null,
+      "ProductId": "",
+      "ProductName": "",
+      "PolicyInceptionDate": "2018-12-01",
+      "PolicyEndDate": "2019-11-30",
+      "PolicyCancellationDate": null,
+      "NextMainDueDate": null,
+      "DocumentLanguage": "en",
+      "Comment": "",
+      "PolicyDataConfirmation": true,
+      "Broker": {
+        "BrokerId": "13",
+        "BrokerName": "",
+        "Provisions": {
+          "Brokerage": 15,
+          "NonPRTRenewalValue": null,
+          "NonPRTInceptionValue": null
+        }
+      },
+      "Premiums": {
+        "TariffPremiumGross": null,
+        "TariffPremiumNet": null
+      },
+      "ExternalPolicyNumbers": {
+        "ExternalPolicyNr": ""
+      },
+      "BusinessCodes": {
+        "Industry": "industry-agriculture",
+        "RiskDescription": ""
+      },
+      "PremiumCollection": {
+        "InstallmentMode": null
+      },
+      "ContactDetails": {
+        "Name": "",
+        "Phone": "",
+        "Email": "",
+        "Description": ""
+      },
+      "TenantId": ""
+    },
+    "PartnerData": {
+      "PartnerId": "",
+      "Name": "Doush",
+      "LegalForm": "1",
+      "Description": "",
+      "MailAddress": {
+        "Street": "Nowhere Street",
+        "ZipCode": "25000",
+        "City": "Danang",
+        "Country": "BE",
+        "PostBox": ""
+      },
+      "InvoiceAddress": {
+        "Street": "",
+        "ZipCode": "",
+        "City": "",
+        "Country": "",
+        "PostBox": ""
+      },
+      "FinancialFigures": {
+        "FiscalYear": 2018,
+        "TotalAssets": null,
+        "Equity": null,
+        "Revenue": 100000,
+        "NetIncome": null
+      },
+      "ExternalPartnerNumbers": {
+        "VatNr": "09.3438.34"
+      }
+    },
+    "Documents": {},
+    "ContractData": {
+      "Coverage": {
+        "Turnover": "1000000",
+        "MainLimit": {
+          "LimitType": "tariff",
+          "TariffLimit": {
+            "TariffLimit": "250000"
+          },
+          "IndividualLimit": {
+            "IndividualLimit": null
+          }
+        },
+        "Deductible": {
+          "Deductible": "5000"
+        },
+        "Premium": {
+          "PremiumType": "tariff",
+          "FlatPremium": {
+            "PremiumValue": null
+          },
+          "TechnicalPremium": {
+            "CALC_TariffPremium": 245000
+          }
+        }
+      },
+      "Questionnaire": {
+        "Client": {
+          "DateOfIncorporation": "2018-12-02",
+          "CountryOfIncorporation": "PS",
+          "Industry": "",
+          "OtherIndustry": "",
+          "SubsidariesOutsideEU": "no",
+          "SubsidariesUSACanada": "no"
+        },
+        "Financials": {
+          "Year": 2018,
+          "Turnover": 100000
+        },
+        "Countries": {}
+      }
+    },
+    "SubmissionData": {
+      "Name": "Doush"
+    }
+  }
+}

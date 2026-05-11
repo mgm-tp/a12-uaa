@@ -1,0 +1,93 @@
+{
+  "name": "Benchmark test Authorization Definition",
+  "description": "This is authorization file",
+  "policies": [
+    {
+      "name": "load list companies",
+      "description": "user has role Admin can load company",
+      "rules": [
+          "principal.username == 'admin'",
+          "principal.extendedPrincipalData.gender == 'male'"
+      ]
+    },
+    {
+      "name": "has property permission",
+      "description": "user is the owner can load property",
+      "rules": [
+        "print('Path Permission: ' + #resource.owner)",
+        "print('Path2 Permission: ' + principal.username)",
+        "#resource.owner == principal.username"
+      ]
+    }
+  ],
+  "permissions": [
+    {
+      "name": "load companies",
+      "description": "user can load list companies",
+      "policy-refs": [
+        "load list companies"
+      ],
+      "repository-refs": [
+        "company data filter by user login"
+      ],
+      "scopes": [
+        "load company"
+      ]
+    }
+  ],
+  "repositoryPolicies": [
+    {
+      "name": "company data filter by user login",
+      "description": "description",
+      "templates": [
+        "'username: ''' + principal.username + ''''",
+        "'Role: ''' + principal.authorities[0].name + ''''",
+        "'Access rights: ''' + principal.authorities[0].accessRights[0].name + ''''",
+        "'Family member gender: ''' + principal.extendedPrincipalData.gender",
+        "'Family member name: ''' + principal.extendedPrincipalData.name"
+      ]
+    }
+  ],
+  "propertyPermissions": [
+    {
+      "name": "company properties Admin",
+      "description": "properties permission for user with role Admin",
+      "policy-refs": [
+        "has property permission"
+      ],
+      "rights-refs": [
+        "company entity for Admin"
+      ]
+    }
+  ],
+  "propertyRights": [
+    {
+      "name": "company entity for Admin",
+      "description": "user has role Admin can read and write this properties",
+      "rights": {
+        "WRITE": [
+          "id",
+          "owner",
+          "name",
+          "countryCode",
+          "taxNumber",
+          "employees",
+          "employees[].id",
+          "employees[].firstName",
+          "employees[].lastName",
+          "employees[].age",
+          "employees[].familyMembers",
+          "employees[].familyMembers[].id",
+          "employees[].familyMembers[].gender",
+          "employees[].familyMembers[].name"
+        ],
+        "MASK": [
+          "countryCode::'Access Denied'",
+          "taxNumber::'masked:['+taxNumber.substring(0,3)+'...]'",
+          "employees[].firstName::'Access Denied'",
+          "employees[].familyMembers[].name::'Access Denied'"
+        ]
+      }
+    }
+  ]
+}

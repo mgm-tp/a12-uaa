@@ -1,0 +1,504 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+[[rest-client]]
+== Java Rest Client
+
+UAA provides an infrastructure for client side JAVA API which allows connecting to the server end-points.
+The infrastructure simplifies the development of a client and completely handles the security aspects of the connection.
+  
+
+UAA REST Client is built on top of the *REST Connector* from Utils.
+The REST Connector provides JAVA API for all HTTP methods.
+UAA intercepts a connection and it's responsible for the following aspects:
+
+* Initiate login flow when the token is missing.
+* Store the token in runtime or persistent storage.
+* Handle token exchange with the server as header.
+* Automatically renew tokens in the background.
+
+image::assets/images/rest-connector.png[REST Connector & UAA infrastructure,title="REST Connector & UAA infrastructure",link="assets/images/rest-connector.png",align="center"]
+
+[NOTE]
+====
+UAA also provides REST connectors to all its end-points.
+====
+
+*UAA Endpoints*
+
+* *currentUser* - Load current authenticated user.
+* *tokenValid* - Validate JWT token issued by UAA.
+* *logout* - Logout a user then invalidate JWT token (if any).
+* *reloadRules* - Reload authorization rules from a persistent resource.
+
+[[rest-client-auth-types]]
+=== Authentication Types
+
+UAA REST Client supports multiple authentication types. Those types can't operate simultaneously and must be specified on initialization phase.
+The configuration values are the same as for the server:
+
+*All Types*
+
+* <<local-flow,LOCAL>> [Login flow will be trigger if authentication data (token) is missing]
+* <<ad-flow,ACTIVE_DIRECTORY_LDAP>> [Login flow will be trigger if authentication data (token) is missing]
+* <<saml-flow,SAML>> [Login flow will be trigger if authentication data (token) is missing]
+* <<oauth2,OAUTH2>> [Login flow will be trigger if authentication data (token) is missing]
+* <<CertificateAuthentication,CERTIFICATE>> [no login flow is needed]
+* <<APIKeyAuthentication,API_KEY>> [no login flow is needed]
+* DELEGATED [no login flow is needed]
+
+[[login-flow]]
+==== LOCAL,ACTIVE_DIRECTORY_LDAP,SAML,OAUTH2
+Those authentication types require configuration for login flow with credentials.
+
+*You can check the login flow overview for each authentication type here:*
+
+* <<local-flow,LOCAL>>
+* <<ad-flow,ACTIVE_DIRECTORY_LDAP>>
+* <<saml-flow,SAML>>
+* <<oauth2-public-flow, OAUTH2_PUBLIC>>
+* <<oauth2-confidential-flow, OAUTH2_CONFIDENTIAL>>
+
+
+[[rest-client-delegated]]
+==== DELEGATED
+Delegated authentication type is a special type which can be described:
+
+> Communication is done on behalf of the logged user.
+
+The authentication can be used only when a rest client is used in the back-end application which needs to communicate to other service(s).
+The REST client shares the same authentication token with a request from web browser. It expects that the browser will obtain the token on its own.
+There is possibility to exclude contexts by a pattern lists see configuration `excluded-contexts` below.
+
+[IMPORTANT]
+====
+To make the `DELEGATED` it's needed to register `DelegatingAuthenticationFilter` in the web container.
+This is done in *uaa-rest-client-spring-boot-autoconfigure* module based on configuration.
+====
+
+[[rest-client-certificate]]
+==== CERTIFICATE
+The client and server have the TLS handshake to authenticate each other, agree on encryption standards, and establish a secure channel for transferring data.
+
+[[rest-client-certificate]]
+==== API_KEY
+The client sends an <<APIKeyAuthentication,Api Key>> in Authentication header instead of token. API Key is encoded to base64 string.
+
+[[token-renewal]]
+=== Token renewal
+
+UAA REST Client runs token renewal in the background once after the user successfully login.
+It will have totally no effect on performance.
+
+The token renewal job will stop when the user logout.
+
+[WARNING]
+====
+The token renewal does not support DELEGATED, CERTIFICATE and API_KEY modes where it's not needed.
+====
+
+[[rest-client-usage]]
+=== Getting Started
+
+UAA REST client is a plain Java application to allow easy integration for NON Spring applications.
+UAA also provides seamless integration with Spring Boot by own configuration modules.
+
+[[rest-client-usage-java]]
+==== Working With Plain Java
+
+Add following dependency to your POM:
+
+[source,xml,subs="verbatim,attributes"]
+----
+<dependency>
+	<groupId>com.mgmtp.a12.uaa</groupId>
+	<artifactId>uaa-rest-client</artifactId>
+	<version>{version}</version>
+</dependency>
+
+----
+
+include::rest-client-plain-java.adoc[]
+
+[NOTE]
+====
+Optionally you can provide custom user object to the REST client.
+
+[source,java]
+----
+
+CustomCurrentUser currentUser = authClient.currentUser(CustomCurrentUser.class);
+----
+====
+
+From the project side, besides the default UAA authentication end points. If you want to connect to your end-point then you can do it by using the connector below:
+[source,java]
+----
+public class CustomConnector {
+
+	private static final String ENDPOINT_URL = "readData";
+
+	private RestGetConnector getConnector;
+	private UrlBuilderSupport urlBuilderSupport;
+
+	public CustomConnector(String baseUrl, RestGetConnector getConnector) {
+		this.getConnector = getConnector;
+		this.urlBuilderSupport = UrlBuilderSupport.withBaseUrl(baseUrl);
+	}
+
+	public String readData() {
+		String url = urlBuilderSupport.createBuilder().pathSegment(ENDPOINT_URL).toUriString();
+		return getConnector.callServer(url, RestServerRequest.empty(), String.class).getData();
+	}
+
+}
+----
+
+[[rest-client-usage-spring]]
+==== Working With Spring Application
+
+Add following dependency to your POM:
+
+[source,xml,subs="verbatim,attributes"]
+----
+<dependency>
+	<groupId>com.mgmtp.a12.uaa</groupId>
+	<artifactId>uaa-rest-client</artifactId>
+	<version>{version}</version>
+</dependency>
+
+----
+
+Usage in Spring application is similar to plain Java.
+You need to instantiate the UAA REST Client manually.
+It's recommended to do it in a `@Configuration` class and provide a `@Bean` (UAA clients/connectors) to the application context which can be injected when necessary.
+`UAARestClientFactory` also wraps all REST Connector classes, so you can get them from the factory.
+As you can see in last lines in the example if you need `*Connector*` beans in the application context you can propagate them from the factory.
+
+To create UAARestClientProperties instance (on below Configuration example) for each authentication type. Please refer (<<rest-client-usage-java,link>>).
+
+[source,java]
+----
+@Configuration
+public class UaaRestClientConfiguration {
+
+	private UAARestClientFactory uaaRestClientFactory; 
+
+	@PostConstruct
+	void initialize() {
+		UAARestClientProperties restClientProperties = new UAARestClientProperties();
+		uaaRestClientFactory = UAARestClientFactoryBuilder
+			.withConfiguration(restClientProperties)
+			.withErrorHandlers(...)
+			.withInterceptors(...)
+			.withMessageConverters(...)
+			.build();
+		
+	}
+
+	@Bean
+	public AuthenticationRestClient authenticationRestClient() {
+		return uaaRestClientFactory.getAuthenticationRestClient();
+	}
+
+	@Bean
+	public AuthorizationRestClient authorizationRestClient() {
+		return uaaRestClientFactory.getAuthorizationRestClient();
+	}
+	
+	//Optionally you can create a @Bean for each connector
+	@Bean
+	public RestGetConnector restGetConnector() {
+		return uaaRestClientFactory.getGetConnector();
+	}
+
+}
+----
+
+[[rest-client-usage-spring-boot]]
+==== Working With Spring Boot Application
+
+Add following dependency to your POM:
+
+[source,xml,subs="verbatim,attributes"]
+----
+<!-- contains utils-rest-server-connector -->
+<dependency>
+	<groupId>com.mgmtp.a12.utils</groupId>
+	<artifactId>utils-rest-server-connector-spring-boot-autoconfigure</artifactId>
+	<version>{utils_version}</version>
+</dependency>
+
+<dependency>
+	<groupId>com.mgmtp.a12.uaa</groupId>
+	<artifactId>uaa-rest-client</artifactId>
+	<version>{version}</version>
+</dependency>
+
+<dependency>
+	<groupId>com.mgmtp.a12.uaa</groupId>
+	<artifactId>uaa-rest-client-spring-boot-autoconfigure</artifactId>
+	<version>{version}</version>
+</dependency>
+----
+
+[[rest-client-configuration]]
+In a Spring Boot application all configuration is handled for you in *autoconfigure* modules.
+Everything is configured by a configuration properties.
+
+===== LOCAL/ACTIVE_DIRECTORY_LDAP
+[%autowidth.stretch,options="header"]
+|================================================================================
+|Configuration property |Default value |Usage |Remark
+|`mgmtp.a12.uaa.authentication.client.rest.uaa-base.url` | `http://localhost:8080` | Base URL for UAA related endpoints, e.g, `login/logout/currentUser`. |
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-type` | `LOCAL` | The authentication type you want to use to communicate with the server. | `LOCAL` or `ACTIVE_DIRECTORY_LDAP` should be specified properly, depending on the specific authentication type.
+|`mgmtp.a12.uaa.authentication.client.rest.generated-token-header-name` | `access_token` | Header name in the login server response where token is expected. | Only valid with `LOCAL`, `ACTIVE_DIRECTORY_LDAP` or `SAML` mode.
+|`mgmtp.a12.uaa.authentication.client.rest.authorization-data-store` | `` | String `resource` where the authorization token is persisted. | Notice that it will not work on `CERTIFICATE` mode.
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.login-relative.url` | `user/local/login` | The login url. | You need to change the default value to `user/active_directory_ldap/login` based on the `ACTIVE_DIRECTORY_LDAP` authentication type.
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.username` | `` | The login credentials required to access to the server. | 
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.password` | `` | The login credentials required to access to the server. | 
+|`mgmtp.a12.uaa.authentication.client.rest.authorization-header-name` | `Authorization` | Header name which is used to send `authorization token` to server. |
+|================================================================================
+
+===== SAML
+[%autowidth.stretch,options="header"]
+|================================================================================
+|Configuration property |Default value |Usage |Remark
+|`mgmtp.a12.uaa.authentication.client.rest.uaa-base.url` | `http://localhost:8080` | Base URL for UAA related endpoints, e.g, `login/logout/currentUser`. |
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-type` | `LOCAL` | The authentication type you want to use to communicate with the server. | You need to change the default value to `SAML` for using.
+|`mgmtp.a12.uaa.authentication.client.rest.generated-token-header-name` | `access_token` | Header name in the login server response where token is expected. | Only valid with `LOCAL`, `ACTIVE_DIRECTORY_LDAP` or `SAML` mode.
+|`mgmtp.a12.uaa.authentication.client.rest.authorization-data-store` | `` | String `resource` where the authorization token is persisted. | Notice that it will not work on `CERTIFICATE` mode.
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.username` | `` | The login credentials required to access to the server. | 
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.password` | `` | The login credentials required to access to the server. | 
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.saml.login-relative.url` | `` | The relative login url for saml, e.g `saml2/authenticate/uaa?uaa_success=http://http://{the_server_domain_which_include_this_rest_client}`. |
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.saml.logout-relative.url` | `` | The relative logout url for saml . |
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.saml.sso-configuration.username-xpath` | `` | Xpath for login name field on the IDP page. | e.g, `//input[@name='username']`
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.saml.sso-configuration.password-xpath` | `` | Xpath for password field on the IDP page. | e.g, `//input[@name='password']`
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.saml.sso-configuration.login-button-xpath` | `` | Xpath for login button on the IDP page. | e.g, `//button[@name='login']`
+|`mgmtp.a12.uaa.authentication.client.rest.authorization-header-name` | `Authorization` | Header name which is used to send `authorization token` to server. |
+|================================================================================
+
+===== OAUTH2 (PUBLIC)
+[cols="~,~,100,~",options="header"]
+|================================================================================
+|Configuration property |Default value |Usage |Remark
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-type` | `LOCAL` | The authentication type you want to use to communicate with the server. | You need to change the default value to `OAUTH2` for using.
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.oidc.client-type` | `CONFIDENTIAL` | The applications are not able to securely authenticate | You need to change the default value to `PUBLIC` for using.
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.oidc.public-client.client-id` | `` | |
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.oidc.public-client.realm-name` | `` | Realm name which contains this client id on the IDP. |
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.oidc.public-client.idp-base.url` | `http://localhost:9090/` | Base url of the IDP. |
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.oidc.public-client.login-relative.url` | `auth` | This is standard endpoint for openid authentication flow. | Incase your IDP provides a different url otherwise please do not change this.
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.oidc.public-client.login-redirect-relative.url` | `callback` | The relative url uses to redirect after the authentication request (above) successfully. |
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.oidc.public-client.token-exchange-relative.url` | `token` | This is standard endpoint for openid authentication flow. | Incase your IDP provides a different url otherwise please do not change this.
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.oidc.public-client.logout-relative.url` | `logout` | This is standard endpoint for openid logout. | Incase your IDP provides a different url otherwise please do not change this.
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.oidc.public-client.token-renew-threshold-in-seconds` | `60` | How many seconds before token expiration to start silent renewal. |
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.username` | `` | The login credentials required to access to the server. |
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.password` | `` | The login credentials required to access to the server. | 
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.oidc.public-client.sso-configuration.username-xpath` | `` | Xpath for login name field on the IDP page. | e.g, `//input[@name='username']`
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.oidc.public-client.sso-configuration.password-xpath` | `` | Xpath for password field on the IDP page. | e.g, `//input[@name='password']`
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.oidc.public-client.sso-configuration.login-button-xpath` | `` | path for login button on the IDP page. | e.g, `//button[@name='login']`
+|`mgmtp.a12.uaa.authentication.client.rest.uaa-base.url` | `http://localhost:8080` | Base URL for UAA related endpoints, e.g, `currentUser`. |
+|`mgmtp.a12.uaa.authentication.client.rest.authorization-header-name` | `Authorization` | Header name which is used to send `authorization token` to server. |
+|================================================================================
+
+===== OAUTH2 (CONFIDENTIAL)
+[%autowidth.stretch,options="header"]
+|================================================================================
+|Configuration property |Default value |Usage |Remark
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-type` | `LOCAL` | The authentication type you want to use to communicate with the server. | You need to change the default value to `OAUTH2` for using.
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.oidc.client-type` | `CONFIDENTIAL` | The applications are able to securely authenticate |
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.oidc.public-client.client-id` | `` | OAUTH2 client ID. |
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.oidc.public-client.realm-name` | `` | Realm name which contains this client id on the IDP. |
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.oidc.public-client.idp-base.url` | `http://localhost:9090/` | Base url of the IDP. |
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.oidc.confidential-client.login-relative.url` | `token` | This is standard endpoint for oidc login flow. | Incase your IDP provides a different url otherwise please do not change this.
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.oidc.confidential-client.logout-relative.url` | `logout` | This is standard endpoint for oidc logout. | Incase your IDP provides a different url otherwise please do not change this.
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.oidc.confidential-client.client-secret` | `` | IDP client secret. | 
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.oidc.confidential-client.token-renew-threshold-in-seconds` | `60` | How many seconds before token expiration to start silent renewal. |
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.username` | `` | The login credentials required to access to the server. |
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.password` | `` | The login credentials required to access to the server. | 
+|`mgmtp.a12.uaa.authentication.client.rest.uaa-base.url` | `http://localhost:8080` | Base URL for UAA related endpoints, e.g, `currentUser`. |
+|`mgmtp.a12.uaa.authentication.client.rest.authorization-header-name` | `Authorization` | Header name which is used to send `authorization token` to server. |
+|================================================================================
+
+===== CERTIFICATE
+[%autowidth.stretch,options="header"]
+|================================================================================
+|Configuration property |Default value |Usage |Remark
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-type` | `LOCAL` | The authentication type you want to use to communicate with the server. | You need to change the default value to `CERTIFICATE` for using.
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.certificate.key-store` | | Classpath file-system path to the PKCS#12 (.p12) KeyStore that contains the REST client’s private key and certificate chain. | The client must present this certificate to prove its identity to clients.
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.certificate.key-store-password` | | Password that unlocks the KeyStore above. | Client needs this password to load the client’s private key when building the SSLContext, without it the secure client cannot start.
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.certificate.trust-store` | | Path to the trust store (.p12) holding the CA certificates that the client trusts. | Enables the client to verify the server’s certificate chain and establish a secure connection.
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.certificate.trust-store-password` | | Password that unlocks the trust store. | Required so client can read the trusted certificates list during RestTemplate initialization.
+|================================================================================
+
+===== API_KEY
+[%autowidth.stretch,options="header"]
+|================================================================================
+|Configuration property |Default value |Usage |Remark
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-type` | `LOCAL` | The authentication type you want to use to communicate with the server. | You need to change the default value to `API_KEY` for using.
+|`mgmtp.a12.uaa.authentication.client.rest.api-key-resource` | `` | The api_key required to authenticate access to the server. | Support for single file.
+|`mgmtp.a12.uaa.authentication.client.rest.uaa-base.url` | `http://localhost:8080` | Base URL for UAA related endpoints, e.g, `currentUser`. |
+|================================================================================
+
+===== DELEGATED
+[%autowidth.stretch,options="header"]
+|================================================================================
+|Configuration property |Default value |Usage |Remark
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-type` | `LOCAL` | The authentication type is depend on incoming request. | You need to change the default value to `DELEGATED` for using.
+|`mgmtp.a12.uaa.authentication.client.rest.delegated-mode-configuration.excluded-contexts` | `` | Excluded context patterns. | *UAA will not manipulate the authentication tokens of these un-secure urls.*
+|`mgmtp.a12.uaa.authentication.client.rest.uaa-base.url` | `http://localhost:8080` | Base URL for UAA related endpoints, e.g, `currentUser`. |
+|`mgmtp.a12.uaa.authentication.client.rest.authorization-header-name` | `Authorization` | Header name which is used to send `certificate` to server. |
+|================================================================================
+
+[[rest-client-selfconfiguration]]
+=== Client With Self Configuration
+
+The UAA REST Client supports self configuration.
+If configured, the client downloads configuration from the server.
+On the rest client just a few configuration settings are needed.
+
+*Self configuration settings*
+
+* Self Configuration URL [Required for all authentication types]
+* UserName [Required for all authentication types]
+* Password [Required for all authentication types]
+* Oauth2 ClientType [Required for oauth2 type only]
+* Oauth2 ClientSecret [Required for oauth2 type which client type is confidential only]
+* Certificate [Required for key-store, key-store-password, trust-store and trust-store-password]
+* Api_key Resource [Required for api_key type only]
+
+==== In plain Java or Spring application
+
+instantiate the UAA REST Client manually.
+
+include::rest-client-selfconfig-java-factory.adoc[]
+
+==== In a Spring Boot application
+
+Everything is configured by a configuration properties.
+
+===== LOCAL/ACTIVE_DIRECTORY_LDAP/SAML
+[%autowidth.stretch,options="header"]
+|================================================================================
+|Configuration property |Default value |Usage |Remark
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-type` | `LOCAL` | The authentication type you want to use to communicate with the server. | `LOCAL` or `ACTIVE_DIRECTORY_LDAP` or `SAML` should be specified properly, depending on the specific authentication type.
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.username` | `` | The login credentials required to access to the server. | 
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.password` | `` | The login credentials required to access to the server. | 
+|`mgmtp.a12.uaa.authentication.client.rest.selfconfiguration.url` | `` | Specify it, the rest of configurations will be automatically downloaded from server . | e.g, http://localhost:8080/uaa-authentication/selfconfigure
+|================================================================================
+
+===== OAUTH2 (PUBLIC)
+[%autowidth.stretch,options="header"]
+|================================================================================
+|Configuration property |Default value |Usage |Remark
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-type` | `LOCAL` | The authentication type you want to use to communicate with the server. | You need to change the default value to `OAUTH2` for using.
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.oauth2.client-type` | `CONFIDENTIAL` | The applications are not able to securely authenticate | You need to change the default value to `PUBLIC` for using.
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.username` | `` | The login credentials required to access to the server. | 
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.password` | `` | The login credentials required to access to the server. | 
+|`mgmtp.a12.uaa.authentication.client.rest.selfconfiguration.url` | `` | Specify it, the rest of configurations will be automatically downloaded from server . | e.g, http://localhost:8080/uaa-authentication/selfconfigure
+|================================================================================
+
+===== OAUTH2 (CONFIDENTIAL)
+[%autowidth.stretch,options="header"]
+|================================================================================
+|Configuration property |Default value |Usage |Remark
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-type` | `LOCAL` | The authentication type you want to use to communicate with the server. | You need to change the default value to `OAUTH2` for using.
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.oidc.confidential-client.client-secret=` | `` | IDP client secret. |
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.username` | `` | The login credentials required to access to the server. | 
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.password` | `` | The login credentials required to access to the server. | 
+|`mgmtp.a12.uaa.authentication.client.rest.selfconfiguration.url` | `` | Specify it, the rest of configurations will be automatically downloaded from server . | e.g, http://localhost:8080/uaa-authentication/selfconfigure
+|================================================================================
+
+===== CERTIFICATE
+[%autowidth.stretch,options="header"]
+|================================================================================
+|Configuration property |Default value |Usage |Remark
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-type` | `LOCAL` | The authentication type you want to use to communicate with the server. | You need to change the default value to `CERTIFICATE` for using.
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.certificate.key-store` | | Classpath file-system path to the PKCS#12 (.p12) KeyStore that contains the REST client’s private key and certificate chain. | The client must present this certificate to prove its identity to clients.
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.certificate.key-store-password` | | Password that unlocks the KeyStore above. | Client needs this password to load the client’s private key when building the SSLContext, without it the secure client cannot start.
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.certificate.trust-store` | | Path to the trust store (.p12) holding the CA certificates that the client trusts. | Enables the client to verify the server’s certificate chain and establish a secure connection.
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-configuration.certificate.trust-store-password` | | Password that unlocks the trust store. | Required so client can read the trusted certificates list during RestTemplate initialization.
+|`mgmtp.a12.uaa.authentication.client.rest.selfconfiguration.url` | `` | Specify it, the rest of configurations will be automatically downloaded from server . | e.g, http://localhost:8080/uaa-authentication/selfconfigure
+|================================================================================
+
+===== API_KEY
+[%autowidth.stretch,options="header"]
+|================================================================================
+|Configuration property |Default value |Usage |Remark
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-type` | `LOCAL` | The authentication type you want to use to communicate with the server. | You need to change the default value to `API_KEY` for using.
+|`mgmtp.a12.uaa.authentication.client.rest.api-key-resource` | `` | The certificate resource which uses to authenticate with server. | Support for single file.
+|`mgmtp.a12.uaa.authentication.client.rest.selfconfiguration.url` | `` | Specify it, the rest of configurations will be automatically downloaded from server . | e.g, http://localhost:8080/uaa-authentication/selfconfigure
+|================================================================================
+
+===== DELEGATED
+[%autowidth.stretch,options="header"]
+|================================================================================
+|Configuration property |Default value |Usage |Remark
+|`mgmtp.a12.uaa.authentication.client.rest.authentication-type` | `LOCAL` | The authentication type is depend on incoming request. | You need to change the default value to `DELEGATED` for using.
+|`mgmtp.a12.uaa.authentication.client.rest.selfconfiguration.url` | `` | Specify it, the rest of configurations will be automatically downloaded from server . | e.g, http://localhost:8080/uaa-authentication/selfconfigure
+|================================================================================
+
+[[rest-client-calling-custom-endpoint]]
+==== Working With Spring Boot Application
+Beside default endpoints supported by UAA REST Client, you can make your own requests to any others endpoints.
+Let check the example bellow
+
+[source,java]
+----
+public class ExampleCustomRestClient {
+
+	private static final String CONTEXT = "context";
+	private static final String POST_ENDPOINT = "postPath";
+	private static final String GET_ENDPOINT = "getPath";
+
+	private RestGetConnector getConnector;
+	private RestPostConnector postConnector;
+	private UrlBuilderSupport urlBuilderSupport;
+
+	public ExampleCustomRestClient(String baseUrl, RestGetConnector getConnector, RestPostConnector postConnector) {
+		this.getConnector = getConnector;
+		this.postConnector = postConnector;
+		this.urlBuilderSupport = UrlBuilderSupport.withBaseUrl(baseUrl, CONTEXT);
+	}
+
+	/**
+	 * Make get request
+	 */
+	public <T> T getRequest(Class<T> userType) {
+		String url = urlBuilderSupport.createBuilder().pathSegment(GET_ENDPOINT).toUriString();
+		return getConnector.callServer(url, RestServerRequest.empty(), userType).getData();
+	}
+
+	/**
+	 * Make post request
+	 */
+	public boolean postRequest(String body) {
+		String url = urlBuilderSupport.createBuilder().pathSegment(POST_ENDPOINT).toUriString();
+		try {
+			RestServerRequest<String> request = RestServerRequest.withPayload(body);
+			return postConnector.callServer(url, request, Boolean.class).getData();
+		} catch (Exception e) {
+			//do something
+		}
+		return false;
+	}
+
+}
+----
+Based on the request method, you can use respective built-in helper classes to make the request calling, such as `RestGetConnector` for get method, `RestPostConnector` for post method.
+
+Using helper `UrlBuilderSupport` class to easily build the complete url.

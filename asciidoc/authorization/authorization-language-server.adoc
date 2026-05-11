@@ -1,0 +1,177 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+[[authorization-language-server]]
+=== Authorization Language Server
+
+UAA provides a tool that makes writing authorization definition files easier by offering features such as code completion, syntax coloring, go-to-definition, validations, and more.
+
+If you want to use it, you have to follow the steps:
+
+** Install `uaa-authorization-language-server` in your temporary (or any) client project:
+
+[source,shell]
+----
+npm i @com.mgmtp.a12.uaa/uaa-authorization-language-server
+----
+
+After installation, in `node_modules` package, follow the path `${YOUR_PROJECT_PATH}/node_modules/@com.mgmtp.a12.uaa/uaa-authorization-language-server/main/uaa-authorization-language-server`.
+There is a file named `uaa-authorization-language-server` used to run LSP.
+
+** Create new metadata file follow the structure:
+
+[source,json5]
+----
+{
+  "principal": "...",
+  "A12Models": "...",
+  "resource": [
+    {
+      "path": "..."
+    },
+    {
+      "path": "..."
+    },
+    {
+      "path": "..."
+    }
+  ]
+}
+----
+
+[NOTE]
+====
+* *principal*: Absolute Path to the class of the principal.
+Based on this class, you can access all its properties and methods.
+However, it has one limitation: It cannot access nested data through object references +
+** When you type the word “principal.” in one of the [“target", "dataPreload", "rules", "policies”] properties in json file, it will provide a list of suggestions, including the fields and methods of the class.
+** When you type either “READ” or “WRITE” in the propertyRights property, it will suggest the name of this class along with ".*" symbol.
+Example: The name of class is Principal.java, it will suggest “Principal.*”, and when you processed with it, it will list all the fields of this class.
+
+* *resource**: Absolute Path class of resource.
+Based on this class, you can access all its properties and methods.
+However, it has one limitation: It cannot access nested data though object references +
+** When you type the word “#resource.” in one of [“target", "dataPreload", "rules", "policies”] properties in json file, it will suggest all the fields and methods of all resources.
+** When you the either “READ” or “WRITE” in the propertyRights, it will suggest the name of this class along with ".*" symbol.
+Example: The names of classes are Company.java and Employee.java, it will suggest "Company.*" and "Employee.*", and when you processed with it, it will list all its fields.
+
+* *A12Models**: Absolute Path to the models.
+When you type either “READ” or “WRITE” in propertyRights property, it will provide the name of document model along with ".*" symbol.
+Example: The name of document model is UserManagement, it will suggest “UserManagement.*”, and when you processed with it, it will list all its fields.
+====
+
+Use with Intellij:
+
+** Install plugin lsp4ij from Redhat (requires IntelliJ version 2023.2+).
+** Go to `Preferences` -> `Languages & Frameworks` -> `Language Servers` -> `Add Language Server`: +
+*** `Server`:
+**** `Name`: name it up to you
+**** `Command`: +
+***** MacOS
++
+[source,shell]
+----
+${YOUR_PROJECT_PATH}/node_modules/@com.mgmtp.a12.uaa/uaa-authorization-language-server/main/uaa-authorization-language-server --metadataPath=${METADATA_PATH}/metadata.json --node-ipc
+${YOUR_PROJECT_PATH}/node_modules/@com.mgmtp.a12.uaa/uaa-authorization-language-server/main/uaa-authorization-language-server --metadataPath=${METADATA_PATH}/metadata.json --stdio
+----
++
+***** Windows
++
+[source,shell]
+----
+node ${YOUR_PROJECT_PATH}/node_modules/@com.mgmtp.a12.uaa/uaa-authorization-language-server/main/uaa-authorization-language-server --metadataPath=${METADATA_PATH}/metadata.json --node-ipc
+node ${YOUR_PROJECT_PATH}/node_modules/@com.mgmtp.a12.uaa/uaa-authorization-language-server/main/uaa-authorization-language-server --metadataPath=${METADATA_PATH}/metadata.json --stdio
+----
+
+image::assets/images/authorization/lsp/lsp4j-server.png[Authorization,title="LSP4j Server"]
+
+*** `Mappings`: Add new `Json` language
+
+image::assets/images/authorization/lsp/lsp4j-mapping.png[Authorization,title="LSP4j Mapping"]
+
+Use with VSCode:
+
+** Install extension named `Generic LSP Client`
+** Goto `setting.json` file
+** Add more this configuration into it +
+*** MacOS
++
+[source,json5]
+----
+  ..........,
+  "glspc.languageId": "json",
+  "glspc.serverCommandArguments": [
+    "--stdio",
+    "--node-ipc",
+    "--metadataPath=${METADATA_PATH}/metadata.json"
+  ],
+  "glspc.serverCommand": "${YOUR_PROJECT_PATH}/node_modules/@com.mgmtp.a12.uaa/uaa-authorization-language-server/main/uaa-authorization-language-server",
+  "workbench.settings.applyToAllProfiles": [
+    "glspc.serverCommand",
+    "glspc.languageId",
+    "glspc.serverCommandArguments"
+  ]
+----
+*** Windows
++
+[source,json5]
+----
+  ..........,
+  "glspc.languageId": "json",
+  "glspc.serverCommandArguments": [
+    "{YOUR_PROJECT_PATH}/node_modules/@com.mgmtp.a12.uaa/uaa-authorization-language-server/main/uaa-authorization-language-server",
+    "--stdio",
+    "--node-ipc",
+    "--metadataPath=${METADATA_PATH}/metadata.json"
+  ],
+  "glspc.serverCommand": "node",
+  "workbench.settings.applyToAllProfiles": [
+    "glspc.serverCommand",
+    "glspc.languageId",
+    "glspc.serverCommandArguments"
+  ]
+----
+
+List function we support:
+
+* **Validation**:
+** Notify error when wrong structure json file
+** Notify error when there is more than one instance of the same name in each property
+** Warning wrong Spring Expression syntax in ["target", "dataPreload", "rules", "policies"] properties
+** Warning if Policy, Repository Policy or Property Right is unused
+** Warning if policy-refs, rights-refs or repository-refs cannot be found
+
+* **Recommendation**:
+** Template structure json file
+** Template properties in json file
+** In ["target", "dataPreload", "rules", "policies"] properties:
+*** List function of UAA Security Expression
+*** Any word that starts with "#resource." will list all methods and properties, which be declared at metadata json file.
+*** Any the word starts with "principal." will list all methods and properties, which be declared at metadata json file.
+** In ["READ", "WRITE"] properties: Suggest class names and document model names along with ".*" symbol based on the metadata file provided above.
+When you select, it will list all its fields.
+** In ["policy-refs", "rights-refs", "repository-refs"] properties: List all the corresponding property names.
+
+* **Go to definition**:
+** In ["policies", "repositoryPolicies", "propertyRights"] properties: When click on one of its names, it will list all positions where it is used (described by name).
+** In ["policy-refs", "rights-refs", "repository-refs"] properties: When click on one of its value, you will be redirected to position where it is defined.
+
+* **Hover**: Hover over the key or value of properties will display the description of its usage +
+* **Color**: There are some colors in authorization file to detect expressions, keywords and operators. +
+* **Save**: Automatically format json file when type save +
+
+

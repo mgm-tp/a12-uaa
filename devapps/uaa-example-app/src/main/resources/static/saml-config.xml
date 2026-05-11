@@ -1,0 +1,39 @@
+<EntitiesDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" Name="urn:keycloak">
+	<EntityDescriptor entityID="https://elsteronline.mgm-edv.de">
+		<IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+			<KeyDescriptor use="signing">
+				<dsig:KeyInfo>
+					<dsig:KeyName>DfZWpwlljmTuIp6si4UIbk66vMklX-kfPuytGOzYxp8</dsig:KeyName>
+					<dsig:X509Data>
+						<!-- <dsig:X509Certificate> -->
+						<!-- MIIEtTCCAp2gAwIBAgIGAWR/ngYmMA0GCSqGSIb3DQEBCwUAMBExDzANBgNVBAMMBldJRVNFTDAeFw0xODA3MDkxNTE3MDBaFw0xOTA3MDkxNTE3MDBaMBExDzANBgNVBAMMBldJRVNFTDCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBANdfw6TcyJu9S+Wk0V5nFWeM1zxmehf6kHJ8BcYk8FphgQQZac+gl/LG8ihmhlwdWSnsN56vaDZrsH1Y1rEruoYmiXGXnVxF99LrpmK22sp27xUKHhk10O4mdCPW8JLmse5TzkuSBH2Ho+6dP8MpEeN3EJiKA5XQE2gF5BltCi9xa23HUzGpQgGPJDRNzTjs7+KFbX9BgE2rHCbDkyW9I2onHOP1DURDs0dwY2qL4OrwfMLk5wJAGeJz42C3N0EZaV9Op9uxu8/hUAq2p3ooPwWSaMQWhK1IoYKslTt4lh2l9VMsJvsvAOTByh8/06/BtxvfR/WcB09BDzs+AcbcNy7ny3z6NpGUKWQb3aueoXWUlIcOqJQK6+aTMAGCaYFiXvBV0vCm11Z+tPmdkJnhcN7lpU+7/e70TGHGmOL8xAefSXRgY0f1CREcL/wMAvQ/SeKg7IH+XiT0928dRy7sVKmvQqmfvTXBOTvsVJACKCC+kQ1fxIhS9iuLfppL4RNejLPg/1EZpKn4c5ZqoDgmKMpEv9k5vxTp4Od6ErZVZ7otuad43it1bdwW67c8pKfQV8ELXBTP7Cjl73k7ncHPtEdQ/ZWj2mTaQcZenx+dJ4KFVQ9hZxCbJAFTEE0YWGsGCdYBtK87vXzx8FjKJV6FMDtTAK9DxYTYmHnUGy0DEIY3AgMBAAGjEzARMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggIBAFiimMw/h59cH19M/DGfZwVAzQlBW9hjaIhXrdKjq0tbPUBnO8miRvdjio5BVxC/+DtL0X9Mi0I2tmUEjUVzy+CsycARGG2RpvFSe79nRkPITDRO4HDznqgBJeh+QItJ9J56is58H5atlU2uv7BKeZLfRfaCKVH1yNpRfHdTvepmph1Rm3N8mAZtn+J6Kg8nzDV2re85C1IumE8781shL45FIuDMuu4XxibIExoCiM9wua3gW9fCEeovgPhdvOSkwnclTGR3sU/mnzjdq2LeGjrbR6Ir4g5gSha2Wx4m1h6uBwssu4OIRXF31rulTfGTUIY12yLhRv1a4KHEmw2fe9fHW0y43JFkzlAi13shi1J7dhZEmLTPrmWdU/9Oz3U/YoSULJ6Y0gI6lo1AAIIYA2DX1mZewbdY1ao+HZ/Oe2cjgbcnUzLJR95RYeqlSaI+16x/odN1oZjHxACU5EoPhPqNmPutpnCwZ/kCHxhmHkGHiyR3I6B09ypx4nDk4FIsCaE6So9ADet/skzB47h83W3Cmbtbcxb5hQlt7Nx1A1QoJwj25gA1IUsb2svWX0w1nTuNHdO/NLXJS3gBK76O3Go5luyq8D+0hP8k/dU2N4zsaICc8wgiQMaVaA3KhuKBIfmYn2PqO5xrKhDCSXRdM+6Uavvvmha/fsRlPbZ2gsSw -->
+						<!-- </dsig:X509Certificate> -->
+						<dsig:X509Certificate>
+							MIIFgTCCBDWgAwIBAgIEO5rP1TBBBgkqhkiG9w0BAQowNKAPMA0GCWCGSAFlAwQCAQUAoRwwGgYJKoZIhvcNAQEIMA0GCWCGSAFlAwQCAQUAogMCASAwRDELMAkGA1UEBhMCREUxDzANBgNVBAoTBkVsc3RlcjELMAkGA1UECxMCQ0ExFzAVBgNVBAMTDkVsc3RlcktyeXB0b0NBMB4XDTE4MTEwODE2MTg0MFoXDTIyMTEwODE2MTg0MFowWDEbMBkGA1UEAxMSRUxTVEVSIElkUCBTaWduaW5nMQ0wCwYDVQQLEwRUZXN0MQwwCgYDVQQLEwNCdUcxDzANBgNVBAoTBkVsc3RlcjELMAkGA1UEBhMCREUwggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQC//+tgyIeS5pHoD1zi+PLl0TLpKea6OMA9BUDV2cRcpqs9Or8Sh3lIxlG8GenJPotPPp1Y/k8eWU8IikNc3ALh6k+7bl6OCeTtALEUNBUpkgv+Pfq1c2TP/OPkElov3pMpBkZa5eNCUzgrUWpvWMbnazQwgZGwR4DUogfZKXrlz1AsSqwLh+45D8IhVIGNm6YtH1Xc/6fcZNXLp83+gCNbVe6K3ctcP7tkLfnQhS8vrRG/Ip3Bee/zNF0Kha6Se+fCJhf5B0TFV90wD2KZhVPUkBysAmjFrBsIj8MSguOTfbiM1COEoGvQuSw45RY2UPDSvdtZzA1FbXqdr9QtMNFrveVyTVRzrb1c7YWr+/EPaG84J3Ee6rQdoLpPVduBgSUzWMBkoAdowKCnuQLSCkrdb17EW8l5PxdIQOBXGUsiuWtpldbWbnaWaQ9Pyl9JvNEb8qZzNsraEXq5tPDpj+NGrCP8/cuDTzwcrZLtVBoTEVnN7rbLHjZYSehg9QRfJORiVwdGz1GO9W4CJwTC0SzQ3rh9MI5+lhJaVV+xop3GbpYz1YIfB/Xeks40FhFsGgY/vV/1qkZi3uPDD9PUQX106CWcsDld9T+35gGCHh4TbGFFxWmOF9Ws47kSQTZPhnJ6UUgQ+i8Mo1FHzQnfDvKV83LnLkQS0C3ncZ2BM5P5ZwIDAQABo4H+MIH7MA4GA1UdDwEB/wQEAwIFIDAMBgNVHRMBAf8EAjAAMEkGA1UdHwRCMEAwPqA8oDqGOENOPWh0dHA6Ly9jcmwuZWxzdGVyb25saW5lLm1nbS1lZHYuZGUvRWxzdGVyS3J5cHRvQ0EuY3JsMB0GA1UdDgQWBBS5YKHnyKryqYLaYWB5KJHAFJF6FzBxBgNVHSMEajBogBRxRn95tcArhwDNXFFdv102xHaG4aFKpEgwRjELMAkGA1UEBhMCREUxDzANBgNVBAoTBkVsc3RlcjEPMA0GA1UECxMGUm9vdENBMRUwEwYDVQQDEwxFbHN0ZXJSb290Q0GCBDuay1UwQQYJKoZIhvcNAQEKMDSgDzANBglghkgBZQMEAgEFAKEcMBoGCSqGSIb3DQEBCDANBglghkgBZQMEAgEFAKIDAgEgA4IBAQB1xsA7GIHJ3lthkOkwl/GRG9Smg2IZdACfPxdXK2yJ8iv1T3aX8f5kTe/BU017Wn9Rmkw77iVVbMdQ2qUIoJf109iGdiBxjdbbB67lyEghs7gh3/91w0BpmqILfJxUaF/PiQ0ddibrWDhaYpl1XO+4ufrsUqAqFHVkDsOuyBzpQEjnczSNShd3pzA7GXECeBbZFK7xuueVz/vyXBkQGnEPWLm3MmTq3OQ+ziqyma8OHaBEaN+fywHtwQAjG37ARE4rNPsi4mk/27BblFbJlE0Yd4JqpPrRtNy9sz2+QV6ov6txECdPBke98fPC+IaOrh+S3i0McyacgBV+fKMokNuu
+						</dsig:X509Certificate>
+
+					</dsig:X509Data>
+				</dsig:KeyInfo>
+			</KeyDescriptor>
+            <!-- adjust Location based on project's infra -->
+			<SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://localhost:8080/logout/saml2/slo" />
+			<NameIDFormat>
+				urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+			</NameIDFormat>
+			<NameIDFormat>
+				urn:oasis:names:tc:SAML:2.0:nameid-format:transient
+			</NameIDFormat>
+			<NameIDFormat>
+				urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified
+			</NameIDFormat>
+			<NameIDFormat>
+				urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+			</NameIDFormat>
+            <!-- adjust Location based on project's infra -->
+			<SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://localhost:8080/login/saml2/sso/uaa" />
+			<Extensions>
+				<SigningMethod xmlns="urn:oasis:names:tc:SAML:metadata:algsupport" Algorithm="http://www.w3.org/2007/05/xmldsig-more#sha256-rsa-MGF1"/>
+			</Extensions>
+		</IDPSSODescriptor>
+	</EntityDescriptor>
+</EntitiesDescriptor>

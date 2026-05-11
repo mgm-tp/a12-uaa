@@ -1,0 +1,199 @@
+{
+  "header": {
+    "id": "DomainUserExtensionExample",
+    "modelType": "document",
+    "modelVersion": "28.1.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "savedAt",
+        "value": "2020-10-09T13:30:50.676+07:00"
+      },
+      {
+        "name": "roles",
+        "value": "userManagementAdmin,guest"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "DomainUserExtensionExample",
+      "immutable": false
+    },
+    "modelConfig": {
+      "decimalSeparator": ".",
+      "timeZone": "UTC",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_a0888",
+          "name": "extend",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Field",
+                "id": "field_9ad1f",
+                "name": "department",
+                "annotations": [
+                  {
+                    "name": "enable_approximate_match_search",
+                    "value": "true"
+                  },
+                  {
+                    "name": "enable_case_insensitive_search",
+                    "value": "true"
+                  }
+                ],
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType",
+                    "StringType": {
+                      "maxLength": 255
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Department"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Abteilung"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_300ad",
+                "name": "job_title",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType",
+                    "StringType": {
+                      "maxLength": 255
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Job title"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Berufsbezeichnung"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_e2760",
+                "name": "branchName",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType",
+                    "StringType": {
+                      "maxLength": 255
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Branch name"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Zweigname"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_0bee7",
+                "name": "companyName",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType",
+                    "StringType": {
+                      "maxLength": 255
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Company name"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Name der Firma"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_0be37",
+                "name": "rights",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType",
+                    "StringType": {
+                      "maxLength": 255
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Rights"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Rechte"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_3ad28",
+                "name": "extend2",
+                "Group": {
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_18853",
+                      "name": "department2",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

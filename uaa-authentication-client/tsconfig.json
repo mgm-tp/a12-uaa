@@ -1,0 +1,10 @@
+{
+	"extends": "../tsconfig.src.json",
+	"typedoc": {
+		"name": "UAA Authentication Client",
+		"excludeExternals": true,
+		"excludeInternal": false,
+		"out": "build/docs/typedoc",
+		"theme": "default"
+	}
+}

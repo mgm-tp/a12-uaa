@@ -1,0 +1,40 @@
+{
+	"name": "Test Permission Definition",
+	"description": "",
+	"policies": [
+		{
+			"name": "DataPreloadPolicy",
+			"description": "Check data preload resource",
+			"dataPreload": [
+				"print('Resource: ' + #resource)",
+				"#variable = #resource"
+			],
+			"rules": [
+				"#variable == 'TestValue'"
+			]
+		}
+	],
+	"permissions": [
+		{
+			"name": "Variable Test",
+			"description": "",
+			"policies": [
+				"print(#testVariable)",
+				"#testVariable == 'test'"
+			],
+			"scopes": [
+				"Variable"
+			]
+		},
+		{
+			"name": "Data Preload Permission",
+			"description": "Service Permission",
+			"policy-refs": [
+				"DataPreloadPolicy"
+			],
+			"scopes": [
+				"Test Data Preload"
+			]
+		}
+	]
+}

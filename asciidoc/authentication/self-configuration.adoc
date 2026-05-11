@@ -1,0 +1,148 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+[[self-configuration]]
+=== Client Self Configuration
+
+Self configuration means client (JavaScript or JavaRestClient) will download configurations from server and configure it instead of keeping configuration on client side.
+This would allow more flexible on deployment in different environment for both java-script and java-rest clients.
+
+The server configuration has following the below properties:
+
+[%autowidth.stretch,options="header"]
+|================================================================================
+|Configuration property |Default value |Usage |Remark
+|`mgmtp.a12.uaa.authentication.client-selfconfiguration.application-base.url` | `http://localhost:8080` | Base url of the application. | You should change to your application domain.
+|`mgmtp.a12.uaa.authentication.client-selfconfiguration.uaa-base.url` | `http://localhost:8080` | Base url of the UAA application. | You should change to your uaa application domain.
+|`mgmtp.a12.uaa.authentication.client-selfconfiguration.authorization-data-store` | `` | Spring `resource` where the authorization token is persisted. |
+|`mgmtp.a12.uaa.authentication.client-selfconfiguration.excluded-delegated-contexts` | `` | Excluded context patterns.  | Only valid with `DELEGATED` mode. If you work with un-secure urls then you should ignore it by this config.
+|`mgmtp.a12.uaa.authentication.client-selfconfiguration.saml.login-relative.url` | `` | Relative url pattern "saml2/authenticate/{clientId}". | You have to provide this url (e.g saml2/authenticate/uaa).
+|`mgmtp.a12.uaa.authentication.client-selfconfiguration.saml.sso-configuration.username-xpath` | `` | Xpath for Login name field on the IDP page. |
+|`mgmtp.a12.uaa.authentication.client-selfconfiguration.saml.sso-configuration.password-xpath` | `` | Xpath for password field on the IDP page. |
+|`mgmtp.a12.uaa.authentication.client-selfconfiguration.saml.sso-configuration.login-button-xpath` | `` | Xpath for login button on the IDP page. |
+|`mgmtp.a12.uaa.authentication.client-selfconfiguration.oidc.confidential-client.idp-base.url` | `http://localhost:9090` | Base url of the IDP. | You should change to your IDP domain.
+|`mgmtp.a12.uaa.authentication.client-selfconfiguration.oidc.idp-logout.enabled` | `true` | Client logout also trigger logout IDP. | Change to 'false' if you just want logout your application, IDP session will be remained.
+|`mgmtp.a12.uaa.authentication.client-selfconfiguration.oidc.confidential-client.client-id` | `` | OAUTH2 client ID for confidential client type. |
+|`mgmtp.a12.uaa.authentication.client-selfconfiguration.oidc.confidential-client.realm-name` | `` | Realm name on the IDP. |
+|`mgmtp.a12.uaa.authentication.client-selfconfiguration.oidc.public-client.idp-base.url` | `http://localhost:9090` | Base url of the IDP. | You should change to your IDP domain.
+|`mgmtp.a12.uaa.authentication.client-selfconfiguration.oidc.public-client.client-id` | `` | OAUTH2 client ID for public client type. |
+|`mgmtp.a12.uaa.authentication.client-selfconfiguration.oidc.public-client.realm-name` | `` | Realm name on the IDP. |
+|`mgmtp.a12.uaa.authentication.client-selfconfiguration.oidc.public-client.login-redirect-relative.url` | `callback` | The relative url uses to redirect after the authentication request (above) successfully. |
+|`mgmtp.a12.uaa.authentication.client-selfconfiguration.oidc.public-client.silent-redirect-relative.url` | `silent_renew.html` | The relative url uses to redirect after the token renew successfully". |
+|`mgmtp.a12.uaa.authentication.client-selfconfiguration.oidc.public-client.logout-redirect-relative.url` | `logout` | The relative url uses to redirect to client after the logout successfully. |
+|`mgmtp.a12.uaa.authentication.client-selfconfiguration.oidc.public-client.currentUserUrl` | `` | If set, the library calls this URL to load the current user. If omitted, defaults to `${baseUrl}uaa-authentication/currentUser`. |
+|`mgmtp.a12.uaa.authentication.client-selfconfiguration.oidc.public-client.enable-refresh-token-grant`| `false`| If true, the library exchanges the stored refresh token for a new access token and skips the silent renew HTML page. | WARNING: If you set this property to `true`, you must follow <<using-oidc-refresh-token,Using OIDC Refresh Token>>.|`mgmtp.a12.uaa.authentication.client-selfconfiguration.oidc.public-client.sso-configuration.username-xpath` | `` | Xpath for Login name field on the IDP page. |
+|`mgmtp.a12.uaa.authentication.client-selfconfiguration.oidc.public-client.sso-configuration.username-xpath` | `` | Xpath for Login name field on the IDP page. |
+|`mgmtp.a12.uaa.authentication.client-selfconfiguration.oidc.public-client.sso-configuration.password-xpath` | `` | Xpath for password field on the IDP page. |
+|`mgmtp.a12.uaa.authentication.client-selfconfiguration.oidc.public-client.sso-configuration.login-button-xpath` | `` | Xpath for login button on the IDP page. |
+
+|================================================================================
+
+UAA provides end-point to get this self-configuration info
+[source,shell]]
+----
+YOUR_DOMAIN/<context>/uaa-authentication/selfconfigure
+---- 
+(The end-point is un-secured).
+
+The data output will depend on what authentication types are running on UAA server and what you provided by `mgmtp.a12.uaa.authentication.client-selfconfiguration.` above.
+
+Below is an example:
+
+[source,json]
+----
+{
+   "applicationBaseUrl":"http://localhost:8080",
+   "uaaBaseUrl":"http://localhost:8080",
+   "authorizationDataStore":"",
+   "excludedDelegatedContexts":null,
+   "local":{
+      "loginRelativeUrl":"user/local/login",
+      "logoutRelativeUrl":"user/logout",
+      "logoutMethod":"POST",
+      "tokenType":"UAABEARER"
+   },
+   "activeDirectoryLdap":{
+      "loginRelativeUrl":"user/active_directory_ldap/login",
+      "logoutRelativeUrl":"user/logout",
+      "logoutMethod":"POST",
+      "tokenType":"UAABEARER"
+   },
+   "saml":{
+      "loginRelativeUrl":"saml2/authenticate/uaa?uaa_success=http://localhost:3000",
+      "logoutRelativeUrl":"user/logout?uaa_success=http://localhost:3000",
+      "logoutMethod":"POST",
+      "tokenType":"UAABEARER",
+      "ssoConfiguration":{
+         "userNameXpath":"//input[@name='username']",
+         "passwordXpath":"//input[@name='password']",
+         "loginButtonXpath":"//button[@name='login']"
+      }
+   },
+   "oidc":{
+      "tokenType":"BEARER",
+      "confidentialClient":{
+         "loginRelativeUrl":"token",
+         "clientId":"uaa-auth-client",
+         "realmName":"UAARealm",
+         "idpBaseUrl":"http://localhost:9090"
+      },
+      "publicClient":{
+         "loginRelativeUrl":"auth",
+         "clientId":"uaa-spa-client",
+         "realmName":"UAARealm",
+         "idpBaseUrl":"http://localhost:9090",
+         "tokenExchangeRelativeUrl":"token",
+         "loginRedirectRelativeUrl":"callback",
+         "logoutRedirectRelativeUrl":"logout",
+         "silentRedirectRelativeUrl":"silent_renew.html",
+         "ssoConfiguration":{
+            "userNameXpath":"//input[@name='username']",
+            "passwordXpath":"//input[@name='password']",
+            "loginButtonXpath":"//button[@name='login']"
+         }
+      }
+   },
+   "tokens":[
+      {
+         "authorizationHeaderName":"Authorization",
+         "tokenType":"UAABEARER",
+         "generatedTokenHeaderName":"access_token"
+      },
+      {
+         "authorizationHeaderName":"Authorization",
+         "tokenType":"BEARER"
+      },
+      {
+         "authorizationHeaderName":"Authorization",
+         "tokenType":"CERT"
+      }
+   ]
+}
+----
+
+[TIP]
+====
+* *applicationBaseUrl*: This is the base URL for the application that provide the protected resource.
+* *uaaBaseUrl*: This is the base URL for the application that provide the authentication flow and token.
+* *authorizationDataStore*: this is a location where persistent authorization data into file system (only valid for java-rest-client).
+* *excludedDelegatedContexts*: this is for exclude some urls with DELEGATED mode (only valid for java-rest-client).
+* *local, activeDirectoryLdap, saml, oauth2*: contains the detail information for create the login, logout flow for each authentication types.
+* *tokens*: this contains the detail information for get token and send to token to server for each TokenType.
+====
+
+

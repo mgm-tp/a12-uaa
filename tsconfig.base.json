@@ -1,0 +1,9 @@
+{
+	"extends": "@com.mgmtp.a12.devtools/tsconfig",
+	"compilerOptions": {
+		"noEmit": true,
+		"incremental": true,
+		"noEmitOnError": false,
+		"tsBuildInfoFile": "${configDir}/target/tsbuildinfo"
+	}
+}

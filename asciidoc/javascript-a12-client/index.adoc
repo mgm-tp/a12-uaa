@@ -1,0 +1,46 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+[[javascript-a12-client]]
+== JavaScript A12 Client
+
+=== Introduction
+
+The *A12 UAA Authentication Client* (`uaa-authentication-a12-client`) is a small integration module that reuses all capabilities of the base *UAA-Authentication-Client* and wires them into the A12 *client-core* runtime.
+
+Instead of using the lower-level `uaa-authentication-client` API directly, A12 applications consume UAA features through the A12 application setup mechanism. This module provides the `withUaa` feature, which can be passed to `createA12ApplicationSetup(combineFeatures(...))`.
+
+By adding `withUaa` to the feature list, an application automatically gets the default UAA integration for A12:
+
+- Registers the UAA-specific reducers in the A12 Redux store.
+- Adds the UAA middleware and sagas to the A12 runtime.
+- Connects the UAA configuration (endpoints, authentication types, client IDs, etc.) from the A12 application config.
+- Exposes the full UAA-Authentication-Client behavior (authentication flow, token handling, localization, etc.) through the A12 application shell.
+
+In short, `uaa-authentication-a12-client` acts as a dependency bridge between *client-core* and *uaa-authentication-client* and offers a single, A12-style entry point `withUaa` that makes it easy to plug UAA authentication into an A12 React application using:
+
+[source,javascript]
+----
+const { store, Component, initialActions } = createA12ApplicationSetup(
+  combineFeatures(
+    .........
+    withUaa,
+    ........
+  ),
+);
+----
+

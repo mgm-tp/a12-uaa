@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model xmlns="http://www.mgm-tp.com/a12/picus/model/v2">
+	<metadata>
+		<name>product</name>
+		<languages>en</languages>
+		<annotation name="roles">admin</annotation>
+		<comment>This is a sample product model for a commerce PIM.</comment>
+		<savedAt>2015-05-18T11:20:04.796+02:00</savedAt>
+		<schemaVersion>22.6.0</schemaVersion>
+	</metadata>
+	<group max="1" id="G2" name="product">
+		<field id="F0" name="country">
+			<description trait="internal">
+				<text lang="en">The product country.</text>
+			</description>
+			<string />
+			<required />
+		</field>
+		<field id="F3" name="number">
+			<description trait="internal">
+				<text lang="en">The unique business identifier of the product.</text>
+			</description>
+			<string />
+			<required />
+		</field>
+		<group max="100" id="G4" name="externalNumber">
+			<description trait="internal">
+				<text lang="en">A list of numbers identifying the product uniquely in external systems.</text>
+			</description>
+			<field id="F5" name="system">
+				<description trait="internal">
+					<text lang="en">A transformation to the external system using this number.</text>
+				</description>
+				<string />
+				<required />
+			</field>
+			<field id="F6" name="number">
+				<description trait="internal">
+					<text lang="en">The number used by this external system.</text>
+				</description>
+				<string />
+				<required />
+			</field>
+		</group>
+		<field id="F7" name="name">
+			<description trait="internal">
+				<text lang="en">A rather short name of the product, which can be displayed in product lists, invoices, etc.</text>
+			</description>
+			<string>
+				<minLength>3</minLength>
+				<maxLength>256</maxLength>
+			</string>
+			<required />
+		</field>
+		<field id="F8" name="description">
+			<description trait="internal">
+				<text lang="en">A transformation to the brand of this product.</text>
+			</description>
+			<string>
+				<linebreaksPermitted />
+			</string>
+			<required />
+		</field>
+		<field id="F9" name="metaDescription">
+			<description trait="internal">
+				<text lang="en">For the HTML meta tag description.</text>
+			</description>
+			<string />
+		</field>
+		<group max="1" id="G10" name="searchKeywords">
+			<description trait="internal">
+				<text lang="en">A list of keywords for site search boosting.</text>
+			</description>
+			<field id="F11" name="searchKeyword">
+				<description trait="internal">
+					<text lang="en">A list of keywords for site search boosting. The entry of keywords is supported suing keyword prediction.</text>
+				</description>
+				<string />
+			</field>
+		</group>
+		<group max="100" id="G17" name="mediaFiles">
+			<description trait="internal">
+				<text lang="en">A list of media files, which are imported or uploaded for this particular product.</text>
+			</description>
+			<group max="1" id="G18" name="mediaFile">
+				<description trait="internal">
+					<text lang="en">One media file with…</text>
+				</description>
+				<field id="F19" name="type">
+					<description trait="internal">
+						<text lang="en">a type, e.g. image, video, document, etc.</text>
+					</description>
+					<string />
+					<required />
+				</field>
+				<field id="F21" name="mimeType">
+					<description trait="internal">
+						<text lang="en">a mime type, e.g. image/jpeg, video/mp4, application/pdf, …</text>
+					</description>
+					<string />
+					<required />
+				</field>
+				<field id="F22" name="url">
+					<description trait="internal">
+						<text lang="en">an absolute or relative path and/or file name. The interpretation depends on the digital asset management solution.</text>
+					</description>
+					<string />
+					<required />
+				</field>
+			</group>
+		</group>
+		<group max="1" id="G13" name="logistics">
+			<group max="1" id="G14" name="weight">
+				<field id="F15" name="weightValue">
+					<description trait="internal">
+						<text lang="en">The weight of the product.</text>
+					</description>
+					<number>
+						<fractionalDigits>0</fractionalDigits>
+						<maxFractionalDigits>4</maxFractionalDigits>
+					</number>
+					<required />
+				</field>
+				<field id="F16" name="weightUnit">
+					<description trait="internal">
+						<text lang="en">The unit, in which the weight is measured.</text>
+					</description>
+					<string />
+					<required />
+				</field>
+			</group>
+		</group>
+		<group max="1" id="G23" name="packaging">
+			<field id="F24" name="packagingMultiplicator">
+				<description trait="internal">
+					<text lang="en">The number of sub items in the product, e.g. the number of bottles in a box of wine.</text>
+				</description>
+				<number />
+				<required />
+			</field>
+			<field id="F25" name="packagingAmount">
+				<description trait="internal">
+					<text lang="en">The amount of content in one sub item of the product, e.g. 0.75 in case of a wine bottle.</text>
+				</description>
+				<number>
+					<fractionalDigits>1</fractionalDigits>
+					<maxFractionalDigits>3</maxFractionalDigits>
+				</number>
+				<required />
+			</field>
+			<field id="F26" name="packagingUnit">
+				<description trait="internal">
+					<text lang="en">The unit, in which the packagingAmount is measured, e.g. liter.</text>
+				</description>
+				<string />
+				<required />
+			</field>
+		</group>
+	</group>
+</model>

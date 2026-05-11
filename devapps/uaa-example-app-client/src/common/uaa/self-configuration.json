@@ -1,0 +1,53 @@
+{
+  "applicationBaseUrl": "http://localhost:8080",
+  "uaaBaseUrl": "http://localhost:8080",
+  "tokens": [
+    {
+      "authorizationHeaderName": "Authorization",
+      "tokenType": "UAABEARER",
+      "generatedTokenHeaderName": "access_token",
+      "generatedTokenExpirationHeaderName": "access_token_expiration",
+      "allowCredentials": true
+    },
+    {
+      "authorizationHeaderName": "Authorization",
+      "tokenType": "BEARER",
+      "allowCredentials": false
+    },
+    {
+      "authorizationHeaderName": "Authorization",
+      "tokenType": "CERT",
+      "allowCredentials": false
+    }
+  ],
+  "local": {
+    "loginRelativeUrl": "user/local/login",
+    "logoutRelativeUrl": "user/logout",
+    "logoutMethod": "POST",
+    "tokenType": "UAABEARER"
+  },
+  "activeDirectoryLdap": {
+    "loginRelativeUrl": "user/active_directory_ldap/login",
+    "logoutRelativeUrl": "user/logout",
+    "logoutMethod": "POST",
+    "tokenType": "UAABEARER"
+  },
+  "saml": {
+    "loginRelativeUrl": "saml2/authenticate/uaa?uaa_success=http://localhost:3000",
+    "logoutRelativeUrl": "user/logout?uaa_success=http://localhost:3000",
+    "logoutMethod": "POST",
+    "tokenType": "UAABEARER"
+  },
+  "oidc": {
+    "tokenType": "BEARER",
+    "clientId": "uaa-spa-client",
+    "realmName": "UAARealm",
+    "idpBaseUrl": "http://localhost:9090",
+    "enableRefreshTokenGrant": false,
+    "loginRedirectRelativeUrl": "callback",
+    "currentUserUrl": "http://localhost:8080/uaa-authentication/currentUser",
+    "logoutRedirectRelativeUrl": "logout",
+    "silentRedirectRelativeUrl": "silent_renew.html",
+    "logoutIdp": true
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "name": "validate_OnlyParentFile_NoError",
+  "policies": [
+    {
+      "name": "Policy 1",
+      "rules": [
+        "true"
+      ]
+    },
+    {
+      "name": "Policy 2",
+      "rules": [
+        "true"
+      ]
+    }
+  ],
+  "repositoryPolicies": [
+    {
+      "name": "repository policy 1",
+      "templates": [
+        "'This is a string'"
+      ]
+    },
+    {
+      "name": "repository policy 2",
+      "templates": [
+        "false"
+      ]
+    }
+  ],
+  "propertyRights": [
+    {
+      "name": "Property Right 1",
+      "rights": {
+        "READ": [
+          "object.field1"
+        ],
+        "WRITE": [
+          "object.field2"
+        ]
+      }
+    },
+    {
+      "name": "Property Right 2",
+      "rights": {
+        "READ": [
+          "object.field1"
+        ],
+        "WRITE": [
+          "object.field2"
+        ]
+      }
+    }
+  ],
+  "permissions": [
+    {
+      "name": "Permission 1",
+      "policy-refs": [
+        "Policy 1 || Policy 2"
+      ],
+      "scopes": [
+        "Scope 1"
+      ],
+      "repository-refs": [
+        "repository policy 1"
+      ]
+    },
+    {
+      "name": "Permission 2",
+      "scopes": [
+        "Scope 2"
+      ],
+      "repository-refs": [
+        "repository policy 2"
+      ]
+    }
+  ],
+  "propertyPermissions": [
+    {
+      "name": "Property Permission 1",
+      "policy-refs": [
+        "Policy 2"
+      ],
+      "rights-refs": [
+        "Property Right 1"
+      ]
+    }
+  ]
+}

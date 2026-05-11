@@ -1,0 +1,15 @@
+**/lib/
+**/build/
+**/dist/
+**/node_modules/
+*.json
+*.yaml
+*.md
+asciidoc/
+devapps/
+jenkins/
+gradle/
+config/
+performance-test/
+uaa-regression-tests/
+uaa-authorization-language-server/

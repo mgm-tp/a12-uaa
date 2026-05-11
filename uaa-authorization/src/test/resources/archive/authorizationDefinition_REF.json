@@ -1,0 +1,76 @@
+{
+	"name": "Test Permission Definition",
+	"description": "",
+	"policies": [
+		{
+			"name": "Admin from Vietnam",
+			"description": "All rules for admin user from Vietnam",
+			"rules": [
+				"hasRole('Manager') && principal.user.organization.country == 'Vietnam'"
+			]
+		},
+		{
+			"name": "com.mgmtp.a12.uaa.authorization.entity.Country",
+			"description": "",
+			"rules": [
+				"#domainObject.name == 'Vietnam' || #domainObject.name == 'Japan'"
+			]
+		},
+		{
+			"name": "Country Data Object for Admin",
+			"description": "",
+			"properties": {
+				"rights": {
+					"READ": [
+						"type"
+					],
+					"WRITE": [
+						"contract.type",
+						"period"
+					]
+				}
+			}
+		}
+	],
+	"permissions": [
+		{
+			"name": "Display Country",
+			"description": "",
+			"resource": "Admin from vietnam resource",
+			"policy-refs": [
+				"Admin from Vietnam"
+			],
+			"policies": [
+				"hasRole('Admin')",
+				"hasRole('Admin')"
+			],
+			"scopes": [
+				"report"
+			]
+		},
+		{
+			"name": "Load Country for Admin",
+			"description": "",
+			"policy-refs": [
+				"Admin from Vietnam",
+				"com.mgmtp.a12.uaa.authorization.entity.Country"
+			],
+			"scopes": [
+				"report:country"
+			]
+		},
+		{
+			"name": "Access Country for Admin",
+			"description": "",
+			"policy-refs": [
+				"Admin from Vietnam",
+				"com.mgmtp.a12.uaa.authorization.entity.Country",
+				"Country Data Object for Admin"
+				
+			],
+			"scopes": [
+				"report:country:data"
+			]
+		}
+	]
+}

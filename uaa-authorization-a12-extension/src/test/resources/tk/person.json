@@ -1,0 +1,279 @@
+{
+  "header": {
+    "id": "person",
+    "modelType": "document",
+    "modelVersion": "28.0.2",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "person"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "guest,admin"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "address",
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "address"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "person",
+      "immutable": false
+    },
+    "modelConfig": {
+      "decimalSeparator": ".",
+      "timeZone": "UTC"
+    },
+    "typeDefinitions": [
+      {
+        "id": "typedef_2773d3b8-7592-45bf-9ade-172e991f5350",
+        "name": "CompanyType",
+        "fieldType": {
+          "type": "EnumerationType",
+          "EnumerationType": {
+            "values": [
+              {
+                "value": "good",
+                "label": [
+                  {
+                    "locale": "en",
+                    "text": "Good"
+                  }
+                ]
+              },
+              {
+                "value": "bad",
+                "label": [
+                  {
+                    "locale": "en",
+                    "text": "Bad"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_a4a9a",
+          "name": "person",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Field",
+                "id": "field_8d4d7",
+                "name": "id",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "id"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_4a29d",
+                "name": "firstName",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "firstName"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_8c708",
+                "name": "sureName",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "sureName"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_181a6",
+                "name": "age",
+                "Field": {
+                  "fieldType": {
+                    "type": "NumberType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": ""
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "include_b95ab",
+                "name": "addresses",
+                "Group": {
+                  "repeatability": 10,
+                  "modelAlias": "address"
+                }
+              },
+              {
+                "type": "Group",
+                "id": "include_a20d7",
+                "name": "primaryAddress",
+                "Group": {
+                  "repeatability": 1,
+                  "modelAlias": "address"
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_b5213",
+                "name": "job",
+                "Group": {
+                  "repeatability": 20,
+                  "elements": [
+                    {
+                      "type": "Group",
+                      "id": "group_9de2d",
+                      "name": "companies",
+                      "Group": {
+                        "repeatability": 10,
+                        "indexFieldName": "name",
+                        "elements": [
+                          {
+                            "type": "Field",
+                            "id": "field_6f04c",
+                            "name": "name",
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              },
+                              "label": [
+                                {
+                                  "locale": "en",
+                                  "text": "Name"
+                                }
+                              ],
+                              "requirednessConfig": {
+                                "mode": "absoluteOrRelativeToNextRepAncestor"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_91f16",
+                            "name": "startDate",
+                            "Field": {
+                              "fieldType": {
+                                "type": "DateType",
+                                "DateType": {
+                                  "format": "yyyy-MM-dd"
+                                }
+                              },
+                              "label": [
+                                {
+                                  "locale": "en",
+                                  "text": "Start Date"
+                                }
+                              ],
+                              "requirednessConfig": {
+                                "mode": "absoluteOrRelativeToNextRepAncestor"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_b0055",
+                            "name": "description",
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              },
+                              "label": [
+                                {
+                                  "locale": "en",
+                                  "text": "Description"
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_78dd4",
+                            "name": "type",
+                            "Field": {
+                              "fieldType": {
+                                "type": "TypeDefType",
+                                "TypeDefType": {
+                                  "typeDefinitionId": "typedef_2773d3b8-7592-45bf-9ade-172e991f5350"
+                                }
+                              },
+                              "label": [
+                                {
+                                  "locale": "en",
+                                  "text": "Type"
+                                }
+                              ],
+                              "requirednessConfig": {
+                                "mode": "absoluteOrRelativeToNextRepAncestor"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_1d903",
+                      "name": "Name",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

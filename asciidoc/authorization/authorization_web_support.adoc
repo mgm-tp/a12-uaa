@@ -1,0 +1,76 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+[[authorization_web_support]]
+=== Authorization web support
+UAA supports to secure any context path in the application and also provides an endpoint for reloading authorization rules.
+
+==== Secure by URL path
+
+This approach can be particularly helpful when you don't have access to the source code, making it impossible to add Spring Security annotations to methods.
+This is often the case when an application has a dependency on an external library that registers its own endpoint(s).
+
+For instance: Actuator endpoints cannot be secured with method-level security since they are not in the UAA or project scope. Therefore in the Application Properties file, you can configure:
+
+ `mgmtp.a12.uaa.authorization.web.uri-secured-contexts` 
+
+to enable authorization based on the URL path with pattern `<uri path>::<scope name>`. 
+
+For instance, you can configure it like this:
+
+ `mgmtp.a12.uaa.authorization.web.uri-secured-contexts=/actuator/**::MyActuatorScope`.
+
+- The `MyActuatorScope` is the scope name that you will use in the `permission` of Authorization Definition file.
+
+- The `"/actuator/**"` is the endpoint which you want to apply authorization.
+
+- The `HttpServletRequest` object representation of the request is passed as the environment variable `#resource`.
+
+[WARNING]
+====
+In some cases, a single request may correspond to multiple scope names based on the configured paths. Such as:
+
+- In case the paths are set to `mgmtp.a12.uaa.authorization.web.uri-secured-contexts=loadCompany/**::MyLoadCompanyScope,loadCompany/abc::MyLoadCompanyABCScope`
+- the `http://localhost:8080/loadCompany/abc` request must pass *at least one* of the permissions associated with `MyLoadCompanyScope` *or* `MyLoadCompanyABCScope` in case the `/loadCompany/abc` endpoint is reached.
+====
+
+===== Custom handling
+. It’s possible to register custom filters which will be applied for each actuator endpoints. Add `FilterRegistration` bean to your application context. The bean needs to have proper actuator context. By default, it's `/actuator/**`.
+. Not only for Actuator endpoints, but you also secure any endpoints base on their URL path with the same mechanism.
+
+[[reload-authorization-rules]]
+==== Reload Authorization rules
+Reloading Authorization Rules follows these steps:
+
+- UAA loads the authorization file on start-up
+- Authorization structure is stored in-memory.
+
+Therefore, follow these steps to reload authorization definition at runtime:
+
+- Update Authorization Definition file in the place which is configured in your project.
+- Trigger an endpoint `/uaa-authorization/reloadRules` which reloads the authorization file back to memory.
+
+
+[WARNING]
+====
+- The endpoint `/uaa-authorization/reloadRules` is bound to the scope `Reload Rules`.
+- The context path is handled by mgmtp.a12.uaa.authorization.web.context-path.
+- When the application is executed from an archive and file is loaded from a class-path inside the archive it's impossible to change the authorization file.
+- *UAA has no cluster support!*  When an application is running in a cluster it's an application responsibility to reload the authorization file in each cluster node.
+- This endpoint will change the whole authorization object in the memory, so please make sure the file is properly tested before it's uploaded as the new authorization definition file at runtime.
+- It's highly recommended to use system user with higher privileges to reload authorization file.
+====

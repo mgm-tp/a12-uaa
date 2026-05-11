@@ -1,0 +1,55 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+Copyright (c) 2012-2026 mgm technology partners GmbH
+Dual License
+This source file is part of the mgm A12 Platform and available under a choice of two different licenses:
+1. Open-Source License – EUPL v1.2
+You may redistribute and/or modify this file under the terms of the European Union Public License, version 1.2 - see https://eupl.eu/.
+2. Commercial License
+Alternatively, you may obtain a commercial license from mgm technology partners GmbH, that permits use of this software under different terms (including support and maintenance services).
+
+Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+[[anonymous]]
+=== Anonymous
+UAA supports *Anonymous* access. The anonymous access can be configured for certain URLs. Those URLs will be accessible to outside world and no authentication is needed.
+`AnonymousAuthenticationToken` is created automatically with configured roles. 
+
+[TIP]
+====
+Principal type is aligned with all other authentication type(s).
+====
+
+[TIP]
+====
+In SpEL you can identify the user by following expressions:
+
+* isAnonymous()
+* hasRole([configured role])  
+====
+
+[NOTE]
+====
+The principal is processed in the same way like in other authentication types. If the principal extension is used, the object is filled with configured Access Rights.
+There is possibility to register custom principal instance by implementing the `AnonymousPrincipalAdapter` interface.
+====
+
+[[anonymous-configuration]]
+==== Configuration
+
+[%autowidth.stretch,options="header"]
+|================================================================================
+|Configuration property |Default value |Usage |Remark
+
+|`mgmtp.a12.uaa.authentication.anonymous.access.urls` |`` | Comma separated list of URLs. Wildcards are allowed like /models/** |
+|`mgmtp.a12.uaa.authentication.anonymous.roles` |`ROLE_ANONYMOUS` | Comma separated list of roles. |
+
+|================================================================================
+
+ 
+ 
