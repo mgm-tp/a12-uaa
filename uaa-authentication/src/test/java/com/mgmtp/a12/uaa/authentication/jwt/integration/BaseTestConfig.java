@@ -122,4 +122,10 @@ public class BaseTestConfig {
 	public AuthenticationProperties createAuthenticationProperties() {
 		return new AuthenticationProperties();
 	}
+
+	@Bean
+	public TestExtendedJacksonModule createTestExtendedJacksonModule() {
+		return new TestExtendedJacksonModule();
+	}
+
 }

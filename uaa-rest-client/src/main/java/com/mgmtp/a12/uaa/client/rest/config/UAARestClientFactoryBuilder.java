@@ -35,15 +35,14 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.List;
 
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.springframework.cache.CacheManager;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.web.client.ResponseErrorHandler;
 
+import com.mgmtp.a12.connector.rest.ResponseErrorHandler;
 import com.mgmtp.a12.uaa.client.rest.cache.CacheNameMapper;
 import com.mgmtp.a12.uaa.client.rest.config.properties.UAARestClientProperties;
-
-import okhttp3.OkHttpClient;
 
 public class UAARestClientFactoryBuilder {
 
@@ -53,7 +52,7 @@ public class UAARestClientFactoryBuilder {
 	private List<HttpMessageConverter<?>> messageConverters;
 	private CacheNameMapper[] cacheNameMappers = new CacheNameMapper[0];
 	private CacheManager cacheManager;
-	private OkHttpClient okHttpClient;
+	private CloseableHttpClient httpClient;
 
 	private UAARestClientFactoryBuilder(UAARestClientProperties uaaRestClientProperties) {
 		this.uaaRestClientProperties = uaaRestClientProperties;
@@ -88,21 +87,21 @@ public class UAARestClientFactoryBuilder {
 		return this;
 	}
 
-	public UAARestClientFactoryBuilder withOkHttpClient(OkHttpClient okHttpClient) {
-		this.okHttpClient = okHttpClient;
+	public UAARestClientFactoryBuilder withHttpClient(CloseableHttpClient httpClient) {
+		this.httpClient = httpClient;
 		return this;
 	}
 
 	public UAARestClientFactory build()
 		throws GeneralSecurityException, IOException {
 		UAARestClientProperties finalConfiguration = UAARestClientPropertiesResolver.resolve(uaaRestClientProperties);
-		return new UAARestClientFactory(finalConfiguration, okHttpClient, interceptors, errorHandlers, messageConverters, cacheManager, cacheNameMappers);
+		return new UAARestClientFactory(finalConfiguration, httpClient, interceptors, errorHandlers, messageConverters, cacheManager, cacheNameMappers);
 	}
 
 	public UAARestClientFactory buildWithInjectedBeans()
 		throws GeneralSecurityException, IOException {
 		UAARestClientProperties finalConfiguration = UAARestClientPropertiesResolver.resolve(uaaRestClientProperties);
-		return new UAARestClientFactory(finalConfiguration, okHttpClient, interceptors, messageConverters, errorHandlers);
+		return new UAARestClientFactory(finalConfiguration, httpClient, interceptors, messageConverters, errorHandlers);
 	}
 
 }

@@ -48,7 +48,7 @@ import com.mgmtp.a12.uaa.authentication.jwt.internal.JwtTokenVerifier;
 import com.mgmtp.a12.uaa.authentication.principal.internal.UAALdapPrincipal;
 import com.mgmtp.a12.uaa.authentication.utils.TokenTester;
 import com.mgmtp.a12.uaa.authentication.utils.UserDataCreator;
-import com.mgmtp.a12.uaa.authentication.utils.UserDataCreator.TestExtededData;
+import com.mgmtp.a12.uaa.authentication.utils.UserDataCreator.TestExtendedData;
 
 @ExtendWith(SpringExtension.class)
 public class UAALdapUserTokenTest {
@@ -61,12 +61,12 @@ public class UAALdapUserTokenTest {
 
 	@Test
 	public void testUAALdapUserSerializerAndDeserializer() {
-		UAALdapPrincipal<UserDataCreator.TestExtededData> user =
+		UAALdapPrincipal<TestExtendedData> user =
 			new UAALdapPrincipal<>("admin", "***", true, true, true, true,
 				Arrays.asList(new SimpleGrantedAuthority("role1"), new SimpleGrantedAuthority("role2")),
 				UserDataCreator.createTestSubData(), "testDN");
 		String tokenString = jwtTokenGenerator.generateToken(user).getToken();
-		UAALdapPrincipal<TestExtededData> rtnUserDetails = (UAALdapPrincipal<TestExtededData>) jwtTokenVerifier.unpackToken(tokenString).getPrincipal();
+		UAALdapPrincipal<TestExtendedData> rtnUserDetails = (UAALdapPrincipal<TestExtendedData>) jwtTokenVerifier.unpackToken(tokenString).getPrincipal();
 		TokenTester.assertPrincipal(user, rtnUserDetails);
 		Assertions.assertEquals("testDN", rtnUserDetails.getDn());
 		Assertions.assertEquals(UAALdapPrincipal.class, rtnUserDetails.getClass());

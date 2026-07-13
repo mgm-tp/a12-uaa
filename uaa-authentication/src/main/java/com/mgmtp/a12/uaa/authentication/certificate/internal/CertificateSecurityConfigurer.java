@@ -60,7 +60,7 @@ public class CertificateSecurityConfigurer extends UAASecurityConfigurer<Certifi
 	private Optional<CertificateValidator> certificateValidator;
 
 	@Override
-	public void configure(HttpSecurity http) throws Exception {
+	public void configure(HttpSecurity http) {
 		UAALoginEntryPoint loginEntryPoint = new UAALoginEntryPoint(authenticationProperties.getUnauthorizedCode());
 		CertificateAuthenticationFilter certificateAuthenticationFilter = new CertificateAuthenticationFilter(
 			getAuthenticationManager(http), authenticationProperties.getContextPath(),

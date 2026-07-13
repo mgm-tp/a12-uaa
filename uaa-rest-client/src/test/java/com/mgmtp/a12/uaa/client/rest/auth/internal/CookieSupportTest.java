@@ -32,7 +32,6 @@
 package com.mgmtp.a12.uaa.client.rest.auth.internal;
 
 import java.net.HttpCookie;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -47,7 +46,7 @@ public class CookieSupportTest {
 
 	@Test
 	void createCookiesTest() {
-		List<String> cookies = CookieSupport.createCookies(new AuthorizationData("tokenData", Instant.now(), TokenType.BEARER, "sessionData"));
+		List<String> cookies = CookieSupport.createCookies(new AuthorizationData("tokenData", TokenType.BEARER, "sessionData", 300));
 
 		Assertions.assertEquals(1, cookies.size());
 		Assertions.assertEquals("JSESSIONID=\"sessionData\"", cookies.get(0));

@@ -36,7 +36,7 @@ import java.util.List;
 import jakarta.inject.Inject;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
@@ -44,8 +44,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mgmtp.a12.uaa.authorization.schema.internal.SchemaValidator;
+
+import tools.jackson.databind.ObjectMapper;
 
 @ExtendWith(SpringExtension.class)
 @TestInstance(Lifecycle.PER_CLASS)
@@ -57,7 +58,7 @@ public class SchemaValidatorTest {
 
 	private SchemaValidator schemaValidator;
 
-	@BeforeAll
+	@BeforeEach
 	void setUp() {
 		schemaValidator = new SchemaValidator(resourceLoader, new ObjectMapper());
 	}

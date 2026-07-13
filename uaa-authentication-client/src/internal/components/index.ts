@@ -29,5 +29,7 @@
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
-export { LoginPage, type LoginPageProps } from "./LoginPage.js";
-export { UserInfoHeader, type UserInfoHeaderProps } from "./UserInfoHeader.js";
+export { LoginPage } from "./LoginPage.js";
+export type { LoginPageProps } from "./LoginPage.js";
+export { UserInfoHeader } from "./UserInfoHeader.js";
+export type { UserInfoHeaderProps } from "./UserInfoHeader.js";

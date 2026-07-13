@@ -104,7 +104,7 @@ public class RedirectSupport {
 			}
 			UriComponentsBuilder uriBuilder;
 			if (redirectUrlObject.isAbsolute()) {
-				uriBuilder = UriComponentsBuilder.fromHttpUrl(redirectUrl);
+				uriBuilder = UriComponentsBuilder.fromUriString(redirectUrl);
 			} else {
 				uriBuilder = UriComponentsBuilder.fromPath(redirectUrl);
 			}

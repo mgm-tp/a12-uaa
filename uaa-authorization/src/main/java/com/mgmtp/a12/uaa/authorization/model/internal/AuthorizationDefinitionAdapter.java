@@ -41,9 +41,10 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonMerge;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.mgmtp.a12.uaa.authorization.exception.InvalidAuthorizationDefinitionException;
 import com.mgmtp.a12.uaa.authorization.model.AuthorizationDefinition;
+
+import tools.jackson.databind.annotation.JsonDeserialize;
 
 public class AuthorizationDefinitionAdapter extends AuthorizationDefinition {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AuthorizationDefinitionAdapter.class);

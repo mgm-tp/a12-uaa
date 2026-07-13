@@ -38,12 +38,10 @@ import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mgmtp.a12.uaa.authentication.principal.certificate.internal.CertificatePrincipalConverter;
-
 public class CertificateUtils {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(CertificatePrincipalConverter.class);
-	
+	private static final Logger LOGGER = LoggerFactory.getLogger(CertificateUtils.class);
+
 	public static String getAttributeValueFromCertificateExtension(X509Certificate certificate, String attributeName) {
 		try {
 			ASN1Primitive extensionValue = JcaX509ExtensionUtils.parseExtensionValue(certificate.getExtensionValue(attributeName));
@@ -53,6 +51,5 @@ public class CertificateUtils {
 		}
 		return null;
 	}
-
 
 }

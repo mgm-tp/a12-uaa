@@ -42,7 +42,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
 import com.mgmtp.a12.uaa.authentication.AuthenticationProperties;
 import com.mgmtp.a12.uaa.authentication.AuthenticationType;
@@ -65,7 +65,7 @@ public class AnonymousSecurityConfigurer extends UAASecurityConfigurer<Anonymous
 		List<String> anonymousUrls = authenticationProperties.getAnonymous().getAccess().getUrls();
 		if (CollectionUtils.isNotEmpty(anonymousUrls)) {
 			http.authorizeHttpRequests((authorize) -> {
-				anonymousUrls.forEach(anonymousUrl -> authorize.requestMatchers(new AntPathRequestMatcher(anonymousUrl)).permitAll());
+				anonymousUrls.forEach(anonymousUrl -> authorize.requestMatchers(PathPatternRequestMatcher.withDefaults().matcher(anonymousUrl)).permitAll());
 			});
 		}
 

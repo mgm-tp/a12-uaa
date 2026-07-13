@@ -33,13 +33,13 @@ package com.mgmtp.a12.uaa.authorization.schema.internal.location;
 
 import java.util.Objects;
 
-import com.fasterxml.jackson.core.JsonLocation;
+import tools.jackson.core.TokenStreamLocation;
 
 public class LocationDetails {
-	private final JsonLocation start;
-	private final JsonLocation end;
+	private final TokenStreamLocation start;
+	private final TokenStreamLocation end;
 
-	public LocationDetails(JsonLocation tokenLocation, JsonLocation currentLocation) {
+	public LocationDetails(TokenStreamLocation tokenLocation, TokenStreamLocation currentLocation) {
 		this.start = tokenLocation;
 		this.end = currentLocation;
 	}

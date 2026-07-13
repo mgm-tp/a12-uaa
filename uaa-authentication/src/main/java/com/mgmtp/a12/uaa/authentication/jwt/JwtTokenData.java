@@ -46,10 +46,8 @@ public class JwtTokenData {
 	private Collection<? extends GrantedAuthority> authorities;
 	private UserDetails principal;
 	private Instant issuedTime;
-	@Deprecated(since = "8.2.2", forRemoval = true)
+	/** Time of the first login. Preserved across token renewals so {@code user-lifetime-seconds} is measured from it. */
 	private Instant loginTime;
-	@Deprecated(since = "8.2.2", forRemoval = true)
-	private Instant expirationTime;
 	private Integer expirationSeconds;
 	private Integer tokenRenewThresholdInSeconds;
 
@@ -61,7 +59,6 @@ public class JwtTokenData {
 		this.principal = builder.principal;
 		this.loginTime = builder.loginTime;
 		this.issuedTime = builder.issuedTime;
-		this.expirationTime = builder.expirationTime;
 		this.expirationSeconds = builder.expirationSeconds;
 		this.tokenRenewThresholdInSeconds = builder.tokenRenewThresholdInSeconds;
 	}
@@ -78,7 +75,9 @@ public class JwtTokenData {
 		return principal;
 	}
 
-	@Deprecated(since = "8.2.2", forRemoval = true)
+	/**
+	 * Time of the first login. Unlike {@link #getIssuedTime()} this value is preserved across token renewals.
+	 */
 	public Instant getLoginTime() {
 		return loginTime;
 	}
@@ -106,7 +105,7 @@ public class JwtTokenData {
 	@Override
 	public String toString() {
 		return "JwtTokenData [token=" + token + ", username=" + username + ", authorities=" + authorities + ", principal=" + principal + ", loginTime="
-			+ loginTime + ", expirationTime=" + expirationTime + ", expirationSeconds=" + expirationSeconds + "]";
+			+ loginTime + ", issuedTime=" + issuedTime + ", expirationSeconds=" + expirationSeconds + "]";
 	}
 
 	@Generated("SparkTools")
@@ -121,10 +120,7 @@ public class JwtTokenData {
 		private Collection<? extends GrantedAuthority> authorities;
 		private UserDetails principal;
 		private Instant issuedTime;
-		@Deprecated(since = "8.2.2", forRemoval = true)
 		private Instant loginTime;
-		@Deprecated(since = "8.2.2", forRemoval = true)
-		private Instant expirationTime;
 		private Integer expirationSeconds;
 		private Integer tokenRenewThresholdInSeconds;
 
@@ -138,7 +134,6 @@ public class JwtTokenData {
 			this.principal = jwtTokenData.principal;
 			this.loginTime = jwtTokenData.loginTime;
 			this.issuedTime = jwtTokenData.issuedTime;
-			this.expirationTime = jwtTokenData.expirationTime;
 			this.expirationSeconds = jwtTokenData.expirationSeconds;
 			this.tokenRenewThresholdInSeconds = jwtTokenData.tokenRenewThresholdInSeconds;
 		}
@@ -163,15 +158,8 @@ public class JwtTokenData {
 			return this;
 		}
 
-		@Deprecated(since = "8.2.2", forRemoval = true)
 		public Builder withLoginTime(Instant loginTime) {
 			this.loginTime = loginTime;
-			return this;
-		}
-
-		@Deprecated(since = "8.2.2", forRemoval = true)
-		public Builder withExpirationTime(Instant expirationTime) {
-			this.expirationTime = expirationTime;
 			return this;
 		}
 

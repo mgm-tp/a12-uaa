@@ -40,7 +40,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.web.filter.GenericFilterBean;
 
 import com.mgmtp.a12.uaa.authentication.filter.AbstractPathFilter;
@@ -52,7 +52,7 @@ public class DelegatingPathFilter extends AbstractPathFilter {
 	private final GenericFilterBean delegatedFilter;
 
 	public DelegatingPathFilter(String context, GenericFilterBean delegatedFilter) {
-		super(new AntPathRequestMatcher(context));
+		super(PathPatternRequestMatcher.withDefaults().matcher(context));
 		this.delegatedFilter = delegatedFilter;
 	}
 

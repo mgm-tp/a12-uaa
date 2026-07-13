@@ -46,12 +46,13 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.mgmtp.a12.uaa.authentication.internal.CacheStorageType;
 import com.mgmtp.a12.uaa.authentication.principal.RoleMappingDataHolder;
 import com.mgmtp.a12.uaa.authentication.principal.RoleMappingLoader;
 import com.mgmtp.a12.uaa.authentication.principal.UnableToUpdateMappingException;
+
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.dataformat.yaml.YAMLFactory;
 
 /**
  * Yaml based role mapping loader supports every pay-load since roles are pre-loaded from file.

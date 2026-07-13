@@ -31,54 +31,79 @@
  */
 package com.mgmtp.a12.uaa.authentication.principal.internal.serialization;
 
-import java.io.IOException;
+import java.util.Collections;
 import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.MissingNode;
 import com.mgmtp.a12.uaa.authentication.principal.UAAPrincipal;
 
-public class UAAPrincipalDeserializer extends JsonDeserializer<UAAPrincipal<?>> {
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.ObjectReadContext;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ValueDeserializer;
+import tools.jackson.databind.node.MissingNode;
 
-	private static final String DEFAULT_PASSWORD = "***";
+public class UAAPrincipalDeserializer extends ValueDeserializer<UAAPrincipal<?>> {
 
-	UAAPrincipal<?> deserializeInternal(ObjectMapper mapper, JsonNode jsonNode) throws IOException, JsonProcessingException {
-
-		Set<? extends GrantedAuthority> authorities =
-			mapper.convertValue(
-				jsonNode.get("authorities"),
-				new TypeReference<Set<SimpleGrantedAuthority>>() {
-				});
-		Object extendedData = mapper.convertValue(jsonNode.get("extendedPrincipalData"), Object.class);
-		UAAPrincipal<Object> result = new UAAPrincipal<>(
-			readJsonNode(jsonNode, "username").asText(), DEFAULT_PASSWORD,
-			readJsonNode(jsonNode, "enabled").asBoolean(), readJsonNode(jsonNode, "accountNonExpired").asBoolean(),
-			readJsonNode(jsonNode, "credentialsNonExpired").asBoolean(),
-			readJsonNode(jsonNode, "accountNonLocked").asBoolean(),
-			authorities, extendedData
-		);
-
-		return result;
-	}
+	protected static final String DEFAULT_PASSWORD = "***";
+	protected static final TypeReference<Set<SimpleGrantedAuthority>> AUTH_TYPE =
+		new TypeReference<>() {
+		};
 
 	@Override
-	public UAAPrincipal<?> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-		ObjectMapper mapper = (ObjectMapper) p.getCodec();
-		JsonNode jsonNode = mapper.readTree(p);
-		return deserializeInternal(mapper, jsonNode);
+	public UAAPrincipal<?> deserialize(JsonParser p, DeserializationContext ctxt) throws JacksonException {
+		ObjectReadContext rc = p.objectReadContext();
+		if (rc == null) {
+			rc = ctxt;
+		}
+		JsonNode root = rc.readTree(p);
+		return deserializeInternal(rc, root);
 	}
 
-	JsonNode readJsonNode(JsonNode jsonNode, String field) {
-		return jsonNode.has(field) ? jsonNode.get(field) : MissingNode.getInstance();
+	protected UAAPrincipal<?> deserializeInternal(ObjectReadContext rc, JsonNode jsonNode) throws JacksonException {
+		Set<? extends GrantedAuthority> authorities = readOrDefault(
+			rc, readJsonNode(jsonNode, "authorities"), AUTH_TYPE, Collections.emptySet());
+
+		Object extendedData = readOrDefault(
+			rc, readJsonNode(jsonNode, "extendedPrincipalData"), Object.class, null);
+
+		return new UAAPrincipal<>(
+			readJsonNode(jsonNode, "username").asText(), DEFAULT_PASSWORD,
+			readJsonNode(jsonNode, "enabled").asBoolean(),
+			readJsonNode(jsonNode, "accountNonExpired").asBoolean(),
+			readJsonNode(jsonNode, "credentialsNonExpired").asBoolean(),
+			readJsonNode(jsonNode, "accountNonLocked").asBoolean(),
+			authorities,
+			extendedData
+		);
 	}
 
+	protected JsonNode readJsonNode(JsonNode jsonNode, String field) {
+		return (jsonNode != null && jsonNode.has(field)) ? jsonNode.get(field) : MissingNode.getInstance();
+	}
+
+	protected static <T> T readOrDefault(ObjectReadContext rc, JsonNode node, Class<T> type, T defaultValue)
+		throws JacksonException {
+		if (node == null || node.isMissingNode() || node.isNull())
+			return defaultValue;
+		try (JsonParser np = rc.treeAsTokens(node)) {
+			np.nextToken();
+			return rc.readValue(np, type);
+		}
+	}
+
+	protected static <T> T readOrDefault(ObjectReadContext rc, JsonNode node, TypeReference<T> typeRef, T defaultValue)
+		throws JacksonException {
+		if (node == null || node.isMissingNode() || node.isNull())
+			return defaultValue;
+		try (JsonParser np = rc.treeAsTokens(node)) {
+			np.nextToken();
+			return rc.readValue(np, typeRef);
+		}
+	}
 }

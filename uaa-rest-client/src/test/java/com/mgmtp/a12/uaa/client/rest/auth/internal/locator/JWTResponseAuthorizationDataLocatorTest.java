@@ -33,7 +33,6 @@ package com.mgmtp.a12.uaa.client.rest.auth.internal.locator;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,11 +83,9 @@ public class JWTResponseAuthorizationDataLocatorTest {
 	@Test
 	void convertTest() throws MalformedURLException {
 		String authToken = "token data";
-		String authTokenExpiration = String.valueOf(Instant.now().toEpochMilli());
 
 		List<NameValuePair> responseHeaders = new ArrayList<>();
 		responseHeaders.add(new NameValuePair("access_token", authToken));
-		responseHeaders.add(new NameValuePair("access_token_expiration", authTokenExpiration));
 		responseHeaders.add(new NameValuePair("token_renew_in_seconds", "50"));
 
 		Mockito.when(webWindow.getWebClient()).thenReturn(webClient);

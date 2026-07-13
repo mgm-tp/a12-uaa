@@ -30,8 +30,9 @@
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 import { Middleware } from "redux";
+import { SigninPopupArgs, SigninRedirectArgs } from "oidc-client-ts";
 
-import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging/lib/factory.js";
+import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging";
 
 import * as UaaActions from "./actions.js";
 import { UAAServiceWorker } from "./serviceWorkerRegistration.js";
@@ -53,29 +54,26 @@ export function onUaaOidcMiddleware(): Middleware {
 		const {
 			uaa: { authenticationType, user }
 		} = store.getState();
-		switch (action.type) {
-			case UaaActions.loggingInOIDC.type:
-				OidcClient.userManager.signIn(action.payload);
-				break;
-			case UaaActions.oidc_silentRenewError.type:
-				OidcClient.userManager.signOut();
-				break;
-			case UaaActions.loggingOut.type:
-				if (authenticationType === AuthenticationType.OAUTH2) {
-					OidcClient.userManager.signOut();
-				}
-				break;
-			case UaaActions.oidc_userFound.type:
-				//Store token after silent renew success.
-				reduxStore.dispatch(
-					UaaActions.updateAccessToken({
-						access_token: user.access_token,
-						authenticationType
-					})
-				);
-				break;
-			default:
-				return result;
+		if (UaaActions.loggingInOIDC.match(action)) {
+			OidcClient.userManager.signIn(
+				action.payload as SigninPopupArgs | SigninRedirectArgs | undefined
+			);
+		} else if (UaaActions.oidc_silentRenewError.match(action)) {
+			OidcClient.userManager.signOut();
+		} else if (
+			UaaActions.loggingOut.match(action) &&
+			authenticationType === AuthenticationType.OAUTH2
+		) {
+			OidcClient.userManager.signOut();
+		} else if (UaaActions.oidc_userFound.match(action)) {
+			reduxStore.dispatch(
+				UaaActions.updateAccessToken({
+					access_token: user.access_token,
+					authenticationType
+				})
+			);
+		} else {
+			return result;
 		}
 
 		return result;
@@ -89,74 +87,66 @@ export function onUaaCommonMiddleware(): Middleware {
 		if (!uaaSaga.task) {
 			uaaSaga.init();
 		}
-		switch (action.type) {
-			case UaaActions.loggedOut.type:
-				sessionStorage.removeItem(SessionStorageKeys.ACCESS_TOKEN);
-				sessionStorage.removeItem(SessionStorageKeys.ACCESS_TOKEN_EXPIRATION);
-				sessionStorage.removeItem(SessionStorageKeys.TOKEN_RENEW_IN_SECONDS);
-				sessionStorage.removeItem(SessionStorageKeys.TOKEN_RENEW_TIMESTAMP);
-				sessionStorage.removeItem(SessionStorageKeys.AUTHENTICATION_TYPE);
-				sessionStorage.removeItem(SessionStorageKeys.SELF_CONFIGURE);
-				TokenManagement.getInstance().stopService();
-				break;
-			case UaaActions.loggedIn.type:
-				if (action.payload) {
-					const { type, user } = action.payload;
-					sessionStorage.setItem(SessionStorageKeys.AUTHENTICATION_TYPE, type);
-					const access_token =
-						action.payload?.access_token || user?.access_token;
-					UAAServiceWorker.postToken(access_token, type);
-					if (access_token) {
-						sessionStorage.setItem(
-							SessionStorageKeys.ACCESS_TOKEN,
-							access_token
-						);
-					}
-					if (type !== AuthenticationType.OAUTH2) {
-						TokenManagement.getInstance().startService();
-					} else {
-						store.dispatch(UaaActions.modifyingOidcUser(user));
-					}
-				}
-				break;
-			case UaaActions.updateAccessToken.type:
-				if (action.payload) {
-					const { access_token, authenticationType } = action.payload;
-					sessionStorage.setItem(SessionStorageKeys.ACCESS_TOKEN, access_token);
-					UAAServiceWorker.postToken(access_token, authenticationType);
-					if (authenticationType) {
-						sessionStorage.setItem(
-							SessionStorageKeys.AUTHENTICATION_TYPE,
-							authenticationType
-						);
-					}
-				}
-				break;
-			case UaaActions.restoreFailed.type:
-				if (action.payload) {
-					const error = action.payload.error;
-					if (error === undefined) {
-						LoggerFactory.getLogger("UAA/Restore").error(
-							"Timeout during restoration of the authentication state."
-						);
-					} else if (
-						!isAuthenticationFailedPayload(error) ||
-						error.status !== 403
-					) {
-						LoggerFactory.getLogger("UAA/Restore").error(
-							"Error on restoring the authentication state",
-							error
-						);
-					} else {
-						LoggerFactory.getLogger("UAA/Restore").error(
-							"Authentication state cannot be restored.",
-							error
-						);
-					}
-				}
-				break;
-			default:
-				return result;
+		if (UaaActions.loggedOut.match(action)) {
+			sessionStorage.removeItem(SessionStorageKeys.ACCESS_TOKEN);
+			sessionStorage.removeItem(SessionStorageKeys.TOKEN_EXPIRATION_IN_SECONDS);
+			sessionStorage.removeItem(SessionStorageKeys.TOKEN_EXPIRATION_TIMESTAMP);
+			sessionStorage.removeItem(SessionStorageKeys.TOKEN_RENEW_TIMESTAMP);
+			sessionStorage.removeItem(SessionStorageKeys.AUTHENTICATION_TYPE);
+			sessionStorage.removeItem(SessionStorageKeys.SELF_CONFIGURE);
+			TokenManagement.getInstance().stopService();
+		} else if (UaaActions.loggedIn.match(action) && action.payload) {
+			const { type, user } = action.payload;
+			sessionStorage.setItem(SessionStorageKeys.AUTHENTICATION_TYPE, type);
+			const access_token =
+				action.payload?.access_token ||
+				(user as { access_token?: string })?.access_token;
+			UAAServiceWorker.postToken(access_token as string, type);
+			if (access_token) {
+				sessionStorage.setItem(SessionStorageKeys.ACCESS_TOKEN, access_token);
+			}
+			if (type !== AuthenticationType.OAUTH2) {
+				TokenManagement.getInstance().startService();
+			} else {
+				store.dispatch(
+					UaaActions.modifyingOidcUser(
+						user as UaaActions.UserLoggedInPayload["user"] as never
+					)
+				);
+			}
+		} else if (UaaActions.updateAccessToken.match(action) && action.payload) {
+			const { access_token, authenticationType } = action.payload;
+			sessionStorage.setItem(SessionStorageKeys.ACCESS_TOKEN, access_token);
+			UAAServiceWorker.postToken(
+				access_token,
+				authenticationType as AuthenticationType
+			);
+			if (authenticationType) {
+				sessionStorage.setItem(
+					SessionStorageKeys.AUTHENTICATION_TYPE,
+					authenticationType
+				);
+			}
+		} else if (UaaActions.restoreFailed.match(action) && action.payload) {
+			const error = action.payload.error;
+			if (error === undefined) {
+				LoggerFactory.getLogger("UAA/Restore").error(
+					"Timeout during restoration of the authentication state."
+				);
+			} else if (
+				!isAuthenticationFailedPayload(error) ||
+				error.status !== 403
+			) {
+				LoggerFactory.getLogger("UAA/Restore").error(
+					"Error on restoring the authentication state",
+					error
+				);
+			} else {
+				LoggerFactory.getLogger("UAA/Restore").error(
+					"Authentication state cannot be restored.",
+					error
+				);
+			}
 		}
 		return result;
 	};

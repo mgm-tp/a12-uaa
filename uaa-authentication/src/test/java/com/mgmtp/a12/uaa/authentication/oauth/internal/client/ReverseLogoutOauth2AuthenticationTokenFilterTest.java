@@ -31,14 +31,11 @@
  */
 package com.mgmtp.a12.uaa.authentication.oauth.internal.client;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import jakarta.servlet.ServletException;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -53,6 +50,7 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
 import com.mgmtp.a12.uaa.authentication.oauth.client.UaaOauth2ClientAuthenticationToken;
 import com.mgmtp.a12.uaa.authentication.oauth.client.internal.ReverseLogoutOauth2AuthenticationTokenFilter;
@@ -63,16 +61,28 @@ public class ReverseLogoutOauth2AuthenticationTokenFilterTest {
 	private static String ACCESS_TOKEN = "eylyIn0..BDVU_ACnmNOyoHIc.DOBaIA.dq4hhRzgdiQ";
 
 	@Test
-	public void checkResetToOriginalOauth2TokenBeforeLogoutSupport() throws ServletException, IOException {
-		MockHttpServletRequest request = new MockHttpServletRequest();
-		request.setServletPath("/logout");
+	public void checkResetToOriginalOauth2TokenBeforeLogoutSupport() throws Exception {
+		MockHttpServletRequest request = new MockHttpServletRequest("GET", "/logout");
+
 		MockHttpServletResponse response = new MockHttpServletResponse();
-		ReverseLogoutOauth2AuthenticationTokenFilter reverseLogoutOauth2AuthenticationTokenFilter = new ReverseLogoutOauth2AuthenticationTokenFilter();
+
+		ReverseLogoutOauth2AuthenticationTokenFilter filter =
+			new ReverseLogoutOauth2AuthenticationTokenFilter();
+
+		Assertions.assertTrue(
+			PathPatternRequestMatcher.withDefaults()
+				.matcher(org.springframework.http.HttpMethod.GET, "/logout")
+				.matches(request)
+		);
 
 		SecurityContextHolder.getContext().setAuthentication(createUAAOauth2ClientAuthenticationToken());
-		Assertions.assertEquals(SecurityContextHolder.getContext().getAuthentication().getClass(), UaaOauth2ClientAuthenticationToken.class);
-		reverseLogoutOauth2AuthenticationTokenFilter.doFilter(request, response, new MockFilterChain());
-		Assertions.assertEquals(SecurityContextHolder.getContext().getAuthentication().getClass(), OAuth2AuthenticationToken.class);
+		Assertions.assertEquals(UaaOauth2ClientAuthenticationToken.class,
+			SecurityContextHolder.getContext().getAuthentication().getClass());
+
+		filter.doFilter(request, response, new MockFilterChain());
+
+		Assertions.assertEquals(OAuth2AuthenticationToken.class,
+			SecurityContextHolder.getContext().getAuthentication().getClass());
 	}
 
 	private UaaOauth2ClientAuthenticationToken createUAAOauth2ClientAuthenticationToken() {

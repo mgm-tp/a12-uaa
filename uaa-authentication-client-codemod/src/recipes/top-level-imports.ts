@@ -29,11 +29,7 @@
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
-import {
-	type Recipe,
-	migrateImports,
-	type ImportMigrationConfiguration
-} from "@com.mgmtp.a12.devtools/codemod";
+import { type Recipe, migrateImports, type ImportMigrationConfiguration } from "@com.mgmtp.a12.devtools/codemod";
 
 const packageName = "@com.mgmtp.a12.uaa/uaa-authentication-client";
 

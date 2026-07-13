@@ -1,0 +1,42 @@
+plugins {
+	id 'java-library'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding 'UTF-8'
+    options.compilerArgs.add("-parameters")
+}
+
+tasks.withType(Test) {
+    useJUnitPlatform()
+}
+
+dependencies {
+	runtimeOnly("org.openrewrite:rewrite-java-21")
+
+	implementation platform(libs.openRewriteBom)
+	implementation("org.openrewrite:rewrite-java")
+	implementation("org.openrewrite:rewrite-maven")
+	implementation("org.openrewrite:rewrite-yaml")
+	implementation("org.openrewrite:rewrite-properties")
+	implementation("org.openrewrite:rewrite-xml")
+
+	testImplementation("org.openrewrite:rewrite-test")
+	testImplementation libs.bundles.tests
+	testImplementation libs.slf
+	testImplementation libs.log4j12
+}
+
+// rewrite-test is built against JUnit 5; pin the test JUnit to the version it requires
+// (overriding the repo-wide JUnit 6 catalog entry) so the OpenRewrite recipe tests resolve.
+configurations.all {
+	resolutionStrategy {
+		force 'org.junit.jupiter:junit-jupiter:5.13.3'
+		force 'org.junit.platform:junit-platform-launcher:1.13.3'
+	}
+}
+
+tasks.compileJava {
+	options.release.set(21)
+}
+

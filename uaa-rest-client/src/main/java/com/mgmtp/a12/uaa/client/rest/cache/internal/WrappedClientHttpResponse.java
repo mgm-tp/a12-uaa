@@ -72,10 +72,6 @@ public class WrappedClientHttpResponse implements ClientHttpResponse {
 		return HttpStatus.resolve(response.getStatusCode().value());
 	}
 
-	@Override
-	public int getRawStatusCode() throws IOException {
-		return response.getRawStatusCode();
-	}
 
 	@Override
 	public String getStatusText() throws IOException {

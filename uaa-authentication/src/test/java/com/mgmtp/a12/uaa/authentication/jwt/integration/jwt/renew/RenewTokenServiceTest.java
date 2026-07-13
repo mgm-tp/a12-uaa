@@ -103,13 +103,19 @@ public class RenewTokenServiceTest {
 		Instant issuedTimeAfterRenew = renewedTokenData.getIssuedTime();
 		Assertions.assertNotEquals(initialLoginTimeFromToken, issuedTimeAfterRenew);
 
+		// the original login time must be preserved across renewal even though the issue time is refreshed,
+		// otherwise user-lifetime-seconds would be reset on every renewal (A12-18865)
+		Instant initialLoginTimeClaim = jwtTokenVerifier.unpackToken(idTokenHint.getToken()).getLoginTime();
+		Instant loginTimeAfterRenew = jwtTokenVerifier.unpackToken(renewedTokenData.getToken()).getLoginTime();
+		Assertions.assertEquals(initialLoginTimeClaim.toEpochMilli(), loginTimeAfterRenew.toEpochMilli());
+
 		JwtTokenData freshTokenData = generateToken();
 		Instant freshTokenLoginTime = freshTokenData.getIssuedTime();
 		Assertions.assertNotEquals(initialLoginTime.toEpochMilli(), freshTokenLoginTime.toEpochMilli());
 	}
 
 	protected JwtTokenData generateToken() {
-		UAAPrincipal<UserDataCreator.TestExtededData> user = UserDataCreator.createUser("test1", "password");
+		UAAPrincipal<UserDataCreator.TestExtendedData> user = UserDataCreator.createUser("test1", "password");
 		return jwtTokenGenerator.generateToken(user);
 	}
 

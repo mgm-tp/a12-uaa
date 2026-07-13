@@ -56,7 +56,6 @@
 			"authorizationHeaderName": "Authorization",
 			"tokenType": "UAABEARER",
 			"generatedTokenHeaderName": "access_token",
-			"generatedTokenExpirationHeaderName": "access_token_expiration",
 			"allowCredentials": true
 		},
 		{

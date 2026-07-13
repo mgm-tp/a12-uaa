@@ -31,7 +31,6 @@
  */
 package com.mgmtp.a12.uaa.authentication.jwt.internal;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
@@ -59,13 +58,15 @@ import com.mgmtp.a12.uaa.authentication.internal.UAASpringJsonHandler;
 import com.mgmtp.a12.uaa.authentication.jwt.JwtTokenData;
 import com.mgmtp.a12.uaa.authentication.jwt.JwtTokenStorage;
 import com.mgmtp.a12.uaa.authentication.jwt.encryption.DataEncoder;
-import com.mgmtp.a12.uaa.authentication.principal.internal.serialization.UAAJacksonModule;
+import com.mgmtp.a12.uaa.authentication.principal.UAAJacksonModule;
 import com.nimbusds.jose.KeyLengthException;
 import com.nimbusds.jose.crypto.DirectDecrypter;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jwt.EncryptedJWT;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+
+import tools.jackson.core.JacksonException;
 
 public class JwtTokenVerifier {
 
@@ -74,6 +75,7 @@ public class JwtTokenVerifier {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JwtTokenVerifier.class);
 	private static final String CLAIM_USER_DETAILS = "userDetails";
 	private static final String CLAIM_AUTHORITIES = "authorities";
+	private static final String CLAIM_AUTH_TIME = "auth_time";
 	private Integer userLifetimeSeconds;
 	private RSASSAVerifier verifier;
 	private DirectDecrypter decrypter;
@@ -103,9 +105,26 @@ public class JwtTokenVerifier {
 			.withAuthorities(getAuthorities(claims))
 			.withPrincipal(getPrincipal(claims))
 			.withIssuedTime(claims.getIssueTime().toInstant())
+			.withLoginTime(extractLoginTime(claims))
 			.withExpirationSeconds(jwtProperties.getExpirationSeconds())
 			.withTokenRenewThresholdInSeconds(jwtProperties.getTokenRenewThresholdInSeconds())
 			.build();
+	}
+
+	/**
+	 * Reads the preserved original authentication time from the token. Falls back to the standard issue time for tokens
+	 * issued before the {@code auth_time} claim existed, so that the {@code user-lifetime-seconds} cap remains enforced.
+	 */
+	private Instant extractLoginTime(JWTClaimsSet claims) {
+		try {
+			Long authTimeMillis = claims.getLongClaim(CLAIM_AUTH_TIME);
+			if (authTimeMillis != null) {
+				return Instant.ofEpochMilli(authTimeMillis);
+			}
+		} catch (Exception e) {
+			LOGGER.warn("Unable to read the authentication time claim, falling back to the issue time." + e);
+		}
+		return claims.getIssueTime().toInstant();
 	}
 
 	private UserDetails getPrincipal(JWTClaimsSet claims) {
@@ -145,7 +164,7 @@ public class JwtTokenVerifier {
 
 	private Boolean isTokenLifetimeExpired(JWTClaimsSet tokenClaims) {
 		try {
-			Instant loginTime = tokenClaims.getIssueTime().toInstant();
+			Instant loginTime = extractLoginTime(tokenClaims);
 			return Optional.ofNullable(userLifetimeSeconds).map(lifetime -> {
 				Instant expirationTime = loginTime.plus(Duration.ofSeconds(lifetime));
 				if (Instant.now().isAfter(expirationTime)) {
@@ -216,7 +235,7 @@ public class JwtTokenVerifier {
 	private <T> T deserializeFromJson(String json, Class<T> type) {
 		try {
 			return uaaSpringJsonHandler.convertFromJson(json, type);
-		} catch (IOException e) {
+		} catch (JacksonException e) {
 			throw new RuntimeException("Unable to deserialize UserDetails from the token", e);
 		}
 	}

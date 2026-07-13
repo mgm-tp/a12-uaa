@@ -36,21 +36,17 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatcher;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
 import com.mgmtp.a12.uaa.client.rest.auth.token.internal.URLUtils;
 import com.mgmtp.a12.uaa.client.rest.config.properties.OidcProperties;
@@ -60,48 +56,42 @@ import com.mgmtp.a12.uaa.client.rest.config.properties.OidcProperties;
 public class Oauth2TokenValidatorTest {
 
 	@Mock
-	private RestTemplate restTemplate;
+	private RestClient restClient;
+	@Mock
+	private RestClient.RequestHeadersUriSpec requestHeadersUriSpec;
+	@Mock
+	private RestClient.RequestHeadersSpec validRequestHeadersSpec;
+	@Mock
+	private RestClient.RequestHeadersSpec invalidRequestHeadersSpec;
+	@Mock
+	private RestClient.ResponseSpec validResponseSpec;
+	@Mock
+	private RestClient.ResponseSpec invalidResponseSpec;
+
 	private Oauth2TokenValidator oauth2TokenValidator = new Oauth2TokenValidator(new OidcProperties.ConfidentialClientProperties());
 	private MockedStatic<URLUtils> urlUtilsMockedStatic;
 
 	@BeforeEach
 	void setUp() {
-
 		urlUtilsMockedStatic = Mockito.mockStatic(URLUtils.class);
 		urlUtilsMockedStatic.when(() -> URLUtils.getIdpBaseUrl(Mockito.any())).thenReturn("http://localhost:9090/realms/UAARealm/protocol/openid-connect");
 		urlUtilsMockedStatic.when(() -> URLUtils.getFullUrl(Mockito.any(), Mockito.any()))
 			.thenReturn("http://localhost:9090/realms/UAARealm/protocol/openid-connect/userinfo");
 
-		//We need to init mocks again because setter injection is not working with annotations
-		ResponseEntity<String> response = new ResponseEntity<>("OK", HttpStatus.OK);
+		Mockito.when(restClient.get()).thenReturn(requestHeadersUriSpec);
+		Mockito.when(requestHeadersUriSpec.uri(Mockito.anyString())).thenReturn(validRequestHeadersSpec);
 
-		ArgumentMatcher<HttpEntity<String>> validMatcher = argument -> {
-			String expected = "Bearer valid";
-			String actual = argument.getHeaders().get("Authorization").get(0);
-			return expected.equals(actual);
-		};
+		// Valid token setup
+		Mockito.when(validRequestHeadersSpec.header(Mockito.eq("Authorization"), Mockito.eq("Bearer valid"))).thenReturn(validRequestHeadersSpec);
+		Mockito.when(validRequestHeadersSpec.retrieve()).thenReturn(validResponseSpec);
+		Mockito.when(validResponseSpec.toBodilessEntity()).thenReturn(ResponseEntity.ok().build());
 
-		Mockito.when(restTemplate
-				.exchange(
-					ArgumentMatchers.anyString(),
-					ArgumentMatchers.eq(HttpMethod.GET),
-					Mockito.argThat(validMatcher),
-					ArgumentMatchers.<Class<String>>any()))
-			.thenReturn(response);
+		// Invalid token setup
+		Mockito.when(validRequestHeadersSpec.header(Mockito.eq("Authorization"), Mockito.eq("Bearer invalid"))).thenReturn(invalidRequestHeadersSpec);
+		Mockito.when(invalidRequestHeadersSpec.retrieve()).thenReturn(invalidResponseSpec);
+		Mockito.when(invalidResponseSpec.toBodilessEntity()).thenThrow(new HttpClientErrorException(HttpStatus.UNAUTHORIZED));
 
-		ArgumentMatcher<HttpEntity<String>> invalidMatcher = argument -> {
-			String expected = "Bearer invalid";
-			return expected.equals(argument.getHeaders().get("Authorization").get(0));
-		};
-		Mockito.when(restTemplate
-				.exchange(
-					ArgumentMatchers.anyString(),
-					ArgumentMatchers.eq(HttpMethod.GET),
-					Mockito.argThat(invalidMatcher),
-					ArgumentMatchers.<Class<String>>any()))
-			.thenThrow(new HttpClientErrorException(HttpStatus.UNAUTHORIZED));
-
-		ReflectionTestUtils.setField(oauth2TokenValidator, "restTemplate", restTemplate);
+		ReflectionTestUtils.setField(oauth2TokenValidator, "restClient", restClient);
 	}
 
 	@AfterEach

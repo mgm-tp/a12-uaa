@@ -24,6 +24,7 @@ include(':uaa-authentication-a12-client')
 include(':uaa-authorization-introspector')
 include(':uaa-authorization-language-server')
 include(':uaa-authentication-client-codemod')
+include(':uaa-rewrite')
 
 include 'devapps:uaa-example-app-client'
 include 'devapps:uaa-example-app'

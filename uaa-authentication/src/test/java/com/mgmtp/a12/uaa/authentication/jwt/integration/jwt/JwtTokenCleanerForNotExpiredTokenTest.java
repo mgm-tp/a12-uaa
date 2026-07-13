@@ -60,7 +60,7 @@ public class JwtTokenCleanerForNotExpiredTokenTest {
 
 	@Test
 	public void testRemoveTokenExpiration() {
-		UAAPrincipal<UserDataCreator.TestExtededData> user = UserDataCreator.createUser("test1", "password");
+		UAAPrincipal<UserDataCreator.TestExtendedData> user = UserDataCreator.createUser("test1", "password");
 		String tokenString = jwtTokenGenerator.generateToken(user).getToken();
 		jwtTokenStorage.storeToken(tokenString);
 		Assertions.assertTrue(jwtTokenStorage.loadToken(tokenString).isPresent());

@@ -32,8 +32,7 @@
 import "isomorphic-fetch";
 import * as Assert from "node:assert";
 
-// eslint-disable-next-line no-restricted-imports
-import { FilterChain } from "@com.mgmtp.a12.utils/utils-connector/lib/main/internal/filter/FilterChain.js";
+import { RequestFilterPayload } from "@com.mgmtp.a12.utils/utils-connector";
 
 import {
 	UaaExtendedUser,
@@ -52,7 +51,6 @@ import { UaaSlice } from "../../src/internal/selectors.js";
 describe("com.mgmtp.a12.connector.request.authorizationHeaderFilter", function () {
 	it("test default init authorization header filter", function () {
 		sessionStorage.setItem("authenticationType", AuthenticationType.OAUTH2);
-		const requestFilterChain = new FilterChain();
 		const oidcUser:
 			| UaaUser
 			| UaaOidcUser
@@ -75,14 +73,13 @@ describe("com.mgmtp.a12.connector.request.authorizationHeaderFilter", function (
 		};
 		const bodyFilter: UaaFilters.AuthorizationHeaderFilter =
 			new UaaFilters.AuthorizationHeaderFilter(() => appReduxState);
-		requestFilterChain.registerFilterRequest(bodyFilter);
-		requestFilterChain.startRequestFilter({
-			relativeUrl: "",
-			method: "DELETE"
-		});
-		const requestInit = requestFilterChain.getRequestInit();
+		const requestPayload: RequestFilterPayload = {
+			payload: { relativeUrl: "", method: "DELETE" },
+			request: { headers: new Headers() }
+		};
+		const result = bodyFilter.doRequestFilter(requestPayload);
 		Assert.strictEqual(
-			(requestInit?.headers as Headers).get("Authorization"),
+			(result.request.headers as Headers).get("Authorization"),
 			"Bearer access_token String",
 			"Bearer access_token String"
 		);
@@ -92,7 +89,6 @@ describe("com.mgmtp.a12.connector.request.authorizationHeaderFilter", function (
 describe("com.mgmtp.a12.connector.request.authorizationHeaderFilter.not.oidc", function () {
 	it("test default init authorization header filter", function () {
 		sessionStorage.setItem("authenticationType", AuthenticationType.SAML);
-		const requestFilterChain = new FilterChain();
 		const extendedUser: UaaExtendedUser = {
 			email: "",
 			firstName: "",
@@ -111,14 +107,13 @@ describe("com.mgmtp.a12.connector.request.authorizationHeaderFilter.not.oidc", f
 		};
 		const bodyFilter: UaaFilters.AuthorizationHeaderFilter =
 			new UaaFilters.AuthorizationHeaderFilter(() => appReduxState);
-		requestFilterChain.registerFilterRequest(bodyFilter);
-		requestFilterChain.startRequestFilter({
-			relativeUrl: "",
-			method: "DELETE"
-		});
-		const requestInit = requestFilterChain.getRequestInit();
+		const requestPayload: RequestFilterPayload = {
+			payload: { relativeUrl: "", method: "DELETE" },
+			request: { headers: new Headers() }
+		};
+		const result = bodyFilter.doRequestFilter(requestPayload);
 		Assert.strictEqual(
-			(requestInit?.headers as Headers).get("Authorization"),
+			(result.request.headers as Headers).get("Authorization"),
 			"UAABearer access_token String",
 			"UAABearer access_token String"
 		);
@@ -128,13 +123,12 @@ describe("com.mgmtp.a12.connector.request.authorizationHeaderFilter.not.oidc", f
 describe("com.mgmtp.a12.connector.request.authorizationHeaderFilter.undefined.state", function () {
 	it("test default init authorization header filter with undefined state should success", function () {
 		sessionStorage.setItem("authenticationType", AuthenticationType.SAML);
-		const requestFilterChain = new FilterChain();
 		const bodyFilter: UaaFilters.AuthorizationHeaderFilter =
 			new UaaFilters.AuthorizationHeaderFilter(() => undefined);
-		requestFilterChain.registerFilterRequest(bodyFilter);
-		requestFilterChain.startRequestFilter({
-			relativeUrl: "",
-			method: "DELETE"
-		});
+		const requestPayload: RequestFilterPayload = {
+			payload: { relativeUrl: "", method: "DELETE" },
+			request: { headers: new Headers() }
+		};
+		bodyFilter.doRequestFilter(requestPayload);
 	});
 });

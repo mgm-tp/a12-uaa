@@ -30,15 +30,17 @@
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 import * as React from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { JSX } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
-import { List } from "@com.mgmtp.a12.widgets/widgets-core/lib/list/main/list.view.js";
-import { PopUpMenu } from "@com.mgmtp.a12.widgets/widgets-core/lib/pop-up-menu/main/pop-up-menu.view.js";
-import { HeaderTrigger } from "@com.mgmtp.a12.widgets/widgets-core/lib/button/main/header-trigger/header-trigger.view.js";
-import { Button } from "@com.mgmtp.a12.widgets/widgets-core/lib/button/main/button.view.js";
-import { HeaderTriggerProps } from "@com.mgmtp.a12.widgets/widgets-core/lib/button/main/header-trigger/header-trigger.api.js";
-import { PopUpMenuProps } from "@com.mgmtp.a12.widgets/widgets-core/lib/pop-up-menu/main/pop-up-menu.api.js";
+import {
+	Button,
+	HeaderTrigger,
+	HeaderTriggerProps,
+	List,
+	PopUpMenu,
+	PopUpMenuProps
+} from "@com.mgmtp.a12.widgets/widgets-core";
 
 import * as UaaActions from "../actions.js";
 import * as UaaSelectors from "../selectors.js";

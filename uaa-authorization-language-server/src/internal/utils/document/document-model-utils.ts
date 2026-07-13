@@ -30,7 +30,7 @@
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 import type { DocumentModel } from "@com.mgmtp.a12.kernel/kernel-md-facade";
-import { type ModelPath } from "@com.mgmtp.a12.base/base-model-api/lib/main/model/index.js";
+import { type ModelPath } from "@com.mgmtp.a12.base/base-model-api";
 
 import { allDocumentModels } from "../../loadFieldsDocument.js";
 
@@ -66,8 +66,14 @@ export namespace DocumentModelUtils {
 					: { elementName: element.name }
 			];
 
-			if (element.type === "Group" && element.modelAlias) {
-				const modelAlias = element.modelAlias;
+			// `modelAlias` was removed from kernel-md-facade's Group type in 31.0.0-pre.3
+			// but is still emitted at runtime. Read it through a defensive cast until
+			// the kernel API exposes it again or the language-server stops relying on it.
+			const groupAlias = element.type === "Group"
+				? (element as unknown as { modelAlias?: string }).modelAlias
+				: undefined;
+			if (element.type === "Group" && groupAlias) {
+				const modelAlias = groupAlias;
 				allDocumentModels.forEach(document => {
 					if (document.header.id && document.header.id === modelAlias) {
 						result.push(

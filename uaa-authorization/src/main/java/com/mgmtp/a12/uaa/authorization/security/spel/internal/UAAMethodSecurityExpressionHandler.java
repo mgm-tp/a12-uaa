@@ -114,7 +114,7 @@ public class UAAMethodSecurityExpressionHandler extends DefaultMethodSecurityExp
 	}
 
 	@Override
-	public EvaluationContext createEvaluationContext(Supplier<Authentication> auth, MethodInvocation mi) {
+	public EvaluationContext createEvaluationContext(Supplier<? extends Authentication> auth, MethodInvocation mi) {
 		return createEvaluationContextInternal(auth.get(), mi);
 
 	}

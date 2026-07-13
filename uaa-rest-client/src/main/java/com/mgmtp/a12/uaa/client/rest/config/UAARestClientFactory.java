@@ -35,17 +35,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
-import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.io.HttpClientConnectionManager;
+import org.apache.hc.client5.http.ssl.DefaultClientTlsStrategy;
+import org.apache.hc.core5.ssl.SSLContextBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
@@ -53,8 +54,8 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.web.client.ResponseErrorHandler;
 
+import com.mgmtp.a12.connector.rest.ResponseErrorHandler;
 import com.mgmtp.a12.connector.rest.RestDeleteConnector;
 import com.mgmtp.a12.connector.rest.RestGetConnector;
 import com.mgmtp.a12.connector.rest.RestHeadConnector;
@@ -72,7 +73,6 @@ import com.mgmtp.a12.uaa.client.rest.config.properties.CertificateProperties;
 import com.mgmtp.a12.uaa.client.rest.config.properties.UAARestClientProperties;
 import com.mgmtp.a12.uaa.client.rest.internal.UAAResponseErrorHandler;
 
-import okhttp3.OkHttpClient;
 
 /**
  * Allows manual UAA REST client configuration and initialization. It also initializes underlying REST server connector factory.
@@ -94,7 +94,7 @@ public class UAARestClientFactory {
 	private RestOptionsConnector optionsConnector;
 	private UAARestClientAuthorizationConfig authorizationConfig;
 
-	UAARestClientFactory(UAARestClientProperties uaaRestClientProperties, OkHttpClient okHttpClient, ClientHttpRequestInterceptor[] interceptors,
+	UAARestClientFactory(UAARestClientProperties uaaRestClientProperties, CloseableHttpClient httpClient, ClientHttpRequestInterceptor[] interceptors,
 		ResponseErrorHandler[] errorHandlers, List<HttpMessageConverter<?>> messageConverters, CacheManager cacheManager, CacheNameMapper[] cacheNameMappers
 	) throws GeneralSecurityException, IOException {
 
@@ -108,56 +108,29 @@ public class UAARestClientFactory {
 		ClientHttpRequestInterceptor[] clientInterceptors = buildInterceptors(interceptors);
 		ResponseErrorHandler[] clientErrorHandlers = buildErrorHandlers(errorHandlers);
 
-		init(uaaRestClientProperties, okHttpClient, clientInterceptors, messageConverters, clientErrorHandlers);
+		init(uaaRestClientProperties, httpClient, clientInterceptors, messageConverters, clientErrorHandlers);
 	}
 
-	UAARestClientFactory(UAARestClientProperties uaaRestClientProperties, OkHttpClient okHttpClient, ClientHttpRequestInterceptor[] interceptors,
+	UAARestClientFactory(UAARestClientProperties uaaRestClientProperties, CloseableHttpClient httpClient, ClientHttpRequestInterceptor[] interceptors,
 		List<HttpMessageConverter<?>> messageConverters, ResponseErrorHandler[] errorHandlers)
 		throws GeneralSecurityException, IOException {
-		init(uaaRestClientProperties, okHttpClient, interceptors, messageConverters, errorHandlers);
+		init(uaaRestClientProperties, httpClient, interceptors, messageConverters, errorHandlers);
 	}
 
-	/**
-	 * @deprecated This constructor will be made private in a future release.
-	 *             Use {@link UAARestClientFactoryBuilder} to create instances instead.
-	 */
-	@Deprecated(since = "9.2.0")
-	public UAARestClientFactory(UAARestClientProperties uaaRestClientProperties, ClientHttpRequestInterceptor[] interceptors,
-		ResponseErrorHandler[] errorHandlers, List<HttpMessageConverter<?>> messageConverters)
-		throws GeneralSecurityException, IOException {
-		this(uaaRestClientProperties, interceptors, errorHandlers, messageConverters, null, new CacheNameMapper[0]);
-	}
-
-	/**
-	 * @deprecated This constructor will be made private in a future release.
-	 *             Use {@link UAARestClientFactoryBuilder} to create instances instead.
-	 */
-	@Deprecated(since = "9.2.0")
-	public UAARestClientFactory(UAARestClientProperties uaaRestClientProperties, ClientHttpRequestInterceptor[] interceptors,
-		List<HttpMessageConverter<?>> messageConverters, ResponseErrorHandler[] errorHandlers)
-		throws GeneralSecurityException, IOException {
-		init(uaaRestClientProperties, null, interceptors, messageConverters, errorHandlers);
-	}
-
-	/**
-	 * @deprecated This constructor will be made private in a future release.
-	 *             Use {@link UAARestClientFactoryBuilder} to create instances instead.
-	 */
-	@Deprecated(since = "9.2.0")
-	public UAARestClientFactory(UAARestClientProperties uaaRestClientProperties, ClientHttpRequestInterceptor[] interceptors,
+	private UAARestClientFactory(UAARestClientProperties uaaRestClientProperties, ClientHttpRequestInterceptor[] interceptors,
 		ResponseErrorHandler[] errorHandlers, List<HttpMessageConverter<?>> messageConverters, CacheManager cacheManager, CacheNameMapper[] cacheNameMappers
 	) throws GeneralSecurityException, IOException {
 		this(uaaRestClientProperties, null, interceptors, errorHandlers, messageConverters, cacheManager, cacheNameMappers);
 	}
 
-	private void init(UAARestClientProperties uaaRestClientProperties, OkHttpClient okHttpClient, ClientHttpRequestInterceptor[] interceptors,
+	private void init(UAARestClientProperties uaaRestClientProperties, CloseableHttpClient httpClient, ClientHttpRequestInterceptor[] interceptors,
 		List<HttpMessageConverter<?>> messageConverters, ResponseErrorHandler[] errorHandlers)
 		throws GeneralSecurityException, IOException {
 		RestServerConnectorFactoryBuilder restServerConnectorFactoryBuilder = RestServerConnectorFactoryBuilder.create()
 			.withInterceptors(interceptors)
 			.withErrorHandlers(errorHandlers)
 			.withMessageConverters(messageConverters)
-			.withOkHttpClient(createHttpClientContext(uaaRestClientProperties, okHttpClient));
+			.withHttpClient(createHttpClientContext(uaaRestClientProperties, httpClient));
 
 		restServerConnectorFactory = restServerConnectorFactoryBuilder.build();
 
@@ -236,17 +209,17 @@ public class UAARestClientFactory {
 		return ArrayUtils.add(baseHandlers, new UAAResponseErrorHandler());
 	}
 
-	private OkHttpClient createHttpClientContext(UAARestClientProperties uaaRestClientProperties, OkHttpClient okHttpClient)
+	private CloseableHttpClient createHttpClientContext(UAARestClientProperties uaaRestClientProperties, CloseableHttpClient httpClient)
 		throws GeneralSecurityException, IOException {
 		CertificateProperties certificateProperties = uaaRestClientProperties.getAuthenticationConfiguration().getCertificate();
 		KeyStore keyStore = loadKeyStore(certificateProperties.getKeyStore(), certificateProperties.getKeyStorePassword());
 		KeyStore trustStore = loadKeyStore(certificateProperties.getTrustStore(), certificateProperties.getTrustStorePassword());
 
 		if (keyStore == null && trustStore == null) {
-			return okHttpClient;
+			return httpClient;
 		}
 
-		return getOkHttpClientWithSSLContext(okHttpClient, keyStore, certificateProperties.getKeyStorePassword(), trustStore);
+		return createHttpClientWithSSLContext(httpClient, keyStore, certificateProperties.getKeyStorePassword(), trustStore);
 	}
 
 	private KeyStore loadKeyStore(String resourceLocation, String password)
@@ -262,30 +235,38 @@ public class UAARestClientFactory {
 		return ks;
 	}
 
-	private OkHttpClient getOkHttpClientWithSSLContext(OkHttpClient customOkHttpClient, KeyStore keyStore, String keyStorePassword,
+	private CloseableHttpClient createHttpClientWithSSLContext(CloseableHttpClient customHttpClient, KeyStore keyStore, String keyStorePassword,
 		KeyStore trustStore)
 		throws GeneralSecurityException {
-		OkHttpClient.Builder builder = customOkHttpClient != null ?
-			customOkHttpClient.newBuilder() :
-			new OkHttpClient.Builder()
-				.connectTimeout(0, TimeUnit.MILLISECONDS)
-				.readTimeout(0, TimeUnit.MILLISECONDS)
-				.writeTimeout(0, TimeUnit.MILLISECONDS);
-		SSLContext sslContext = SSLContext.getInstance("TLS");
 
-		KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-		kmf.init(keyStore, Optional.ofNullable(keyStorePassword).orElse("").toCharArray());
+		if (customHttpClient != null) {
+			// If a custom client is provided, we can't easily modify it, so we create a new one with SSL
+			LOGGER.warn("Custom HttpClient provided but SSL context needs to be configured. Creating new HttpClient with SSL.");
+		}
 
-		TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-		tmf.init(trustStore);
-		X509TrustManager trustManager = (X509TrustManager) tmf.getTrustManagers()[0];
+		try {
+			SSLContextBuilder sslContextBuilder = SSLContextBuilder.create();
 
-		sslContext.init(keyStore != null ? kmf.getKeyManagers() : null,
-			trustStore != null ? tmf.getTrustManagers() : null,
-			new SecureRandom());
+			if (keyStore != null) {
+				sslContextBuilder.loadKeyMaterial(keyStore, Optional.ofNullable(keyStorePassword).orElse("").toCharArray());
+			}
 
-		builder.sslSocketFactory(sslContext.getSocketFactory(), trustManager);
-		return builder.build();
+			if (trustStore != null) {
+				sslContextBuilder.loadTrustMaterial(trustStore, null);
+			}
+
+			SSLContext sslContext = sslContextBuilder.build();
+
+			HttpClientConnectionManager connectionManager = PoolingHttpClientConnectionManagerBuilder.create()
+				.setTlsSocketStrategy(new DefaultClientTlsStrategy(sslContext))
+				.build();
+
+			return HttpClients.custom()
+				.setConnectionManager(connectionManager)
+				.build();
+		} catch (Exception e) {
+			throw new GeneralSecurityException("Failed to create HttpClient with SSL context", e);
+		}
 	}
 
 }

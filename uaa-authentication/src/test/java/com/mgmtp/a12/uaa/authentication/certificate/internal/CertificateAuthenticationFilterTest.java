@@ -91,6 +91,7 @@ public class CertificateAuthenticationFilterTest {
 			throw new RuntimeException(e);
 		}
 		request.setAttribute("jakarta.servlet.request.X509Certificate", new X509Certificate[] { cert });
+		request.setRequestURI("/api/aUrl");
 		request.setServletPath("/api/aUrl");
 		UAAPrincipal userDetail = new UAAPrincipal<>("admin", "*****", convertAuthorities("Admin;Manager"));
 		token = new UsernamePasswordAuthenticationToken(userDetail, null);

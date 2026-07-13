@@ -236,7 +236,6 @@ public class UAARestClientPropertiesBuilder {
 		if (tokenConfiguration != null) {
 			uaaRestClientProperties.setAuthorizationHeaderName(tokenConfiguration.getAuthorizationHeaderName());
 			uaaRestClientProperties.setGeneratedTokenHeaderName(tokenConfiguration.getGeneratedTokenHeaderName());
-			uaaRestClientProperties.setGeneratedTokenExpirationHeaderName(tokenConfiguration.getGeneratedTokenExpirationHeaderName());
 		}
 
 		uaaRestClientProperties.setAuthenticationConfiguration(restClientAuthenticationProperties);

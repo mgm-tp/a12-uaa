@@ -27,7 +27,7 @@
         "#region = (hasRole('REGION_MANAGER') ? principal.region : '')",
         "#username = (hasRole('REGION_MANAGER') || hasRole('GUEST') ? principal.username : '')"
       ],
-      "template-refs": [
+      "templates": [
         "Admin_Guest_RegionManager"
       ]
     }

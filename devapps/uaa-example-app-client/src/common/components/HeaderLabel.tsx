@@ -30,17 +30,17 @@
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 import * as React from "react";
-import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react/lib/main/index.js";
+import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react";
 import { currentVersion } from "../version.js";
 
 export const HeaderLabel: React.FC = () => {
-  const { localizer } = React.useContext(LocalizerContext);
+	const { localizer } = React.useContext(LocalizerContext);
 
-  const localize = (key: string) => localizer({ key });
+	const localize = (key: string) => localizer({ key });
 
-  return (
-    <span>
+	return (
+		<span>
       {localize("headerLabel")} - {localize("versionLabel")} {currentVersion}
     </span>
-  );
+	);
 };

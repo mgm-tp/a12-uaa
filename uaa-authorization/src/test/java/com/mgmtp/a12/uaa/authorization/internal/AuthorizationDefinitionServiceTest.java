@@ -46,10 +46,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mgmtp.a12.uaa.authorization.AuthorizationDefinitionService;
 import com.mgmtp.a12.uaa.authorization.model.AuthorizationDefinition;
 import com.mgmtp.a12.uaa.authorization.model.internal.AuthorizationDefinitionAdapter;
+
+import tools.jackson.databind.ObjectMapper;
 
 @ExtendWith(SpringExtension.class)
 public class AuthorizationDefinitionServiceTest {

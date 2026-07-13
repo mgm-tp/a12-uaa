@@ -118,13 +118,13 @@ public class TokenHandlingController {
 			.map(Optional::get)
 			.map(jwtToken -> jwtTokenVerifier.unpackToken(jwtToken))
 			.map(jwtTokenData -> {
-				String tokenExpiration = String.valueOf(jwtTokenData.getExpirationTime().toEpochMilli());
 				String tokenRenewInSeconds = String.valueOf(jwtTokenData.getExpirationSeconds() - jwtTokenData.getTokenRenewThresholdInSeconds());
+				String tokenExpirationInSeconds = String.valueOf(jwtTokenData.getExpirationSeconds());
 				CookieUtil.removeCookie(AUTHORIZATION_CODE, request, response);
 				return ResponseEntity.status(HttpStatus.OK)
 					.header(UAAAuthenticationSuccessHandler.TOKEN_KEY, jwtTokenData.getToken())
-					.header(UAAAuthenticationSuccessHandler.TOKEN_EXPIRATION_KEY, tokenExpiration)
 					.header(UAAAuthenticationSuccessHandler.TOKEN_RENEW_IN_SECONDS, tokenRenewInSeconds)
+					.header(UAAAuthenticationSuccessHandler.TOKEN_EXPIRATION_IN_SECONDS, tokenExpirationInSeconds)
 					.body("OK");
 			}).orElseGet(() -> {
 				codeExchangeFailedRedirect(request, response);
@@ -156,12 +156,12 @@ public class TokenHandlingController {
 			.filter(renewTokenService -> renewTokenService.isRequestTokenValid(code, codeVerifier))
 			.map(renewTokenService -> {
 				JwtTokenData tokenData = renewTokenService.generateNewToken(code);
-				String expiration = String.valueOf(tokenData.getExpirationTime().toEpochMilli());
 				String tokenRenewInSeconds = String.valueOf(tokenData.getExpirationSeconds() - tokenData.getTokenRenewThresholdInSeconds());
+				String tokenExpirationInSeconds = String.valueOf(tokenData.getExpirationSeconds());
 				HashMap<String, String> responseBody = new HashMap<>();
 				responseBody.put(UAAAuthenticationSuccessHandler.TOKEN_KEY, tokenData.getToken());
-				responseBody.put(UAAAuthenticationSuccessHandler.TOKEN_EXPIRATION_KEY, expiration);
 				responseBody.put(UAAAuthenticationSuccessHandler.TOKEN_RENEW_IN_SECONDS, tokenRenewInSeconds);
+				responseBody.put(UAAAuthenticationSuccessHandler.TOKEN_EXPIRATION_IN_SECONDS, tokenExpirationInSeconds);
 				return ResponseEntity.status(HttpStatus.OK).body(responseBody);
 			}).orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
 	}

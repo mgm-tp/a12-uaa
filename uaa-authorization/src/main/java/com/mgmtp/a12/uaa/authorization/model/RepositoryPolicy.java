@@ -37,23 +37,18 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import tools.jackson.databind.annotation.JsonDeserialize;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-	"templates",
-	"template-refs"
+	"templates"
 })
 public class RepositoryPolicy extends AbstractPolicy {
 
 	@JsonDeserialize(as = LinkedHashSet.class)
 	@JsonProperty("templates")
 	private Set<String> templates = new LinkedHashSet<>();
-
-	@Deprecated(since = "8.2.0")
-	@JsonDeserialize(as = LinkedHashSet.class)
-	@JsonProperty("template-refs")
-	private Set<String> templateRefs = new LinkedHashSet<>();
 
 	public Set<String> getTemplates() {
 		return templates;
@@ -63,18 +58,8 @@ public class RepositoryPolicy extends AbstractPolicy {
 		this.templates = templates;
 	}
 
-	@Deprecated(since = "8.2.0")
-	public Set<String> getTemplateRefs() {
-		return templateRefs;
-	}
-
-	@Deprecated(since = "8.2.0")
-	void setTemplateRefs(Set<String> templateRefs) {
-		this.templateRefs = templateRefs;
-	}
-
 	@Override
 	public String toString() {
-		return super.toString() + " RepositoryPolicy [templates=" + templates + ", templateRefs=" + templateRefs + "]";
+		return super.toString() + " RepositoryPolicy [templates=" + templates + "]";
 	}
 }

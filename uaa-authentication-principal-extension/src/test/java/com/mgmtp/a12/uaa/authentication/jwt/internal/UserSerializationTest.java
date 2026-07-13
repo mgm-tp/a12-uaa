@@ -31,8 +31,8 @@
  */
 package com.mgmtp.a12.uaa.authentication.jwt.internal;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import jakarta.inject.Inject;
 
@@ -43,7 +43,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.mgmtp.a12.uaa.authentication.AuthenticationProperties;
@@ -54,6 +53,7 @@ import com.mgmtp.a12.uaa.authentication.jwt.JwtTokenStorage;
 import com.mgmtp.a12.uaa.authentication.jwt.encryption.internal.BypassingEncoder;
 import com.mgmtp.a12.uaa.authentication.principal.ExtendedPrincipal;
 import com.mgmtp.a12.uaa.authentication.principal.PrincipalFactory;
+import com.mgmtp.a12.uaa.authentication.principal.Role;
 import com.mgmtp.a12.uaa.authentication.principal.internal.UAAPrincipalFactory;
 
 @ExtendWith(SpringExtension.class)
@@ -67,7 +67,7 @@ public class UserSerializationTest {
 
 	@Test
 	public void checkUserSerialization() {
-		Collection<GrantedAuthority> grantedAuthorities = Arrays.asList(new SimpleGrantedAuthority("rest_role"));
+		Collection<GrantedAuthority> grantedAuthorities = List.of(new Role.Builder("rest_role").build());
 		String extendedData = "extendedData";
 		ExtendedPrincipal principal = new ExtendedPrincipal("test", "pwd", grantedAuthorities, extendedData);
 		principal.setEmail("email");

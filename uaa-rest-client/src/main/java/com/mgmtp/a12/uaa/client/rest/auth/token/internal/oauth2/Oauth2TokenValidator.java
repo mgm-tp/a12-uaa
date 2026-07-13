@@ -33,11 +33,8 @@ package com.mgmtp.a12.uaa.client.rest.auth.token.internal.oauth2;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
 import com.mgmtp.a12.uaa.client.rest.auth.TokenValidator;
 import com.mgmtp.a12.uaa.client.rest.auth.token.internal.TokenType;
@@ -51,7 +48,7 @@ public class Oauth2TokenValidator implements TokenValidator {
 
 	private OidcProperties.BaseOauth2ClientTypeProperties baseOauth2ClientType;
 	private String TOKEN_RELATIVE_URL = "userinfo";
-	private RestTemplate restTemplate = new RestTemplate();
+	private RestClient restClient = RestClient.create();
 
 	public Oauth2TokenValidator(OidcProperties.BaseOauth2ClientTypeProperties baseOauth2ClientType) {
 		this.baseOauth2ClientType = baseOauth2ClientType;
@@ -61,13 +58,12 @@ public class Oauth2TokenValidator implements TokenValidator {
 	public boolean isTokenValid(String token) {
 		String tokenValidUrl = URLUtils.getFullUrl(URLUtils.getIdpBaseUrl(baseOauth2ClientType), TOKEN_RELATIVE_URL);
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.add(KEY_AUTHORIZATION, "%s %s".formatted(TokenType.BEARER.getTypeName(), token));
-
-		HttpEntity<String> request = new HttpEntity<>(headers);
-
 		try {
-			restTemplate.exchange(tokenValidUrl, HttpMethod.GET, request, String.class);
+			restClient.get()
+				.uri(tokenValidUrl)
+				.header(KEY_AUTHORIZATION, "%s %s".formatted(TokenType.BEARER.getTypeName(), token))
+				.retrieve()
+				.toBodilessEntity();
 			LOGGER.info("OAUTH2 Authentication token is valid");
 			return true;
 		} catch (HttpClientErrorException e) {

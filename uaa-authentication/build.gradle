@@ -7,6 +7,10 @@ tasks.withType(JavaCompile) {
     options.compilerArgs.add("-parameters")
 }
 
+tasks.withType(Test) {
+    useJUnitPlatform()
+}
+
 dependencies {
 	api(libs.opensamlSecurityExt) {
 		exclude group: 'org.apache.httpcomponents.client5', module: 'httpclient5'
@@ -18,6 +22,8 @@ dependencies {
 	api libs.springLdapCore
 	api libs.springSecurityLdap
 	api libs.springSecurityConfig
+	api libs.springStarterOauth2Cl
+	api libs.springStarterOauth2RS
 	api libs.springSecurityOauth2Rs
 	api libs.springSecurityOauth2Client
 	// force use json-smart version. Will be delete in the future

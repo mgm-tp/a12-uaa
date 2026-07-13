@@ -36,7 +36,7 @@ import {
 	RestRequestPayload,
 	RestServerConnector
 } from "@com.mgmtp.a12.utils/utils-connector";
-import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging/lib/factory.js";
+import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging";
 
 import * as UaaActions from "../actions.js";
 import * as UaaRequest from "../utils/request.js";

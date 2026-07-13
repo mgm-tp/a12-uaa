@@ -4,15 +4,15 @@
 
 ```ts
 
-import { ActionCreator } from 'typescript-fsa';
-import { AnyAction } from 'typescript-fsa';
-import { AnyAction as AnyAction_2 } from 'redux';
+import type { Action } from 'redux';
+import { ActionCreator } from '@com.mgmtp.a12.client/typescript-fsa-redux-5-compat';
+import { AnyAction } from 'redux';
 import { Dispatch } from 'redux';
-import { HeaderTriggerProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/button/main/header-trigger/header-trigger.api.js';
+import { HeaderTriggerProps } from '@com.mgmtp.a12.widgets/widgets-core';
 import { JSX } from 'react/jsx-runtime';
 import { JSX as JSX_2 } from 'react';
 import { Middleware } from 'redux';
-import { PopUpMenuProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/pop-up-menu/main/pop-up-menu.api.js';
+import { PopUpMenuProps } from '@com.mgmtp.a12.widgets/widgets-core';
 import { default as React_2 } from 'react';
 import * as React_3 from 'react';
 import { Reducer } from 'redux';
@@ -21,7 +21,7 @@ import { RequestFilterPayload } from '@com.mgmtp.a12.utils/utils-connector';
 import { RequestFilterResult } from '@com.mgmtp.a12.utils/utils-connector';
 import { ResponseFilter } from '@com.mgmtp.a12.utils/utils-connector';
 import { ResponseFilterResult } from '@com.mgmtp.a12.utils/utils-connector';
-import { SagaIterator } from 'redux-saga';
+import { SagaGenerator } from 'typed-redux-saga';
 import { ServerConnector } from '@com.mgmtp.a12.utils/utils-connector';
 import { SigninPopupArgs } from 'oidc-client-ts';
 import { SigninRedirectArgs } from 'oidc-client-ts';
@@ -172,7 +172,7 @@ const loggingInLDAP: ActionCreator<UserLoggingInPayload>;
 const loggingInLocal: ActionCreator<UserLoggingInPayload>;
 
 // @public (undocumented)
-const loggingInOIDC: ActionCreator<SigninPopupArgs | SigninRedirectArgs | undefined>;
+const loggingInOIDC: ActionCreator<void | SigninRedirectArgs | SigninPopupArgs>;
 
 // @public (undocumented)
 const loggingInSAML: ActionCreator<void>;
@@ -331,14 +331,14 @@ export interface SelfConfigure {
 export enum SessionStorageKeys {
     // (undocumented)
     ACCESS_TOKEN = "access_token",
-    // @deprecated (undocumented)
-    ACCESS_TOKEN_EXPIRATION = "access_token_expiration",
     // (undocumented)
     AUTHENTICATION_TYPE = "authenticationType",
     // (undocumented)
     SELF_CONFIGURE = "selfConfigure",
-    // @deprecated (undocumented)
-    TOKEN_RENEW_IN_SECONDS = "token_renew_in_seconds",
+    // (undocumented)
+    TOKEN_EXPIRATION_IN_SECONDS = "token_expiration_in_seconds",
+    // (undocumented)
+    TOKEN_EXPIRATION_TIMESTAMP = "token_expiration_timestamp",
     // (undocumented)
     TOKEN_RENEW_TIMESTAMP = "token_renew_timestamp"
 }
@@ -399,7 +399,6 @@ class TokenResponseFilter implements ResponseFilter {
 export interface TokenSelfConfigure {
     readonly allowCredentials?: boolean;
     readonly authorizationHeaderName?: string;
-    readonly generatedTokenExpirationHeaderName?: string;
     readonly generatedTokenHeaderName?: string;
     readonly tokenType?: string;
 }
@@ -606,12 +605,12 @@ export type UaaOidcUser = User & {
 export const UaaProvider: React_2.FC<ProviderProps>;
 
 // @public
-export function UaaReducer(slice: UaaSlice | undefined, action: AnyAction_2): UaaSlice;
+export function UaaReducer(slice: UaaSlice | undefined, action: AnyAction): UaaSlice;
 
 // @public (undocumented)
 export type UaaSagaDescriptor = {
-    canHandle(action: AnyAction): boolean;
-    handle(action: AnyAction): SagaIterator<void>;
+    canHandle(action: Action): boolean;
+    handle(action: Action): SagaGenerator<void>;
 };
 
 // @public
@@ -706,10 +705,10 @@ interface UpdateIdTokenPayload {
 }
 
 // @public (undocumented)
-const updateUserInfo: ActionCreator<UaaUser | UaaExtendedUser | UaaOidcUser | UaaOidcModifiedUser>;
+const updateUserInfo: ActionCreator<UaaOidcModifiedUser | UaaUser | UaaExtendedUser | UaaOidcUser>;
 
 // @public
-const user: ConfigurableSelector<UaaUser | UaaExtendedUser | UaaOidcUser | UaaOidcModifiedUser>;
+const user: ConfigurableSelector<UaaOidcModifiedUser | UaaUser | UaaExtendedUser | UaaOidcUser>;
 
 // @public (undocumented)
 export const UserInfoHeader: (props: UserInfoHeaderProps) => JSX_2.Element | null;

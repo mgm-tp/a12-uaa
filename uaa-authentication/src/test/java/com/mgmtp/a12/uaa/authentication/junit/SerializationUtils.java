@@ -41,11 +41,14 @@ import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Assertions;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.util.DefaultIndenter;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+
+import tools.jackson.core.util.DefaultIndenter;
+import tools.jackson.core.util.DefaultPrettyPrinter;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 public class SerializationUtils {
 	public static ObjectMapper MAPPER = createConfiguredObjectMapper();
@@ -61,21 +64,26 @@ public class SerializationUtils {
 
 	public static void assertSerializationFromString(final String expected, Object objectToSerialize) throws IOException {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		MAPPER.writer(printer).writeValue(outputStream, objectToSerialize);
+		MAPPER.writer().with(printer).writeValue(outputStream, objectToSerialize);
 		String actual = outputStream.toString();
 		Assertions.assertEquals(expected, actual);
 	}
 
 	static private ObjectMapper createConfiguredObjectMapper() {
-		return new ObjectMapper()
+		return JsonMapper.builder()
 			// Deserialization (json -> Object)
-			.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-			.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
+			.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+			.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
 			.enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)
+
 			// Serialization (Object -> json)
-			.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
-			.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-			.setSerializationInclusion(JsonInclude.Include.NON_NULL)
-			.enable(SerializationFeature.INDENT_OUTPUT);
+			.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+			.disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+			.changeDefaultPropertyInclusion(incl ->
+				incl.withValueInclusion(JsonInclude.Include.NON_NULL))
+			.changeDefaultPropertyInclusion(incl ->
+				incl.withContentInclusion(JsonInclude.Include.NON_NULL))
+			.enable(SerializationFeature.INDENT_OUTPUT)
+			.build();
 	}
 }

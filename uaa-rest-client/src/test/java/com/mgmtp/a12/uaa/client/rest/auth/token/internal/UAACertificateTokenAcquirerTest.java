@@ -67,7 +67,6 @@ public class UAACertificateTokenAcquirerTest {
 			String keyStore = Base64.getEncoder().encodeToString(bytes);
 			Assertions.assertEquals(keyStore, authorizationData.getAuthenticationToken());
 			Assertions.assertNull(authorizationData.getAuthenticationTokenType());
-			Assertions.assertNull(authorizationData.getAuthenticationTokenExpiration());
 			Assertions.assertNull(authorizationData.getSessionId());
 		}
 	}

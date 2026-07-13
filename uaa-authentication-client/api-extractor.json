@@ -5,7 +5,7 @@
 	"bundledPackages": [],
 	"newlineKind": "lf",
 	"compiler": {
-		"tsconfigFilePath": "./tsconfig.json"
+		"tsconfigFilePath": "./tsconfig.api-extractor.json"
 	},
 	"apiReport": {
 		"enabled": true,

@@ -43,7 +43,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
 import com.mgmtp.a12.uaa.authentication.AuthenticationType;
 import com.mgmtp.a12.uaa.authentication.internal.RedirectSupport;
@@ -51,7 +51,6 @@ import com.mgmtp.a12.uaa.authentication.internal.StandardJsonHandler;
 
 public class UAAAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
-	private static final String METHOD = "POST";
 	private static final String URL_LOGIN_TEMPLATE = "/user/%s/login";
 	private AuthenticationType type;
 	private StandardJsonHandler standardJsonHandler;
@@ -59,7 +58,9 @@ public class UAAAuthenticationFilter extends AbstractAuthenticationProcessingFil
 
 	public UAAAuthenticationFilter(String context, RedirectSupport loginRedirectSupport, AuthenticationManager authenticationManager,
 		StandardJsonHandler standardJsonHandler, AuthenticationType type) {
-		super(new AntPathRequestMatcher(context + URL_LOGIN_TEMPLATE.formatted(StringUtils.lowerCase(type.name())), METHOD), authenticationManager);
+		super(PathPatternRequestMatcher.withDefaults()
+				.matcher(org.springframework.http.HttpMethod.POST, context + URL_LOGIN_TEMPLATE.formatted(StringUtils.lowerCase(type.name()))),
+			authenticationManager);
 		this.type = type;
 		this.standardJsonHandler = standardJsonHandler;
 		this.loginRedirectSupport = loginRedirectSupport;

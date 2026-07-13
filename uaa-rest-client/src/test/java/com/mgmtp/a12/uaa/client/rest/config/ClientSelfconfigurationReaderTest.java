@@ -37,12 +37,10 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedConstruction;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
 import com.mgmtp.a12.uaa.client.rest.auth.token.internal.TokenType;
 import com.mgmtp.a12.uaa.client.rest.auth.token.internal.oauth2.ClientType;
@@ -97,9 +95,18 @@ public class ClientSelfconfigurationReaderTest {
 
 	@Test
 	void readSelfconfigurationTestSuccessful() {
-		try (MockedConstruction<RestTemplate> mockedConstruction = Mockito.mockConstruction(RestTemplate.class,
-			(restTemplate, context) -> Mockito.when(restTemplate.getForEntity(Mockito.anyString(), Mockito.any()))
-				.thenReturn(new ResponseEntity<>(clientSelfconfiguration, HttpStatus.OK)))) {
+		RestClient restClient = Mockito.mock(RestClient.class);
+		RestClient.RequestHeadersUriSpec requestHeadersUriSpec = Mockito.mock(RestClient.RequestHeadersUriSpec.class);
+		RestClient.RequestHeadersSpec requestHeadersSpec = Mockito.mock(RestClient.RequestHeadersSpec.class);
+		RestClient.ResponseSpec responseSpec = Mockito.mock(RestClient.ResponseSpec.class);
+
+		try (MockedStatic<RestClient> mockedStatic = Mockito.mockStatic(RestClient.class)) {
+			mockedStatic.when(RestClient::create).thenReturn(restClient);
+			Mockito.when(restClient.get()).thenReturn(requestHeadersUriSpec);
+			Mockito.when(requestHeadersUriSpec.uri(Mockito.anyString())).thenReturn(requestHeadersSpec);
+			Mockito.when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+			Mockito.when(responseSpec.onStatus(Mockito.any(), Mockito.any())).thenReturn(responseSpec);
+			Mockito.when(responseSpec.body(ClientSelfconfiguration.class)).thenReturn(clientSelfconfiguration);
 
 			UAARestClientProperties uaaRestClientProperties = selfconfigurationReader.readSelfconfiguration(
 				SELF_CONFIGURE_URL,
@@ -118,19 +125,27 @@ public class ClientSelfconfigurationReaderTest {
 			Assertions.assertEquals(
 				clientSelfconfiguration.getOidc().getPublicClient().getSsoConfiguration().getPasswordXpath(),
 				authenticationConfiguration.getOidc().getPublicClient().getSsoConfiguration().getPasswordXpath());
-			Assertions.assertEquals(1, mockedConstruction.constructed().size());
 		}
 	}
 
 	@Test
 	void readSelfconfigurationTestFail() {
-		try (MockedConstruction<RestTemplate> mockedConstruction = Mockito.mockConstruction(RestTemplate.class,
-			(restTemplate, context) -> Mockito.when(restTemplate.getForEntity(Mockito.anyString(), Mockito.any())).thenThrow(RestClientException.class))) {
+		RestClient restClient = Mockito.mock(RestClient.class);
+		RestClient.RequestHeadersUriSpec requestHeadersUriSpec = Mockito.mock(RestClient.RequestHeadersUriSpec.class);
+		RestClient.RequestHeadersSpec requestHeadersSpec = Mockito.mock(RestClient.RequestHeadersSpec.class);
+		RestClient.ResponseSpec responseSpec = Mockito.mock(RestClient.ResponseSpec.class);
+
+		try (MockedStatic<RestClient> mockedStatic = Mockito.mockStatic(RestClient.class)) {
+			mockedStatic.when(RestClient::create).thenReturn(restClient);
+			Mockito.when(restClient.get()).thenReturn(requestHeadersUriSpec);
+			Mockito.when(requestHeadersUriSpec.uri(Mockito.anyString())).thenReturn(requestHeadersSpec);
+			Mockito.when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+			Mockito.when(responseSpec.onStatus(Mockito.any(), Mockito.any())).thenReturn(responseSpec);
+			Mockito.when(responseSpec.body(ClientSelfconfiguration.class)).thenThrow(RestClientException.class);
 
 			RuntimeException runtimeException = Assertions.assertThrows(RuntimeException.class, () -> selfconfigurationReader
 				.readSelfconfiguration(SELF_CONFIGURE_URL, BASE_URL, "admin", "admin", AuthenticationType.OAUTH2.name(),
 					"abc123", ClientType.PUBLIC, null, "Authorization"));
-			Assertions.assertEquals(1, mockedConstruction.constructed().size());
 		}
 	}
 

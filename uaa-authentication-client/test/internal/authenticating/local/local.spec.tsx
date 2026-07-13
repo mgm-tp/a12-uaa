@@ -227,7 +227,10 @@ describe("LOCAL authenticating test", function () {
 	// TODO: This test never completed its async flow (mocha version called done() synchronously)
 	it.skip("Silent renew token successfully", async function () {
 		sessionStorage.setItem("access_token", access_token);
-		sessionStorage.setItem("access_token_expiration", "10000000");
+		sessionStorage.setItem(
+			"token_renew_timestamp",
+			String(Date.now() + 10000000)
+		);
 		fetchMock.mock(
 			url => {
 				const results = url.match(regex_authorize_url);
@@ -278,7 +281,7 @@ describe("LOCAL authenticating test", function () {
 						status: 200,
 						body: {
 							access_token: "new access_token",
-							access_token_expiration: 1000000
+							token_renew_in_seconds: 1000
 						}
 					};
 				}

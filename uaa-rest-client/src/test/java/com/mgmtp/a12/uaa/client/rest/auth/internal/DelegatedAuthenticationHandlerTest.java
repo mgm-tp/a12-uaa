@@ -31,7 +31,6 @@
  */
 package com.mgmtp.a12.uaa.client.rest.auth.internal;
 
-import java.time.Instant;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -51,7 +50,7 @@ public class DelegatedAuthenticationHandlerTest {
 
 	private DelegatedAuthenticationHandler delegatedAuthenticationHandler = new DelegatedAuthenticationHandler();
 	private AuthorizationDataStore credentialsContext = new ThreadLocalAuthorizationDataStore();
-	private AuthorizationData authorizationData = new AuthorizationData("tokenData", Instant.now(), TokenType.BEARER, "sessionData");
+	private AuthorizationData authorizationData = new AuthorizationData("tokenData", TokenType.BEARER, "sessionData", 300);
 	private MockedStatic<AuthorizationDataHolder> authorizationDataHolder;
 
 	@BeforeEach

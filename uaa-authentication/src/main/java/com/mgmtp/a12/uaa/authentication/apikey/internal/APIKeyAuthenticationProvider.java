@@ -39,16 +39,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.mgmtp.a12.uaa.authentication.apikey.APIKeyConverter;
 import com.mgmtp.a12.uaa.authentication.apikey.APIKeyValidator;
-import com.mgmtp.a12.uaa.authentication.certificate.CertificateConverter;
 
 public class APIKeyAuthenticationProvider implements AuthenticationProvider {
 
-	private CertificateConverter apiKeyConverter;
+	private APIKeyConverter apiKeyConverter;
 	private RootCAManager rootCAManager;
 	private APIKeyValidator apiKeyValidator;
 
-	public APIKeyAuthenticationProvider(CertificateConverter apiKeyConverter, RootCAManager rootCAManager,
+	public APIKeyAuthenticationProvider(APIKeyConverter apiKeyConverter, RootCAManager rootCAManager,
 		APIKeyValidator apiKeyValidator) {
 		this.apiKeyConverter = apiKeyConverter;
 		this.rootCAManager = rootCAManager;

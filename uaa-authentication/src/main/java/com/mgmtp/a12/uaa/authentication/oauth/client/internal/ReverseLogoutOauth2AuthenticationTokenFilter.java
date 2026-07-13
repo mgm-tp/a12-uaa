@@ -38,9 +38,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
 import com.mgmtp.a12.uaa.authentication.filter.AbstractPathFilter;
 import com.mgmtp.a12.uaa.authentication.oauth.client.UaaOauth2ClientAuthenticationToken;
@@ -50,7 +51,7 @@ public class ReverseLogoutOauth2AuthenticationTokenFilter extends AbstractPathFi
 	private static final String URL_LOGOUT = "/logout";
 
 	public ReverseLogoutOauth2AuthenticationTokenFilter() {
-		super(new AntPathRequestMatcher(URL_LOGOUT, "GET"));
+		super(PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, URL_LOGOUT));
 	}
 
 	@Override protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain)

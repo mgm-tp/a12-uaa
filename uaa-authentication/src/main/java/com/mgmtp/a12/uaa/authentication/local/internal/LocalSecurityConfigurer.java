@@ -73,7 +73,7 @@ public class LocalSecurityConfigurer extends UAASecurityConfigurer<LocalSecurity
 	private RedirectSupport loginRedirectSupport;
 
 	@Override
-	public void configure(HttpSecurity http) throws Exception {
+	public void configure(HttpSecurity http) {
 		if (authenticationProperties.getJwt().getTokenEndpoints().isEnabled()) {
 			http
 				.addFilterBefore(createLocalAuthenticationFilter(getAuthenticationManager(http)), UsernamePasswordAuthenticationFilter.class);
@@ -99,7 +99,7 @@ public class LocalSecurityConfigurer extends UAASecurityConfigurer<LocalSecurity
 		return new UAAAuthenticationSuccessHandler(new ManualRedirectStrategy());
 	}
 
-	private UAAAuthenticationFilter createLocalAuthenticationFilter(AuthenticationManager authenticationManager) throws Exception {
+	private UAAAuthenticationFilter createLocalAuthenticationFilter(AuthenticationManager authenticationManager) {
 		UAAAuthenticationFilter filter =
 			new UAAAuthenticationFilter(authenticationProperties.getContextPath(), loginRedirectSupport, authenticationManager, standardJsonHandler,
 				AuthenticationType.LOCAL);

@@ -47,7 +47,7 @@ import org.springframework.security.data.repository.query.SecurityEvaluationCont
 import com.mgmtp.a12.uaa.authentication.AuthenticationType;
 import com.mgmtp.a12.uaa.authentication.ConditionalOnAuthentication;
 import com.mgmtp.a12.uaa.authentication.principal.PrincipalFactory;
-import com.mgmtp.a12.uaa.authentication.principal.internal.serialization.UAAJacksonModule;
+import com.mgmtp.a12.uaa.authentication.principal.UAAJacksonModule;
 import com.mgmtp.a12.uaa.authentication.user.LocalUserLoader;
 import com.mgmtp.a12.uaa.example.authentication.local.principal_extension.ExtendedLocalUser;
 import com.mgmtp.a12.uaa.example.authentication.local.principal_extension.ExtendedLocalUserLoader;

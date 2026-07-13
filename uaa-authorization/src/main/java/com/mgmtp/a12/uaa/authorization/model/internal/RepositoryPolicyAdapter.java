@@ -41,10 +41,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.gson.Gson;
 import com.mgmtp.a12.uaa.authorization.exception.InvalidAuthorizationDefinitionException;
 import com.mgmtp.a12.uaa.authorization.model.RepositoryPolicy;
+
+import tools.jackson.databind.annotation.JsonDeserialize;
 
 public class RepositoryPolicyAdapter extends RepositoryPolicy {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RepositoryPolicyAdapter.class);

@@ -31,7 +31,7 @@
  */
 import "../common/dev.config.js";
 import "../common/ServiceWorker.js";
-import "@com.mgmtp.a12.widgets/widgets-core/lib/theme/basic.css";
+import "@com.mgmtp.a12.widgets/widgets-core/styles/basic.css";
 
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
@@ -64,6 +64,7 @@ const initialConfig: A12ApplicationConfig = {
 };
 
 const { store, Component, initialActions } = createA12ApplicationSetup(
+
   combineFeatures(
     withModel(appModel),
     withReducerMap({ appReducer: Localization.localeReducer }),

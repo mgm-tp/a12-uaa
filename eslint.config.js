@@ -39,7 +39,7 @@ import { fixupPluginRules } from "@eslint/compat";
 import unusedImports from "eslint-plugin-unused-imports";
 import typedReduxSaga from "@jambit/eslint-plugin-typed-redux-saga";
 
-import { strict as devtoolsStrict } from "@com.mgmtp.a12.devtools/eslint-config";
+import { reactStrict as devtoolsReactStrict } from "@com.mgmtp.a12.devtools/eslint-config";
 
 /**
  * @param { import("eslint").Eslint.Plugin } plugin
@@ -68,7 +68,7 @@ const license =
 
 /** @type { import("eslint").Linter.Config[] } */
 export default [
-	...devtoolsStrict,
+	...devtoolsReactStrict,
 	{
 		name: "uaa/ignores",
 		ignores: [

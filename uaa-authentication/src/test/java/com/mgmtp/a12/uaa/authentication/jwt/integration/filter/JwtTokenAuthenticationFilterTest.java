@@ -63,7 +63,7 @@ import com.mgmtp.a12.uaa.authentication.principal.UAAPrincipal;
 import com.mgmtp.a12.uaa.authentication.security.login.internal.UAALoginEntryPoint;
 import com.mgmtp.a12.uaa.authentication.utils.TokenTester;
 import com.mgmtp.a12.uaa.authentication.utils.UserDataCreator;
-import com.mgmtp.a12.uaa.authentication.utils.UserDataCreator.TestExtededData;
+import com.mgmtp.a12.uaa.authentication.utils.UserDataCreator.TestExtendedData;
 
 @ExtendWith(SpringExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -82,7 +82,7 @@ public class JwtTokenAuthenticationFilterTest {
 
 	@Test
 	public void testHeaderExistSupport() throws ServletException, IOException {
-		UAAPrincipal<TestExtededData> user = UserDataCreator.createUser("test", "N/A");
+		UAAPrincipal<TestExtendedData> user = UserDataCreator.createUser("test", "N/A");
 		JwtTokenData tokenData = jwtTokenGenerator.generateToken(user);
 
 		MockHttpServletRequest request = new MockHttpServletRequest();
@@ -96,9 +96,9 @@ public class JwtTokenAuthenticationFilterTest {
 
 	static class PrincipalExistingCheckFilter implements FilterChain {
 
-		private UAAPrincipal<TestExtededData> inputUser;
+		private UAAPrincipal<TestExtendedData> inputUser;
 
-		public PrincipalExistingCheckFilter(UAAPrincipal<TestExtededData> inputUser) {
+		public PrincipalExistingCheckFilter(UAAPrincipal<TestExtendedData> inputUser) {
 			super();
 			this.inputUser = inputUser;
 		}
@@ -106,7 +106,7 @@ public class JwtTokenAuthenticationFilterTest {
 		@Override
 		public void doFilter(ServletRequest request, ServletResponse response) {
 			@SuppressWarnings("unchecked")
-			UAAPrincipal<TestExtededData> userDetails = (UAAPrincipal<TestExtededData>) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			UAAPrincipal<TestExtendedData> userDetails = (UAAPrincipal<TestExtendedData>) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			//password is erased by spring - ProviderManager
 			TokenTester.assertPrincipal(inputUser, userDetails, false, false);
 		}

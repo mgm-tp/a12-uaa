@@ -29,19 +29,19 @@
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
-import { Container } from "@com.mgmtp.a12.widgets/widgets-core/lib/common/main/base-props.js";
+import { Container } from "@com.mgmtp.a12.widgets/widgets-core";
 import {
   defaultDataFormats,
   defaultLocalizerFactory,
   defaultValueConversion,
   Locale,
-} from "@com.mgmtp.a12.utils/utils-localization/lib/main/index.js";
+} from "@com.mgmtp.a12.utils/utils-localization";
 import { useSelector } from "react-redux";
-import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react/lib/main/index.js";
+import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react";
 import {
   A11YLanguageContext,
   getA11yResource,
-} from "@com.mgmtp.a12.widgets/widgets-core/lib/common/main/index.js";
+} from "@com.mgmtp.a12.widgets/widgets-core";
 import { localeJsonResource } from "../localization/resources.js";
 import { Localization } from "../localization/localization.js";
 

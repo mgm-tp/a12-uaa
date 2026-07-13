@@ -31,7 +31,6 @@
  */
 package com.mgmtp.a12.uaa.client.rest.auth.internal.store;
 
-import java.time.Instant;
 import java.util.Collections;
 
 import org.junit.jupiter.api.Assertions;
@@ -52,7 +51,7 @@ public class DelegatingAuthorizationDataStoreTest {
 
 	@BeforeAll
 	void setUp() {
-		authData = new AuthorizationData("tokenData", Instant.now().plusSeconds(99999), TokenType.BEARER, "sessionData");
+		authData = new AuthorizationData("tokenData", TokenType.BEARER, "sessionData", 99999);
 	}
 
 	@Test

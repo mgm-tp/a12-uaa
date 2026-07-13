@@ -44,7 +44,7 @@ import {
   SignInRedirect,
   SignOutRedirect,
 } from "../common/uaa/redirectComponents.js";
-import "@com.mgmtp.a12.widgets/widgets-core/lib/theme/basic.css";
+import "@com.mgmtp.a12.widgets/widgets-core/styles/basic.css";
 import { BrowserRouter } from "react-router-dom";
 import "../common/dev.config.js";
 import {

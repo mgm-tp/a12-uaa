@@ -32,36 +32,21 @@
 package com.mgmtp.a12.uaa.authorization.security.spel.internal;
 
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import com.google.gson.Gson;
-import com.mgmtp.a12.uaa.authorization.AuthorizationDefinitionRepository;
-import com.mgmtp.a12.uaa.authorization.exception.MissingPolicyException;
-import com.mgmtp.a12.uaa.authorization.model.Policy;
 import com.mgmtp.a12.uaa.authorization.model.RepositoryPolicy;
-import com.mgmtp.a12.uaa.authorization.security.PolicyProcessor;
 import com.mgmtp.a12.uaa.authorization.security.RepositoryPolicyProcessor;
 
 public class SpelRepositoryPolicyProcessor extends SpelGenericPolicyProcessor implements RepositoryPolicyProcessor {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(SpelRepositoryPolicyProcessor.class);
-	private final PolicyProcessorResolver policyProcessorResolver;
-	private final AuthorizationDefinitionRepository authorizationDefinitionRepository;
-
-	public SpelRepositoryPolicyProcessor(StandardEvaluationContext evaluationContext, PolicyProcessorResolver policyProcessorResolver,
-		AuthorizationDefinitionRepository authorizationDefinitionRepository) {
+	public SpelRepositoryPolicyProcessor(StandardEvaluationContext evaluationContext) {
 		super(evaluationContext);
-		this.policyProcessorResolver = policyProcessorResolver;
-		this.authorizationDefinitionRepository = authorizationDefinitionRepository;
 	}
 
 	@Override
@@ -92,34 +77,11 @@ public class SpelRepositoryPolicyProcessor extends SpelGenericPolicyProcessor im
 			.map((template) -> new Gson().toJson(template))
 			.collect(Collectors.toSet());
 
-		Set<Policy> policyReferences = resolvePolicyReferences(repositoryPolicy);
-		Set<String> generatedTemplates = policyReferences.stream()
-			.map(policy -> {
-				PolicyProcessor policyProcessor = policyProcessorResolver.resolvePolicyProcessor(policy.getType());
-				return policyProcessor.executeRulesAndGenerateTemplate(policy, resource);
-			})
-			.flatMap(List::stream)
-			.collect(Collectors.toCollection(LinkedHashSet::new));
-
 		processedRepositoryTemplates.addAll(parsedStringTemplates);
 		processedRepositoryTemplates.addAll(parsedJsonObjectTemplates);
-		processedRepositoryTemplates.addAll(generatedTemplates);
 
 		return processedRepositoryTemplates;
 
-	}
-
-	private Set<Policy> resolvePolicyReferences(RepositoryPolicy repositoryPolicy) {
-		Set<String> policyReferences = repositoryPolicy.getTemplateRefs();
-
-		return policyReferences.stream()
-			.filter(StringUtils::isNotBlank)
-			.map(StringUtils::trim)
-			.map(ref -> authorizationDefinitionRepository.getPolicyByName(ref).orElseThrow(() -> {
-				LOGGER.error("Missing policy [{}]", ref);
-				return new MissingPolicyException(ref);
-			}))
-			.collect(Collectors.toCollection(LinkedHashSet::new));
 	}
 
 }

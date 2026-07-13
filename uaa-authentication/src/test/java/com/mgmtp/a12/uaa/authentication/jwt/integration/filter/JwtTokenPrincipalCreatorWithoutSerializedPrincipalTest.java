@@ -47,7 +47,7 @@ import com.mgmtp.a12.uaa.authentication.jwt.internal.JwtTokenVerifier;
 import com.mgmtp.a12.uaa.authentication.principal.UAAPrincipal;
 import com.mgmtp.a12.uaa.authentication.utils.TokenTester;
 import com.mgmtp.a12.uaa.authentication.utils.UserDataCreator;
-import com.mgmtp.a12.uaa.authentication.utils.UserDataCreator.TestExtededData;
+import com.mgmtp.a12.uaa.authentication.utils.UserDataCreator.TestExtendedData;
 
 @ExtendWith(SpringExtension.class)
 public class JwtTokenPrincipalCreatorWithoutSerializedPrincipalTest {
@@ -63,9 +63,9 @@ public class JwtTokenPrincipalCreatorWithoutSerializedPrincipalTest {
 
 	@Test
 	public void testGetPrincipalFromServiceSupport() {
-		UAAPrincipal<TestExtededData> user = UserDataCreator.createUser("test", "password");
+		UAAPrincipal<TestExtendedData> user = UserDataCreator.createUser("test", "password");
 		JwtTokenData tokenData = jwtTokenVerifier.unpackToken(jwtTokenGenerator.generateToken(user).getToken());
-		UAAPrincipal<TestExtededData> rtnUserDetails = (UAAPrincipal<TestExtededData>) jwtTokenPrincipalCreator.createPrincipal(tokenData);
+		UAAPrincipal<TestExtendedData> rtnUserDetails = (UAAPrincipal<TestExtendedData>) jwtTokenPrincipalCreator.createPrincipal(tokenData);
 		Assertions.assertNotEquals(user.getPassword(), rtnUserDetails.getPassword());
 		TokenTester.assertPrincipal(user, rtnUserDetails);
 		Assertions.assertEquals(rtnUserDetails.getAuthorities().size(), user.getAuthorities().size());

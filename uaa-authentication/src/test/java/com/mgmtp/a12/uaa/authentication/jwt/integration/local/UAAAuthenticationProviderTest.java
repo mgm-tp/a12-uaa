@@ -59,7 +59,7 @@ public class UAAAuthenticationProviderTest {
 
 	@Test
 	public void testBadCredentialsExceptionSupport() {
-		UAAPrincipal<UserDataCreator.TestExtededData> userDetails = UserDataCreator.createUser("admin", "admin");
+		UAAPrincipal<UserDataCreator.TestExtendedData> userDetails = UserDataCreator.createUser("admin", "admin");
 		TypedUsernamePasswordAuthenticationToken auth = new TypedUsernamePasswordAuthenticationToken(
 			userDetails, null, AuthenticationType.LOCAL, userDetails.getAuthorities());
 		Assertions.assertThrows(BadCredentialsException.class,

@@ -61,6 +61,14 @@ public class WrappingService {
 		return (firstCall && secondCall);
 	}
 
+	@PreAuthorize("hasUAAPermission('Outer Scope')")
+	public boolean executeBackendSwapInsideAnnotation() {
+		Assertions.assertNotNull(getExecutionEnvironment());
+		boolean elevatedResult = elevatedPermissionService.checkPermissionAfterBackendSwapInJava();
+		Assertions.assertNotNull(getExecutionEnvironment());
+		return elevatedResult;
+	}
+
 	public boolean executeMultipleServicesJava() {
 		Assertions.assertNull(getExecutionEnvironment());
 		boolean firstCall = regularService.executePermissionCheckInJava();

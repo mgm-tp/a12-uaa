@@ -41,7 +41,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.opensaml.saml.saml2.core.AuthnRequest;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher.MatchResult;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -63,7 +63,7 @@ public class UAASamlAuthenticationRequestFilter extends OncePerRequestFilter {
 
 	public UAASamlAuthenticationRequestFilter(String context, RedirectSupport loginRedirectSupport, boolean httpOnly, boolean secured,
 		int cookieLifetimeSeconds) {
-		this.authenticateMatcher = new AntPathRequestMatcher(context + "/saml2/authenticate/*");
+		this.authenticateMatcher = PathPatternRequestMatcher.withDefaults().matcher(context + "/saml2/authenticate/*");
 		this.loginRedirectSupport = loginRedirectSupport;
 		this.httpOnly = httpOnly;
 		this.secured = secured;

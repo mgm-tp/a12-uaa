@@ -75,6 +75,7 @@ public class TokenHandlingControllerTest {
 	private static final String STATE_KEY = "state";
 	private static final String CODE_KEY = "code";
 	private static final String TOKEN_KEY = "access_token";
+	private static final String TOKEN_EXPIRATION_IN_SECONDS = "token_expiration_in_seconds";
 	private static final String TOKEN_RENEW_IN_SECONDS = "token_renew_in_seconds";
 
 	@InjectMocks
@@ -114,6 +115,7 @@ public class TokenHandlingControllerTest {
 	public void init() {
 		AuthenticationProperties.Cors cors = new AuthenticationProperties.Cors();
 		cors.setExposedHeaders(List.of(TOKEN_KEY));
+		cors.setExposedHeaders(List.of(TOKEN_EXPIRATION_IN_SECONDS));
 		cors.setExposedHeaders(List.of(TOKEN_RENEW_IN_SECONDS));
 		Mockito.when(authenticationProperties.getCors()).thenReturn(cors);
 
@@ -142,6 +144,7 @@ public class TokenHandlingControllerTest {
 		ResponseEntity<?> tokenResponse = tokenHandlingController.exchangeAuthorizationCodeToToken(request, response, tokenFormData);
 		Assertions.assertEquals(HttpStatus.OK, tokenResponse.getStatusCode());
 		Assertions.assertEquals("token", tokenResponse.getHeaders().get(TOKEN_KEY).get(0));
+		Assertions.assertEquals(String.valueOf(100), tokenResponse.getHeaders().get(TOKEN_EXPIRATION_IN_SECONDS).get(0));
 		Assertions.assertEquals(String.valueOf(50), tokenResponse.getHeaders().get(TOKEN_RENEW_IN_SECONDS).get(0));
 
 		Mockito.verify(loginRedirectSupport, Mockito.never()).performFailureRedirect(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
@@ -255,6 +258,7 @@ public class TokenHandlingControllerTest {
 			(ResponseEntity<Map>) tokenHandlingController.token(tokenFormData);
 		Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		Assertions.assertEquals("new_token", responseEntity.getBody().get(TOKEN_KEY));
+		Assertions.assertEquals(String.valueOf(100), responseEntity.getBody().get(TOKEN_EXPIRATION_IN_SECONDS));
 		Assertions.assertEquals(String.valueOf(50), responseEntity.getBody().get(TOKEN_RENEW_IN_SECONDS));
 	}
 

@@ -33,13 +33,14 @@ package com.mgmtp.a12.uaa.client.rest.auth.token.internal.oauth2;
 
 import org.htmlunit.Page;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mgmtp.a12.uaa.client.rest.auth.AuthorizationData;
 import com.mgmtp.a12.uaa.client.rest.auth.internal.locator.AuthorizationDataLocator;
 import com.mgmtp.a12.uaa.client.rest.auth.token.internal.TokenType;
 import com.mgmtp.a12.uaa.client.rest.config.properties.OidcProperties;
 import com.mgmtp.a12.uaa.client.rest.config.properties.UAARestClientAuthenticationProperties;
+
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 public class Oauth2ResponseAuthorizationDataLocator implements AuthorizationDataLocator<Page> {
 
@@ -64,7 +65,7 @@ public class Oauth2ResponseAuthorizationDataLocator implements AuthorizationData
 			data.setRefreshToken(tokenResponse.getRefreshToken());
 			data.setOauth2IdToken(tokenResponse.getIdToken());
 			return data;
-		} catch (JsonProcessingException e) {
+		} catch (JacksonException e) {
 			throw new IllegalStateException("Unable to convert token response", e);
 		}
 	}

@@ -110,7 +110,7 @@ export async function validateTextDocumentHandler(
 					character: error.range.end.character
 				}
 			},
-			message: error.message,
+			message: typeof error.message === 'string' ? error.message : error.message.value,
 			source: "json"
 		});
 	});

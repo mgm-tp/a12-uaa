@@ -19,8 +19,7 @@ THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPR
 
 CAUTION: Please have a look at link:/docs/overall/migration_guide/index.html[Migration to latest A12] chapter for an explanation of general steps on how to upgrade before starting with the component migration.
 
-include::migrate-202506.adoc[]
+NOTE: UAA provides https://docs.openrewrite.org[OpenRewrite recipes] for automatic migration of breaking changes.
+Please read link:/docs/overall/migration_guide/index.html#_usage_of_openrewrite_for_backend_components[how to apply OpenRewrite recipes] in A12 backend components.
 
-include::migrate-202506-ext2.adoc[]
-
-include::migrate-202506-ext4.adoc[]
+include::migrate-202606.adoc[]

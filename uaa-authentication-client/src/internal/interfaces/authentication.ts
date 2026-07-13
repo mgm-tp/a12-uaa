@@ -29,8 +29,8 @@
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
-import { SagaIterator } from "redux-saga";
-import { AnyAction } from "typescript-fsa";
+import type { Action as ReduxAction } from "redux";
+import { SagaGenerator } from "typed-redux-saga";
 
 /* eslint-disable no-unused-vars */
 export enum AuthenticationState {
@@ -90,20 +90,13 @@ export function isToken(obj: Token | Record<string, unknown>): obj is Token {
 }
 
 export type UaaSagaDescriptor = {
-	canHandle(action: AnyAction): boolean;
-	handle(action: AnyAction): SagaIterator<void>;
+	canHandle(action: ReduxAction): boolean;
+	handle(action: ReduxAction): SagaGenerator<void>;
 };
 
 export enum SessionStorageKeys {
-	/**
-	 * @deprecated This key not be used in the future
-	 */
-	ACCESS_TOKEN_EXPIRATION = "access_token_expiration",
-	/**
-	 * @deprecated This key not be used in the future
-	 */
-	TOKEN_RENEW_IN_SECONDS = "token_renew_in_seconds",
-
+	TOKEN_EXPIRATION_IN_SECONDS = "token_expiration_in_seconds",
+	TOKEN_EXPIRATION_TIMESTAMP = "token_expiration_timestamp",
 	ACCESS_TOKEN = "access_token",
 	TOKEN_RENEW_TIMESTAMP = "token_renew_timestamp",
 	AUTHENTICATION_TYPE = "authenticationType",

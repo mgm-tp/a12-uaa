@@ -29,9 +29,10 @@
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
-import { SagaIterator } from "redux-saga";
-import { Action, AnyAction } from "typescript-fsa";
-import { call, put } from "typed-redux-saga";
+import { call, put, SagaGenerator } from "typed-redux-saga";
+import type { Action as ReduxAction } from "redux";
+
+import type { Action } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 
 import * as UaaActions from "../actions.js";
 import * as UaaRequest from "../utils/request.js";
@@ -52,7 +53,7 @@ import { UserLoginFailedPayload } from "../actions.js";
  */
 function* userLoggingInSaga(
 	action: Action<UaaActions.UserLoggingInPayload>
-): SagaIterator<void> {
+): SagaGenerator<void> {
 	const { username, password, loginRelativeUrl } = action.payload;
 	const type =
 		action.type === UaaActions.loggingInLocal.type
@@ -126,7 +127,7 @@ function createErrorPayload(error: unknown): UserLoginFailedPayload {
  */
 const localClientSaga: UaaSagaDescriptor[] = [
 	{
-		canHandle: (action: AnyAction) =>
+		canHandle: (action: ReduxAction) =>
 			UaaActions.loggingInLocal.match(action) ||
 			UaaActions.loggingInLDAP.match(action),
 		handle: (action: Action<UaaActions.UserLoggingInPayload>) =>

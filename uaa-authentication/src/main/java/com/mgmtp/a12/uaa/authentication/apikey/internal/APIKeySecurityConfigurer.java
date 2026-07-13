@@ -44,8 +44,8 @@ import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import com.mgmtp.a12.uaa.authentication.AuthenticationProperties;
 import com.mgmtp.a12.uaa.authentication.AuthenticationType;
 import com.mgmtp.a12.uaa.authentication.ConditionalOnAuthentication;
+import com.mgmtp.a12.uaa.authentication.apikey.APIKeyConverter;
 import com.mgmtp.a12.uaa.authentication.apikey.APIKeyValidator;
-import com.mgmtp.a12.uaa.authentication.certificate.CertificateConverter;
 import com.mgmtp.a12.uaa.authentication.internal.AuthenticationTokenLocator;
 import com.mgmtp.a12.uaa.authentication.internal.HeaderAuthenticationTokenLocator;
 import com.mgmtp.a12.uaa.authentication.internal.TokenType;
@@ -59,7 +59,7 @@ public class APIKeySecurityConfigurer extends UAASecurityConfigurer<APIKeySecuri
 	@Inject
 	private AuthenticationProperties authenticationProperties;
 	@Inject
-	private CertificateConverter apiKeyPrincipalCreator;
+	private APIKeyConverter apiKeyPrincipalCreator;
 	@Inject
 	private Optional<APIKeyValidator> apiKeyValidator;
 
@@ -69,7 +69,7 @@ public class APIKeySecurityConfigurer extends UAASecurityConfigurer<APIKeySecuri
 	}
 
 	@Override
-	public void configure(HttpSecurity http) throws Exception {
+	public void configure(HttpSecurity http) {
 		AuthenticationTokenLocator locator = new HeaderAuthenticationTokenLocator(authenticationProperties.getJwt().getHeaderName(), TokenType.APIKEY);
 
 		UAALoginEntryPoint loginEntryPoint = new UAALoginEntryPoint(authenticationProperties.getUnauthorizedCode());

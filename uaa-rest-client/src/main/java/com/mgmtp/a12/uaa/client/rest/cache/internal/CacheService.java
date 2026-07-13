@@ -66,26 +66,27 @@ public class CacheService {
 	public void put(HttpRequest request, CachedClientData cacheClientData) {
 		Optional<Cache> cache = getCache(request);
 		cache.ifPresent(cacheRegion -> {
-			String key = calculateCacheKey(request);
-			cacheRegion.putIfAbsent(key, cacheClientData);
-			LOGGER.debug("Cache PUT for cache [{}] under key=[{}], [{}]", cacheRegion.getName(), key, cacheClientData);
+			Optional<String> keyOptional = calculateCacheKey(request);
+			keyOptional.ifPresent(key -> {
+				cacheRegion.putIfAbsent(key, cacheClientData);
+				LOGGER.debug("Cache PUT for cache [{}] under key=[{}], [{}]", cacheRegion.getName(), key, cacheClientData);
+			});
 		});
 	}
 
 	public Optional<CachedClientData> get(HttpRequest request) {
 		Optional<Cache> cache = getCache(request);
-		return cache.map(cacheRegion -> {
-			String key = calculateCacheKey(request);
-			CachedClientData cachedData = cacheRegion.get(key, CachedClientData.class);
-			Optional.ofNullable(cachedData)
-				.ifPresentOrElse((data) -> {
-					LOGGER.debug("Cache HIT for cache [{}] under key=[{}], [{}]", cacheRegion.getName(), key, data);
-				}, () -> {
+		return cache.flatMap(cacheRegion -> {
+			Optional<String> keyOptional = calculateCacheKey(request);
+			return keyOptional.map(key -> {
+				CachedClientData cachedData = cacheRegion.get(key, CachedClientData.class);
+				if (cachedData != null) {
+					LOGGER.debug("Cache HIT for cache [{}] under key=[{}], [{}]", cacheRegion.getName(), key, cachedData);
+				} else {
 					LOGGER.debug("Cache MISS for cache [{}] under key=[{}]", cacheRegion.getName(), key);
-				});
-
-			return cachedData;
-
+				}
+				return cachedData;
+			});
 		});
 	}
 
@@ -124,16 +125,21 @@ public class CacheService {
 		});
 	}
 
-	private String calculateCacheKey(HttpRequest request) {
+	private Optional<String> calculateCacheKey(HttpRequest request) {
 		URI uri = request.getURI();
 		String queryString = Optional.ofNullable(uri.getQuery())
 			.map(query -> "?" + query)
 			.orElse("");
 
 		AuthorizationData authorizationData = authorizationDataStore.getAuthorizationData();
-		String userIdentification = Optional.ofNullable(authorizationData.getUniqueUserIdentification()).orElse(authorizationData.getAuthenticationToken());
+		if (authorizationData == null) {
+			LOGGER.debug("Skip caching - no AuthorizationData available for request [{}]", uri);
+			return Optional.empty();
+		}
+		String userIdentification = Optional.ofNullable(authorizationData.getUniqueUserIdentification())
+			.orElse(authorizationData.getAuthenticationToken());
 
-		return "%s::%s%s".formatted(userIdentification, uri.getPath(), queryString);
+		return Optional.of("%s::%s%s".formatted(userIdentification, uri.getPath(), queryString));
 	}
 
 	private Optional<String> calculateCacheName(HttpRequest request) {

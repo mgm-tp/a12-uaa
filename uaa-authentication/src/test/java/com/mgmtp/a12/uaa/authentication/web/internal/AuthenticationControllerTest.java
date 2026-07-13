@@ -61,7 +61,6 @@ import com.mgmtp.a12.uaa.authentication.junit.SerializationUtils;
 public class AuthenticationControllerTest {
 
 	private static final String TOKEN_KEY = "access_token";
-	private static final String TOKEN_EXPIRATION_KEY = "access_token_expiration";
 	private static final String TOKEN_RENEW_IN_SECONDS = "token_renew_in_seconds";
 	public static final String APPLICATION_BASE_URL = "application_base_url";
 	public static final String UAA_BASE_URL = "uaa_base_url";
@@ -83,7 +82,6 @@ public class AuthenticationControllerTest {
 	public void init() {
 		AuthenticationProperties.Cors cors = new AuthenticationProperties.Cors();
 		cors.setExposedHeaders(List.of(TOKEN_KEY));
-		cors.setExposedHeaders(List.of(TOKEN_EXPIRATION_KEY));
 		cors.setExposedHeaders(List.of(TOKEN_RENEW_IN_SECONDS));
 		Mockito.when(authenticationProperties.getCors()).thenReturn(cors);
 	}

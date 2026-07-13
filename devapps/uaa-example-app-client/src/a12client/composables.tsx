@@ -36,8 +36,8 @@ import {
   addLayout,
   addWrapper,
   modifyLayout,
-} from "@com.mgmtp.a12.client/client-core/lib/core/application/index.js";
-import { FrameViews } from "@com.mgmtp.a12.client/client-core/lib/core/frame/index.js";
+} from "@com.mgmtp.a12.client/client-core";
+import { FrameViews } from "@com.mgmtp.a12.client/client-core";
 import {
   AuthenticationState,
   UaaActions,

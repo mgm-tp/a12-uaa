@@ -29,7 +29,7 @@
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
-import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging/lib/factory.js";
+import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging";
 
 import { AuthenticationType } from "./interfaces/index.js";
 

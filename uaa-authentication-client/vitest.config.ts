@@ -35,6 +35,11 @@ export default defineConfig({
 	test: {
 		globals: true,
 		environment: "jsdom",
-		include: ["test/**/*.spec.{ts,tsx}"]
+		include: ["test/**/*.spec.{ts,tsx}"],
+		server: {
+			deps: {
+				inline: ["@com.mgmtp.a12.widgets/widgets-core"]
+			}
+		}
 	}
 });

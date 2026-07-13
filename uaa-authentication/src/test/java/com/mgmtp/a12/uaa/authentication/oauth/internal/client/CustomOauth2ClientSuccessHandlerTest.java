@@ -74,7 +74,7 @@ public class CustomOauth2ClientSuccessHandlerTest {
 		customOauth2ClientSuccessHandler.onAuthenticationSuccess(request, response, createAuthentication());
 
 		Assertions.assertNotNull(SecurityContextHolder.getContext().getAuthentication());
-		TokenTester.assertPrincipal((UAAPrincipal<UserDataCreator.TestExtededData>) SecurityContextHolder.getContext().getAuthentication().getPrincipal(),
+		TokenTester.assertPrincipal((UAAPrincipal<UserDataCreator.TestExtendedData>) SecurityContextHolder.getContext().getAuthentication().getPrincipal(),
 			UserDataCreator.createUser("admin", "admin"), true, false);
 		Assertions.assertEquals(SecurityContextHolder.getContext().getAuthentication().getClass(), UaaOauth2ClientAuthenticationToken.class);
 		Assertions.assertEquals("oidc",

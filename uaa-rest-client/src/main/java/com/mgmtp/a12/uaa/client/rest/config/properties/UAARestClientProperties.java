@@ -62,11 +62,7 @@ public class UAARestClientProperties {
 		message = "Missing configuration for generated Token Header Name")
 	private String generatedTokenHeaderName = "access_token";
 	@NotNullForAuthenticationType(authenticationTypes = { AuthenticationType.SAML, AuthenticationType.LOCAL, AuthenticationType.ACTIVE_DIRECTORY_LDAP },
-		message = "Missing configuration for generated Token Expiration Header Name")
-	@Deprecated(since = "8.2.2", forRemoval = true)
-	private String generatedTokenExpirationHeaderName = "access_token_expiration";
-	@NotNullForAuthenticationType(authenticationTypes = { AuthenticationType.SAML, AuthenticationType.LOCAL, AuthenticationType.ACTIVE_DIRECTORY_LDAP },
-		message = "Missing configuration for generated Token Expiration Header Name")
+		message = "Missing configuration for generated Token Renew In Seconds Header Name")
 	private String generatedTokenRenewInSecondsHeaderName = "token_renew_in_seconds";
 	private Resource authorizationDataStore;
 	@Valid
@@ -141,15 +137,6 @@ public class UAARestClientProperties {
 		this.generatedTokenHeaderName = generatedTokenHeaderName;
 	}
 
-	@Deprecated(since = "8.2.2", forRemoval = true)
-	public String getGeneratedTokenExpirationHeaderName() {
-		return generatedTokenExpirationHeaderName;
-	}
-
-	@Deprecated(since = "8.2.2", forRemoval = true)
-	public void setGeneratedTokenExpirationHeaderName(String generatedTokenExpirationHeaderName) {
-		this.generatedTokenExpirationHeaderName = generatedTokenExpirationHeaderName;
-	}
 
 	public String getGeneratedTokenRenewInSecondsHeaderName() {
 		return generatedTokenRenewInSecondsHeaderName;
@@ -191,7 +178,6 @@ public class UAARestClientProperties {
 			", authenticationType=" + authenticationType +
 			", authorizationHeaderName='" + authorizationHeaderName + '\'' +
 			", generatedTokenHeaderName='" + generatedTokenHeaderName + '\'' +
-			", generatedTokenExpirationHeaderName='" + generatedTokenExpirationHeaderName + '\'' +
 			", authorizationDataStore=" + authorizationDataStore +
 			", authenticationConfiguration=" + authenticationConfiguration +
 			", delegatedModeConfiguration=" + delegatedModeConfiguration +

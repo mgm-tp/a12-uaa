@@ -33,9 +33,8 @@ package com.mgmtp.a12.uaa.client.rest.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.web.client.RestClient;
 
 import com.mgmtp.a12.uaa.client.rest.auth.token.internal.oauth2.ClientType;
 import com.mgmtp.a12.uaa.client.rest.config.properties.UAARestClientProperties;
@@ -49,14 +48,17 @@ public class ClientSelfconfigurationReader {
 		String password, String authenticationTypeName, String oauth2ClientSecret, ClientType oauth2ClientType, String apiKeyResource,
 		String authorizationHeaderName) {
 		try {
-			RestTemplate restTemplate = new RestTemplate();
-			ResponseEntity<ClientSelfconfiguration> clientSelfConfiguration = restTemplate.getForEntity(selfconfigureUrl, ClientSelfconfiguration.class);
+			RestClient restClient = RestClient.create();
+			ClientSelfconfiguration clientSelfConfiguration = restClient.get()
+				.uri(selfconfigureUrl)
+				.retrieve()
+				.onStatus(HttpStatusCode::isError, (request, response) -> {
+					throw new RuntimeException("Unable to get selfConfiguration %s".formatted(response.getStatusCode()));
+				})
+				.body(ClientSelfconfiguration.class);
 
-			if (HttpStatus.OK != clientSelfConfiguration.getStatusCode()) {
-				throw new RuntimeException("Unable to get selfConfiguration %s".formatted(clientSelfConfiguration.getStatusCode()));
-			}
-			LOGGER.info("Self configuration downloaded: {}", clientSelfConfiguration.getBody());
-			return UAARestClientPropertiesBuilder.with(clientSelfConfiguration.getBody())
+			LOGGER.info("Self configuration downloaded: {}", clientSelfConfiguration);
+			return UAARestClientPropertiesBuilder.with(clientSelfConfiguration)
 				.withBaseUrl(baseUrl)
 				.withUsername(username)
 				.withPassword(password)

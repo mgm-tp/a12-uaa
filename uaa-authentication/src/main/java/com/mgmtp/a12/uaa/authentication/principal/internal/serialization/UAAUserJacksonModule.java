@@ -35,11 +35,16 @@ import java.util.HashSet;
 
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.Version;
 import com.mgmtp.a12.uaa.authentication.AuthenticationType;
 import com.mgmtp.a12.uaa.authentication.ConditionalOnAuthentication;
+import com.mgmtp.a12.uaa.authentication.jwt.internal.UserWrapper;
+import com.mgmtp.a12.uaa.authentication.principal.UAAJacksonModule;
 import com.mgmtp.a12.uaa.authentication.principal.UAAPrincipal;
 import com.mgmtp.a12.uaa.authentication.principal.internal.UAALdapPrincipal;
+
+import tools.jackson.core.Version;
+import tools.jackson.databind.JacksonModule;
+import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 
 @Component
 @ConditionalOnAuthentication({ AuthenticationType.LOCAL, AuthenticationType.ACTIVE_DIRECTORY_LDAP, AuthenticationType.SAML,
@@ -51,10 +56,19 @@ public class UAAUserJacksonModule extends UAAJacksonModule {
 	}
 
 	@Override
-	public void setupModule(SetupContext context) {
-		context.setMixInAnnotations(UAAPrincipal.class, UaaPrincipalMixing.class);
-		context.setMixInAnnotations(UAALdapPrincipal.class, UaaLdapPrincipalMixing.class);
-		context.setMixInAnnotations(HashSet.class, ArrayWhitelistMixin.class);
+	public void configurePolymorphicTypeValidator(BasicPolymorphicTypeValidator.Builder builder) {
+		builder
+			.allowIfSubType(UAAPrincipal.class)
+			.allowIfSubType(UAALdapPrincipal.class)
+			.allowIfSubType(UserWrapper.class);
+	}
+
+	@Override
+	public void setupModule(JacksonModule.SetupContext context) {
+		context.setMixIn(UAAPrincipal.class, UaaPrincipalMixing.class);
+		context.setMixIn(UAALdapPrincipal.class, UaaLdapPrincipalMixing.class);
+		context.setMixIn(UserWrapper.class, UserWrapper.class);
+		context.setMixIn(HashSet.class, ArrayWhitelistMixin.class);
 	}
 
 }

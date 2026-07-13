@@ -477,8 +477,8 @@ public class AuthenticationProperties {
 		private List<String> allowedOrigins = Arrays.asList("http://localhost:3000");
 		private List<String> allowedMethods = Arrays.asList("GET", "POST", "OPTIONS", "DELETE", "PUT", "PATCH");
 		private List<String> allowedHeaders = Arrays.asList("X-Requested-With", "Origin", "Content-Type", "Accept", "Authorization");
-		private List<String> exposedHeaders = Arrays.asList(UAAAuthenticationSuccessHandler.TOKEN_KEY, UAAAuthenticationSuccessHandler.TOKEN_EXPIRATION_KEY,
-			UAAAuthenticationSuccessHandler.TOKEN_RENEW_IN_SECONDS);
+		private List<String> exposedHeaders = Arrays.asList(UAAAuthenticationSuccessHandler.TOKEN_KEY,
+			UAAAuthenticationSuccessHandler.TOKEN_RENEW_IN_SECONDS, UAAAuthenticationSuccessHandler.TOKEN_EXPIRATION_IN_SECONDS);
 		private Boolean allowCredentials;
 		private boolean enabled = true;
 

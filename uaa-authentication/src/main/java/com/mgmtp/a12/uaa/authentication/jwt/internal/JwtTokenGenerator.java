@@ -49,7 +49,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.security.converter.RsaKeyConverters;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mgmtp.a12.uaa.authentication.AuthenticationProperties;
 import com.mgmtp.a12.uaa.authentication.internal.UAASpringJsonHandler;
 import com.mgmtp.a12.uaa.authentication.jwt.JwtTokenData;
@@ -70,11 +69,14 @@ import com.nimbusds.jwt.EncryptedJWT;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 
+import tools.jackson.core.JacksonException;
+
 public class JwtTokenGenerator {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(JwtTokenGenerator.class);
 	private static final String CLAIM_USER_DETAILS = "userDetails";
 	private static final String CLAIM_AUTHORITIES = "authorities";
+	private static final String CLAIM_AUTH_TIME = "auth_time";
 	private Integer expirationSeconds;
 	private Random random = new Random();
 	private JWSHeader jwtHeader;
@@ -102,6 +104,20 @@ public class JwtTokenGenerator {
 	}
 
 	public JwtTokenData generateToken(UserDetails userDetails) {
+		return generateToken(userDetails, null);
+	}
+
+	/**
+	 * Generates a token, optionally preserving the original login time of a previously issued token.
+	 * <p>
+	 * When {@code loginTime} is provided (e.g. during token renewal) it is carried over into the new token so that the
+	 * {@code user-lifetime-seconds} cap keeps being measured from the first login instead of being reset on every
+	 * renewal. The {@code issueTime}/{@code expirationTime} of the token are still refreshed.
+	 *
+	 * @param userDetails principal data
+	 * @param loginTime   original login time to preserve, or {@code null} for a freshly issued token
+	 */
+	public JwtTokenData generateToken(UserDetails userDetails, Instant loginTime) {
 		JwtTokenData.Builder tokenBuilder = new JwtTokenData.Builder(userDetails.getUsername());
 		Map<String, Object> claims = new HashMap<>();
 		if (storeUser) {
@@ -115,11 +131,14 @@ public class JwtTokenGenerator {
 			tokenBuilder.withAuthorities(userDetails.getAuthorities());
 		}
 		Instant issuedTime = Instant.now();
+		Instant loginTimestamp = loginTime != null ? loginTime : issuedTime;
 		Instant expirationTime = calculateExpirationDate(issuedTime);
+		claims.put(CLAIM_AUTH_TIME, loginTimestamp.toEpochMilli());
 		String token = doGenerateToken(claims, userDetails.getUsername(), issuedTime, expirationTime);
 
 		return tokenBuilder.withToken(token)
 			.withIssuedTime(issuedTime)
+			.withLoginTime(loginTimestamp)
 			.withExpirationSeconds(expirationSeconds)
 			.withTokenRenewThresholdInSeconds(authenticationProperties.getJwt().getTokenRenewThresholdInSeconds())
 			.build();
@@ -165,7 +184,7 @@ public class JwtTokenGenerator {
 	private String serializeToJson(Object data) {
 		try {
 			return uaaSpringJsonHandler.convertToJson(data);
-		} catch (JsonProcessingException e) {
+		} catch (JacksonException e) {
 			throw new RuntimeException("Unable to serialize UserDetails from the token", e);
 		}
 

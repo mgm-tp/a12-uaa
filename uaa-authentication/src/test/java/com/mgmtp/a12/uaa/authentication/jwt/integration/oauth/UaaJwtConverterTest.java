@@ -58,7 +58,7 @@ import com.mgmtp.a12.uaa.authentication.oauth2.internal.Oauth2JwtAuthenticationT
 import com.mgmtp.a12.uaa.authentication.principal.UAAPrincipal;
 import com.mgmtp.a12.uaa.authentication.utils.TokenTester;
 import com.mgmtp.a12.uaa.authentication.utils.UserDataCreator;
-import com.mgmtp.a12.uaa.authentication.utils.UserDataCreator.TestExtededData;
+import com.mgmtp.a12.uaa.authentication.utils.UserDataCreator.TestExtendedData;
 
 @ExtendWith(SpringExtension.class)
 public class UaaJwtConverterTest {
@@ -86,7 +86,7 @@ public class UaaJwtConverterTest {
 			Arrays.asList(new SimpleGrantedAuthority("SCOPE_role1"),
 				new SimpleGrantedAuthority("SCOPE_role2"))));
 		TokenTester.assertPrincipal(UserDataCreator.createUser("admin", "admin"),
-			(UAAPrincipal<TestExtededData>) uaaJwtAuthenticationToken.getPrincipal(), true, false);
+			(UAAPrincipal<TestExtendedData>) uaaJwtAuthenticationToken.getPrincipal(), true, false);
 	}
 
 	@Configuration

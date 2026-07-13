@@ -69,18 +69,10 @@ public class ExternalPrincipalImpl implements ExternalPrincipal {
 		this.additionalProperties = builder.additionalProperties;
 	}
 
-	@Deprecated(since = "8.1.0", forRemoval = true)
-	public String geteMail() {
-		return email;
-	}
 	public String getEmail() {
 		return email;
 	}
 
-	@Deprecated(since = "8.1.0", forRemoval = true)
-	public void seteMail(String eMail) {
-		this.email = eMail;
-	}
 	public void setEmail(String email) {
 		this.email = email;
 	}
@@ -221,14 +213,6 @@ public class ExternalPrincipalImpl implements ExternalPrincipal {
 			this.additionalProperties = externalUser.additionalProperties;
 		}
 
-		/**
-		 * Use {@link com.mgmtp.a12.uaa.authentication.principal.ExternalPrincipalImpl.Builder#withEmail(String)} instead
-		 */
-		@Deprecated(since = "8.1.0", forRemoval = true)
-		public Builder withEMail(String eMail) {
-			this.email = eMail;
-			return this;
-		}
 
 		public Builder withEmail(String email) {
 			this.email = email;

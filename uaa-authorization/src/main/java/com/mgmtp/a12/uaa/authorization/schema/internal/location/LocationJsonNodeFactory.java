@@ -33,14 +33,14 @@ package com.mgmtp.a12.uaa.authorization.schema.internal.location;
 
 import java.util.Objects;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.BooleanNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.NullNode;
-import com.fasterxml.jackson.databind.node.NumericNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.BooleanNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.NullNode;
+import tools.jackson.databind.node.NumericNode;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.StringNode;
 
 public class LocationJsonNodeFactory extends JsonNodeFactory {
 	private final JsonParser jsonParser;
@@ -76,7 +76,7 @@ public class LocationJsonNodeFactory extends JsonNodeFactory {
 	}
 
 	@Override
-	public TextNode textNode(String text) {
-		return Objects.nonNull(text) ? new LocationTextNode(text, jsonParser.currentTokenLocation(), jsonParser.currentLocation()) : null;
+	public StringNode stringNode(String text) {
+		return Objects.nonNull(text) ? new LocationStringNode(text, jsonParser.currentTokenLocation(), jsonParser.currentLocation()) : null;
 	}
 }

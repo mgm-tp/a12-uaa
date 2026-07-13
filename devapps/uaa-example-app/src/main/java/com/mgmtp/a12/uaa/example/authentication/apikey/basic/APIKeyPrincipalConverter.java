@@ -55,7 +55,7 @@ import org.springframework.stereotype.Component;
 
 import com.mgmtp.a12.uaa.authentication.AuthenticationType;
 import com.mgmtp.a12.uaa.authentication.ConditionalOnAuthentication;
-import com.mgmtp.a12.uaa.authentication.certificate.CertificateConverter;
+import com.mgmtp.a12.uaa.authentication.apikey.APIKeyConverter;
 import com.mgmtp.a12.uaa.authentication.local.UAAExtendedPrincipalDataLoader;
 import com.mgmtp.a12.uaa.example.principal.basic.BasicPrincipal;
 
@@ -63,7 +63,7 @@ import com.mgmtp.a12.uaa.example.principal.basic.BasicPrincipal;
 @Profile("!principal")
 @Primary
 @ConditionalOnAuthentication(AuthenticationType.API_KEY)
-public class APIKeyPrincipalConverter implements CertificateConverter {
+public class APIKeyPrincipalConverter implements APIKeyConverter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(APIKeyPrincipalConverter.class);
 
@@ -84,7 +84,6 @@ public class APIKeyPrincipalConverter implements CertificateConverter {
 		return new BasicPrincipal(userNameValue, "***", grantedAuthorities, extendedUserDataLoader.loadExtendedPrincipalData(userNameValue));
 
 	}
-
 
 	private String getAttributeValueFromCertificatePrincipal(X509Certificate certificate, String attributeName) {
 		try {

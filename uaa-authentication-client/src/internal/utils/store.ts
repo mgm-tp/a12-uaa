@@ -29,8 +29,9 @@
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
-import { Store } from "redux";
-import { Action, AnyAction } from "typescript-fsa";
+import { Store, UnknownAction } from "redux";
+
+import { Action } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 
 /**
  * @param sliceName
@@ -69,7 +70,7 @@ class ReduxStore {
 		this.store = store;
 	}
 
-	public getStore(): Store<Record<string, unknown>, AnyAction> | undefined {
+	public getStore(): Store<Record<string, unknown>, UnknownAction> | undefined {
 		return this.store;
 	}
 

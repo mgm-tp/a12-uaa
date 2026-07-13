@@ -1,48 +1,49 @@
 [versions]
-jackson = "2.20.1"
-jacksonAnnotation = "2.20"
-spring = "6.2.15"
-springSecurity = "6.5.7"
+jackson = "3.1.3"
+jacksonDatatype = "2.21.1"
+jacksonAnnotation = "2.21"
+spring = "7.0.7"
+springSecurity = "7.0.5"
 #force json-smart version since it used range version. Will be deleted in the future
 jsonSmart = "2.4.10"
-springBoot = "3.5.9"
+springBoot = "4.0.6"
 opensamlSecurityExt = "4.1.2"
-springLdapCore = "3.3.2"
-servletApi = "6.0.0"
+springLdapCore = "4.0.1"
+servletApi = "6.1.0"
 commonsIo = "2.16.1"
 annotationApi = "2.1.1"
 validationApi = "3.0.2"
 inject = "2.0.1"
 commonsLang = "3.14.0"
 commonsCollection = "4.4"
-beanUtils = "1.9.4"
+beanUtils = "1.11.0"
 hibernateValidator = "8.0.1.Final"
 zjsonPatch = "0.4.16"
 jmh = "1.37"
-influxDB = "2.24"
+influxDB = "2.25"
 csvVersion = "1.10.0"
-junit = "5.10.2"
-junitPlatform = "1.10.2"
-junitMockitoPlatform = "5.11.0"
-mockito = "5.2.0"
+junit = "6.0.2"
+junitMockitoPlatform = "5.20.0"
 hamcrest = "2.2"
 slf = "2.0.13"
 xmlUnit = "2.9.1"
 javers = "7.7.0"
 aspects = "1.9.21.1"
-a12Kernel = "30.8.1"
+a12Kernel ="31.1.0"
 cacheAPI = "1.1.1"
 ehcache = "3.10.8"
 h2 = "2.2.224"
 jmockData = "4.3.0"
 postgre = "42.7.3"
-httpclient5 = "5.4.1"
+httpclient5 = "5.4.3"
 commonsLogging = "1.3.1"
-a12ServerConnector = "8.2.1"
+a12ServerConnector = "9.0.1"
 htmlUnit = "4.0.0"
 nimbus = "9.37.4"
-persistenceApi = "3.1.0"
-jsonSchemaValidator = "1.4.0"
+persistenceApi= "3.1.0"
+jsonSchemaValidator = "3.0.0"
+openRewriteBom = "3.13.0"
+assertj = "3.25.3"
 reflections = "0.10.2"
 
 # Plugins version
@@ -50,15 +51,17 @@ okhttp = "4.12.0"
 
 [libraries]
 jacksonAnnotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "jacksonAnnotation" }
-jacksonDatabind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
-jacksonDataFormat = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
-jacksonJsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }
-jacksonParameterNames = { module = "com.fasterxml.jackson.module:jackson-module-parameter-names", version.ref = "jackson" }
+jacksonDatabind = { module = "tools.jackson.core:jackson-databind", version.ref = "jackson" }
+jacksonDataFormat = { module = "tools.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
+jacksonJsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jacksonDatatype" }
+jacksonParameterNames = { module = "com.fasterxml.jackson.module:jackson-module-parameter-names", version.ref = "jacksonDatatype" }
 springWebflux = { module = "org.springframework:spring-webflux", version.ref = "spring" }
 springLdapCore = { module = "org.springframework.ldap:spring-ldap-core", version.ref = "springLdapCore" }
 springSecurityLdap = { module = "org.springframework.security:spring-security-ldap", version.ref = "springSecurity" }
 springSecurityConfig = { module = "org.springframework.security:spring-security-config", version.ref = "springSecurity" }
 springSecurityCore = { module = "org.springframework.security:spring-security-core", version.ref = "springSecurity" }
+springStarterOauth2Cl = {module = "org.springframework.boot:spring-boot-starter-oauth2-client", version.ref = "springBoot"}
+springStarterOauth2RS = {module = "org.springframework.boot:spring-boot-starter-oauth2-resource-server", version.ref = "springBoot"}
 springSecurityOauth2Rs = { module = "org.springframework.security:spring-security-oauth2-resource-server", version.ref = "springSecurity" }
 springSecurityOauth2Client = { module = "org.springframework.security:spring-security-oauth2-client", version.ref = "springSecurity" }
 #force json-smart version since it used range version. Will be deleted in the future
@@ -88,9 +91,9 @@ inject = { module = "jakarta.inject:jakarta.inject-api", version.ref = "inject" 
 commonsLang = { module = "org.apache.commons:commons-lang3", version.ref = "commonsLang" }
 commonsCollection = { module = "org.apache.commons:commons-collections4", version.ref = "commonsCollection" }
 beanUtils = { module = "commons-beanutils:commons-beanutils", version.ref = "beanUtils" }
-jacksonCore = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson" }
-jacksondataBind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
-jacksonDataFormatProperties = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-properties", version.ref = "jackson" }
+jacksonCore = { module = "tools.jackson.core:jackson-core", version.ref = "jackson" }
+jacksondataBind = { module = "tools.jackson.core:jackson-databind", version.ref = "jackson" }
+jacksonDataFormatProperties = { module = "tools.jackson.dataformat:jackson-dataformat-properties", version.ref = "jackson" }
 hibernateValidator = { module = "org.hibernate.validator:hibernate-validator", version.ref = "hibernateValidator" }
 springTest = { module = "org.springframework:spring-test", version.ref = "spring" }
 springSecurityTest = { module = "org.springframework.security:spring-security-test", version.ref = "springSecurity" }
@@ -99,10 +102,9 @@ jmhGenerator = { module = "org.openjdk.jmh:jmh-generator-annprocess", version.re
 influxDB = { module = "org.influxdb:influxdb-java", version.ref = "influxDB" }
 csvCommons = { module = "org.apache.commons:commons-csv", version.ref = "csvVersion" }
 junitJupter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
-junitJupterPlatformEngine = { module = "org.junit.platform:junit-platform-engine", version.ref = "junitPlatform" }
-junitPlatformLauncher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junitPlatform" }
+junitJupterPlatformEngine = { module = "org.junit.platform:junit-platform-engine", version.ref = "junit" }
+junitPlatformLauncher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit" }
 mockitoJunit = { module = "org.mockito:mockito-junit-jupiter", version.ref = "junitMockitoPlatform" }
-mockitoInline = { module = "org.mockito:mockito-inline", version.ref = "mockito" }
 hamcrest = { module = "org.hamcrest:hamcrest", version.ref = "hamcrest" }
 log4j12 = { module = "org.slf4j:slf4j-log4j12", version.ref = "slf" }
 slf = { module = "org.slf4j:slf4j-api", version.ref = "slf" }
@@ -117,30 +119,31 @@ springBootStarterCache = { module = "org.springframework.boot:spring-boot-starte
 springBootStarterActuator = { module = "org.springframework.boot:spring-boot-starter-actuator", version.ref = "springBoot" }
 springBootStarterThymeleaf = { module = "org.springframework.boot:spring-boot-starter-thymeleaf", version.ref = "springBoot" }
 springBootStarterDataJpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa", version.ref = "springBoot" }
+springBootStarterSaml2 = { module = "org.springframework.boot:spring-boot-starter-security-saml2", version.ref = "springBoot" }
 springBootStarterTest = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "springBoot" }
 springBootTest = { module = "org.springframework.boot:spring-boot-test", version.ref = "springBoot" }
-xmlUnit = { module = "org.xmlunit:xmlunit-core", version.ref = "xmlUnit" }
-javersCore = { module = "org.javers:javers-core", version.ref = "javers" }
-aspectJWeaver = { module = "org.aspectj:aspectjweaver", version.ref = "aspects" }
-kernelMdFacade = { module = "com.mgmtp.a12.kernel:kernel-md-facade", version.ref = "a12Kernel" }
-kernelCorefacade = { module = "com.mgmtp.a12.kernel:kernel-core-facade", version.ref = "a12Kernel" }
-kernelMdDocumentService = { module = "com.mgmtp.a12.kernel:kernel-md-document-service", version.ref = "a12Kernel" }
-kernelMdModel = { module = "com.mgmtp.a12.kernel:kernel-md-model", version.ref = "a12Kernel" }
-kernelCoreParser = { module = "com.mgmtp.a12.kernel:kernel-core-parser", version.ref = "a12Kernel" }
-cacheApi = { module = "javax.cache:cache-api", version.ref = "cacheAPI" }
-ehcache = { module = "org.ehcache:ehcache", version.ref = "ehcache" }
-h2 = { module = "com.h2database:h2", version.ref = "h2" }
-jmockData = { module = "com.github.jsonzou:jmockdata", version.ref = "jmockData" }
+xmlUnit = { module = "org.xmlunit:xmlunit-core", version.ref="xmlUnit" }
+javersCore = { module = "org.javers:javers-core", version.ref="javers" }
+aspectJWeaver = { module = "org.aspectj:aspectjweaver", version.ref="aspects" }
+kernelMdFacade = { module = "com.mgmtp.a12.kernel:kernel-md-facade", version.ref="a12Kernel" }
+cacheApi = { module = "javax.cache:cache-api", version.ref="cacheAPI" }
+ehcache = { module = "org.ehcache:ehcache", version.ref="ehcache" }
+h2 = { module = "com.h2database:h2", version.ref="h2" }
+jmockData = { module = "com.github.jsonzou:jmockdata", version.ref="jmockData" }
 postgreSql = { module = "org.postgresql:postgresql", version.ref = "postgre" }
 httpclient5 = { module = "org.apache.httpcomponents.client5:httpclient5", version.ref = "httpclient5" }
-commonsLogging = { module = "commons-logging:commons-logging", version.ref = "commonsLogging" }
-serverConnector = { module = "com.mgmtp.a12.utils:utils-rest-server-connector", version.ref = "a12ServerConnector" }
-serverConnectorAutoconfig = { module = "com.mgmtp.a12.utils:utils-rest-server-connector-spring-boot-autoconfigure", version.ref = "a12ServerConnector" }
-htmlUnit = { module = "org.htmlunit:htmlunit", version.ref = "htmlUnit" }
+commonsLogging = { module = "commons-logging:commons-logging", version.ref="commonsLogging" }
+serverConnector = { module = "com.mgmtp.a12.utils:utils-rest-server-connector", version.ref="a12ServerConnector" }
+serverConnectorAutoconfig = { module = "com.mgmtp.a12.utils:utils-rest-server-connector-spring-boot-autoconfigure", version.ref="a12ServerConnector" }
+htmlUnit = { module = "org.htmlunit:htmlunit", version.ref="htmlUnit" }
 jsonSchemaValidator = { module = 'com.networknt:json-schema-validator', version.ref = 'jsonSchemaValidator' }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+openRewriteBom = { module = "org.openrewrite.recipe:rewrite-recipe-bom", version.ref = "openRewriteBom" }
+assertjCore = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 reflections = { module = "org.reflections:reflections", version.ref = "reflections" }
 
+# Gradle dependencies plugin
 
 [bundles]
-springTest = ["springTest", "springSecurityTest", "zjsonPatch", "jmhGenerator", "junitJupter", "junitPlatformLauncher", "mockitoInline", "mockitoJunit", "hamcrest", "log4j12", "slf", "xmlUnit", "influxDB", "csvCommons"]
+springTest = ["springTest", "springSecurityTest", "zjsonPatch", "jmhGenerator", "junitJupter", "junitPlatformLauncher", "mockitoJunit", "hamcrest", "log4j12", "slf", "xmlUnit", "influxDB", "csvCommons"]
+tests = ["junitJupter", "junitPlatformLauncher", "assertjCore"]

@@ -185,7 +185,7 @@ Below is example. We will get the name, country and userRole attribute from the 
 [source, java,subs="verbatim,attributes"]
 ----
 @Component
-public class APIKeyPrincipalConverter implements CertificateConverter {
+public class APIKeyPrincipalConverter implements APIKeyConverter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProjectAPIKeyPrincipalCreator.class);
 

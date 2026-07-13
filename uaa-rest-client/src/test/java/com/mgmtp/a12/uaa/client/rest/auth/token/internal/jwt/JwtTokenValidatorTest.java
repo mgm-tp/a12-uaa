@@ -44,25 +44,43 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class JwtTokenValidatorTest {
 
 	@Mock
-	private RestTemplate restTemplate;
+	private RestClient restClient;
+	@Mock
+	private RestClient.RequestBodyUriSpec requestBodyUriSpec;
+	@Mock
+	private RestClient.RequestBodySpec validRequestBodySpec;
+	@Mock
+	private RestClient.RequestBodySpec invalidRequestBodySpec;
+	@Mock
+	private RestClient.ResponseSpec validResponseSpec;
+	@Mock
+	private RestClient.ResponseSpec invalidResponseSpec;
+
 	private JwtTokenValidator jwtTokenValidator = new JwtTokenValidator("http://null");
 
 	@BeforeEach
 	void setUp() {
-		//we need to init mocks again because setter injection is not working with annotations
-		ResponseEntity<Object> response = new ResponseEntity<>("OK", HttpStatus.OK);
-		Mockito.when(restTemplate.postForEntity(Mockito.anyString(), Mockito.eq("valid"), Mockito.any())).thenReturn(response);
-		Mockito.when(restTemplate.postForEntity(Mockito.anyString(), Mockito.eq("invalid"), Mockito.any()))
-			.thenThrow(new HttpClientErrorException(HttpStatus.UNAUTHORIZED));
+		Mockito.when(restClient.post()).thenReturn(requestBodyUriSpec);
+		Mockito.when(requestBodyUriSpec.uri(Mockito.anyString())).thenReturn(validRequestBodySpec);
 
-		ReflectionTestUtils.setField(jwtTokenValidator, "restTemplate", restTemplate);
+		// Valid token setup
+		Mockito.when(validRequestBodySpec.body(Mockito.eq("valid"))).thenReturn(validRequestBodySpec);
+		Mockito.when(validRequestBodySpec.retrieve()).thenReturn(validResponseSpec);
+		Mockito.when(validResponseSpec.toBodilessEntity()).thenReturn(ResponseEntity.ok().build());
+
+		// Invalid token setup
+		Mockito.when(validRequestBodySpec.body(Mockito.eq("invalid"))).thenReturn(invalidRequestBodySpec);
+		Mockito.when(invalidRequestBodySpec.retrieve()).thenReturn(invalidResponseSpec);
+		Mockito.when(invalidResponseSpec.toBodilessEntity()).thenThrow(new HttpClientErrorException(HttpStatus.UNAUTHORIZED));
+
+		ReflectionTestUtils.setField(jwtTokenValidator, "restClient", restClient);
 	}
 
 	@Test

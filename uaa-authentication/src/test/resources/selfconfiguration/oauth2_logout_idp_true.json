@@ -1,37 +1,37 @@
 {
   "applicationBaseUrl" : "application_base_url",
-  "uaaBaseUrl" : "uaa_base_url",
   "authorizationDataStore" : "authorization_data_store",
   "excludedDelegatedContexts" : [ "context1", "context2" ],
   "oidc" : {
-    "tokenType" : "BEARER",
     "confidentialClient" : {
+      "idpBaseUrl" : "http://localhost:9090",
       "loginRelativeUrl" : "token",
       "logoutRelativeUrl" : "logout",
-      "tokenRenewThresholdInSeconds" : 60,
-      "idpBaseUrl" : "http://localhost:9090"
+      "tokenRenewThresholdInSeconds" : 60
     },
+    "logoutIdp" : true,
     "publicClient" : {
-      "loginRelativeUrl" : "auth",
-      "logoutRelativeUrl" : "logout",
-      "tokenRenewThresholdInSeconds" : 60,
-      "idpBaseUrl" : "http://localhost:9090",
-      "tokenExchangeRelativeUrl" : "token",
-      "loginRedirectRelativeUrl" : "callback",
-      "logoutRedirectRelativeUrl" : "logout",
-      "silentRedirectRelativeUrl" : "silent_renew.html",
       "enableRefreshTokenGrant" : false,
+      "idpBaseUrl" : "http://localhost:9090",
+      "loginRedirectRelativeUrl" : "callback",
+      "loginRelativeUrl" : "auth",
+      "logoutRedirectRelativeUrl" : "logout",
+      "logoutRelativeUrl" : "logout",
+      "silentRedirectRelativeUrl" : "silent_renew.html",
       "ssoConfiguration" : {
-        "usernameXpath" : "//input[@name='username']",
+        "loginButtonXpath" : "//button[@name='login']",
         "passwordXpath" : "//input[@name='password']",
-        "loginButtonXpath" : "//button[@name='login']"
-      }
+        "usernameXpath" : "//input[@name='username']"
+      },
+      "tokenExchangeRelativeUrl" : "token",
+      "tokenRenewThresholdInSeconds" : 60
     },
-    "logoutIdp" : true
+    "tokenType" : "BEARER"
   },
   "tokens" : [ {
+    "allowCredentials" : false,
     "authorizationHeaderName" : "Authorization",
-    "tokenType" : "BEARER",
-    "allowCredentials" : false
-  } ]
+    "tokenType" : "BEARER"
+  } ],
+  "uaaBaseUrl" : "uaa_base_url"
 }

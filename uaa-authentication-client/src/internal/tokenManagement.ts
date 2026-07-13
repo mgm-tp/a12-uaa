@@ -66,8 +66,6 @@ const DEFAULT_OIDC_TOKEN_SELF_CONFIGURE: TokenConfiguration = {
 };
 const DEFAULT_UAA_TOKEN_SELF_CONFIGURE: TokenConfiguration = {
 	authorizationHeaderName: "Authorization",
-	generatedTokenExpirationHeaderName:
-		SessionStorageKeys.ACCESS_TOKEN_EXPIRATION,
 	generatedTokenHeaderName: SessionStorageKeys.ACCESS_TOKEN,
 	tokenType: "UAABearer",
 	allowCredentials: false
@@ -94,6 +92,7 @@ export class TokenManagement {
 	};
 	private access_token: string | undefined = "";
 
+	private tokenExpirationTask: unknown;
 	private tokenRenewalTask: unknown;
 	private retryTime = 0;
 	private isRenewRunning = false;
@@ -118,6 +117,7 @@ export class TokenManagement {
 
 	private finishTasks = (): void => {
 		this.isRenewRunning = false;
+		this.addTokenExpirationTask();
 		this.addSilentRenewTask();
 	};
 
@@ -178,6 +178,7 @@ export class TokenManagement {
 		if (!this.access_token) {
 			return;
 		}
+
 		await this.prepareTasks();
 		await this.requestAuthorize()
 			?.then(async response => {
@@ -193,13 +194,13 @@ export class TokenManagement {
 					if (res.status === 200) {
 						const {
 							access_token,
-							access_token_expiration,
-							token_renew_in_seconds
+							token_renew_in_seconds,
+							token_expiration_in_seconds
 						} = await res.json();
 						if (
 							access_token &&
-							access_token_expiration &&
-							token_renew_in_seconds
+							token_renew_in_seconds &&
+							token_expiration_in_seconds
 						) {
 							sessionStorage.setItem(
 								SessionStorageKeys.ACCESS_TOKEN,
@@ -207,12 +208,14 @@ export class TokenManagement {
 							);
 							UAAServiceWorker.postToken(access_token, type);
 							sessionStorage.setItem(
-								SessionStorageKeys.ACCESS_TOKEN_EXPIRATION,
-								access_token_expiration
+								SessionStorageKeys.TOKEN_EXPIRATION_IN_SECONDS,
+								token_expiration_in_seconds
 							);
+							const token_expiration_timestamp =
+								Date.now() + Number(token_expiration_in_seconds) * 1000;
 							sessionStorage.setItem(
-								SessionStorageKeys.TOKEN_RENEW_IN_SECONDS,
-								token_renew_in_seconds
+								SessionStorageKeys.TOKEN_EXPIRATION_TIMESTAMP,
+								token_expiration_timestamp.toString()
 							);
 							const token_renew_timestamp =
 								Date.now() + Number(token_renew_in_seconds) * 1000;
@@ -233,6 +236,9 @@ export class TokenManagement {
 				if (isSuccess) {
 					logger.info("Request for new token was successful.");
 					this.retryTime = 0;
+					clearTimeout(
+						this.tokenExpirationTask as ReturnType<typeof setTimeout>
+					);
 				} else {
 					return new Error();
 				}
@@ -251,25 +257,48 @@ export class TokenManagement {
 						sessionStorage.getItem(SessionStorageKeys.ACCESS_TOKEN)
 					) {
 						sessionStorage.removeItem(SessionStorageKeys.ACCESS_TOKEN);
-						sessionStorage.removeItem(
-							SessionStorageKeys.ACCESS_TOKEN_EXPIRATION
-						);
-						sessionStorage.removeItem(
-							SessionStorageKeys.TOKEN_RENEW_IN_SECONDS
-						);
 						sessionStorage.removeItem(SessionStorageKeys.TOKEN_RENEW_TIMESTAMP);
+						sessionStorage.removeItem(
+							SessionStorageKeys.TOKEN_EXPIRATION_IN_SECONDS
+						);
+						sessionStorage.removeItem(
+							SessionStorageKeys.TOKEN_EXPIRATION_TIMESTAMP
+						);
 					}
 				}
 
 				logger.error("Request Authorize was failed", err);
 
 				if (this.retryTime === MAX_RETRY_TIME) {
+					this.isRenewRunning = false;
 					reduxStore.dispatch(UaaActions.silentRenewError());
 					return;
 				}
 				this.retryTime++;
 				this.finishTasks();
 			});
+	};
+
+	private addTokenExpirationTask = (): boolean => {
+		if (this.retryTime > 0) {
+			return false;
+		}
+		const expirationTime = Number(
+			sessionStorage.getItem(SessionStorageKeys.TOKEN_EXPIRATION_TIMESTAMP)
+		);
+		if (expirationTime) {
+			const waitingTime = expirationTime - Date.now();
+			if (waitingTime > 0) {
+				this.tokenExpirationTask = setTimeout(() => {
+					reduxStore.dispatch(UaaActions.loginRequire());
+				}, waitingTime);
+				return true;
+			} else {
+				reduxStore.dispatch(UaaActions.loginRequire());
+				return true;
+			}
+		}
+		return false;
 	};
 
 	private addSilentRenewTask = (): boolean => {
@@ -328,11 +357,13 @@ export class TokenManagement {
 		this.retryTime = 0;
 		this.stopService();
 		this.oidcSilentRenewTask("start");
+		this.addTokenExpirationTask();
 		this.addSilentRenewTask();
 	};
 
 	stopService = (): void => {
 		this.oidcSilentRenewTask("stop");
+		clearTimeout(this.tokenExpirationTask as ReturnType<typeof setTimeout>);
 		clearTimeout(this.tokenRenewalTask as ReturnType<typeof setTimeout>);
 	};
 

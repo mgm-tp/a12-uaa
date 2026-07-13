@@ -90,7 +90,9 @@ public class APIKeyAuthenticationFilterTest {
 	@Test
 	public void successFlow() throws Exception {
 		MockHttpServletRequest request = new MockHttpServletRequest();
+		request.setMethod("GET");
 		request.setServletPath("/api/aUrl");
+		request.setRequestURI("/api/aUrl");
 		MockHttpServletResponse response = new MockHttpServletResponse();
 		apiKeyAuthenticationFilter.doFilterInternal(request, response, filterChanin);
 		Mockito.verify(filterChanin, Mockito.times(1)).doFilter(request, response);
@@ -117,6 +119,7 @@ public class APIKeyAuthenticationFilterTest {
 		SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken("principal", "credentials"));
 
 		MockHttpServletRequest request = new MockHttpServletRequest();
+		request.setRequestURI("/api/aUrl");
 		request.setServletPath("/api/aUrl");
 		MockHttpServletResponse response = new MockHttpServletResponse();
 		apiKeyAuthenticationFilter.doFilterInternal(request, response, filterChanin);
@@ -130,6 +133,7 @@ public class APIKeyAuthenticationFilterTest {
 	public void noCertificateFlow() throws Exception {
 		Mockito.when(authenticationTokenLocator.locateToken(Mockito.any())).thenReturn(Optional.empty());
 		MockHttpServletRequest request = new MockHttpServletRequest();
+		request.setRequestURI("/api/aUrl");
 		request.setServletPath("/api/aUrl");
 		MockHttpServletResponse response = new MockHttpServletResponse();
 		apiKeyAuthenticationFilter.doFilterInternal(request, response, filterChanin);

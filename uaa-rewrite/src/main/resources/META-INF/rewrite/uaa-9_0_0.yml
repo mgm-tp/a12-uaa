@@ -1,0 +1,34 @@
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: com.mgmtp.a12.uaa.openrewrite.UpgradeUaa_9_0
+displayName: UAA 9.0 auto-migration
+recipeList:
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.principal.internal.RoleMappingProcessor
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.principal.a12internal.RoleMappingProcessor
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.UAALocalUserLoader
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.internal.UAALocalUserLoader
+  - org.openrewrite.properties.ChangePropertyKey:
+      oldPropertyKey: mgmtp.a12.uaa.authentication.certificate-authority-resources
+      newPropertyKey: mgmtp.a12.uaa.authentication.api-key-authority-resources
+  - org.openrewrite.properties.ChangePropertyKey:
+      oldPropertyKey: mgmtp.a12.uaa.authentication.certificate-white-list-access-url-patterns
+      newPropertyKey: mgmtp.a12.uaa.authentication.api-key-white-list-access-url-patterns
+  - org.openrewrite.properties.ChangePropertyKey:
+      oldPropertyKey: mgmtp.a12.uaa.authentication.principal.certificate.user-name-field
+      newPropertyKey: mgmtp.a12.uaa.authentication.principal.api-key-config.user-name-field
+  - org.openrewrite.properties.ChangePropertyKey:
+      oldPropertyKey: mgmtp.a12.uaa.authentication.principal.certificate.user-role-field
+      newPropertyKey: mgmtp.a12.uaa.authentication.principal.api-key-config.user-role-field
+  - org.openrewrite.properties.ChangePropertyKey:
+      oldPropertyKey: mgmtp.a12.uaa.authentication.client.rest.certificate-resource
+      newPropertyKey: mgmtp.a12.uaa.authentication.client.rest.api-key-resource
+  - com.mgmtp.a12.uaa.rewrite.ReplaceMethodCall:
+      existingMethodPattern: "com.mgmtp.a12.uaa.authentication.AuthenticationProperties getCertificateAuthorityResources()"
+      newMethodTemplate: "#{any(com.mgmtp.a12.uaa.authentication.AuthenticationProperties)}.getApiKeyAuthorityResources()"
+      parameterIndexes: []
+  - com.mgmtp.a12.uaa.rewrite.ReplaceMethodCall:
+      existingMethodPattern: "com.mgmtp.a12.uaa.authentication.AuthenticationProperties setCertificateAuthorityResources(java.util.List)"
+      newMethodTemplate: "#{any(com.mgmtp.a12.uaa.authentication.AuthenticationProperties)}.setApiKeyAuthorityResources(#{any(java.util.List)})"
+      parameterIndexes: [0]

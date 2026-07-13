@@ -32,20 +32,19 @@
 package com.mgmtp.a12.uaa.example.authentication.apikey;
 
 import java.security.cert.X509Certificate;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
 import com.mgmtp.a12.uaa.authentication.AuthenticationType;
 import com.mgmtp.a12.uaa.authentication.ConditionalOnAuthentication;
-import com.mgmtp.a12.uaa.authentication.certificate.CertificateValidator;
+import com.mgmtp.a12.uaa.authentication.apikey.APIKeyValidator;
 
 @Component
 @ConditionalOnAuthentication(AuthenticationType.API_KEY)
-public class AdditionalAPIKeyValidator implements CertificateValidator {
+public class AdditionalAPIKeyValidator implements APIKeyValidator {
 
-	@Override
-	public boolean validate(X509Certificate certificateToVerify) {
-		return certificateToVerify.getIssuerX500Principal().getName() != null;
+	@Override public boolean validate(X509Certificate certToVerify, List<X509Certificate> rootCAs) {
+		return certToVerify.getIssuerX500Principal().getName() != null;
 	}
-
 }

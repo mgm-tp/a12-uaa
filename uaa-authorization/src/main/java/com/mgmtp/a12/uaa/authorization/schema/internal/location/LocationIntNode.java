@@ -31,13 +31,13 @@
  */
 package com.mgmtp.a12.uaa.authorization.schema.internal.location;
 
-import com.fasterxml.jackson.core.JsonLocation;
-import com.fasterxml.jackson.databind.node.IntNode;
+import tools.jackson.core.TokenStreamLocation;
+import tools.jackson.databind.node.IntNode;
 
 public class LocationIntNode extends IntNode implements LocationProvider {
 	private final LocationDetails locationDetails;
 
-	public LocationIntNode(int value, JsonLocation tokenLocation, JsonLocation currentLocation) {
+	public LocationIntNode(int value, TokenStreamLocation tokenLocation, TokenStreamLocation currentLocation) {
 		super(value);
 		this.locationDetails = new LocationDetails(tokenLocation, currentLocation);
 	}

@@ -34,7 +34,6 @@ package com.mgmtp.a12.uaa.client.rest.auth.internal.store;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Instant;
 import java.util.concurrent.ScheduledFuture;
 
 import org.junit.jupiter.api.AfterAll;
@@ -76,7 +75,7 @@ public class PersistingAuthorizationDataStoreTest {
 
 	@BeforeEach
 	void setUp() {
-		authData = new AuthorizationData("tokenData", Instant.now().plusSeconds(99999), TokenType.BEARER, "sessionData");
+		authData = new AuthorizationData("tokenData", TokenType.BEARER, "sessionData", 99999);
 		Mockito.when(tokenValidator.isTokenValid(Mockito.anyString())).thenReturn(true);
 		dataStore = new PersistingAuthorizationDataStore(AUTH_FILE, tokenRefresher, tokenValidator);
 		refreshTokenSchedulerMockedStatic = Mockito.mockStatic(RefreshTokenScheduler.class);
@@ -110,7 +109,7 @@ public class PersistingAuthorizationDataStoreTest {
 
 	@Test
 	public void serializableStoreTestFail() {
-		dataStore.setAuthorizationData(new AuthorizationData("tokenData", Instant.now(), TokenType.BEARER, "sessionData"));
+		dataStore.setAuthorizationData(new AuthorizationData("tokenData", TokenType.BEARER, "sessionData", 300));
 
 		AuthorizationData authorizationData = dataStore.getAuthorizationData();
 

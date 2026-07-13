@@ -31,14 +31,14 @@
  */
 package com.mgmtp.a12.uaa.authorization.schema.internal.location;
 
-import com.fasterxml.jackson.core.JsonLocation;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.TokenStreamLocation;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public class LocationObjectNode extends ObjectNode implements LocationProvider {
 	private final LocationDetails locationDetails;
 
-	public LocationObjectNode(JsonNodeFactory value, JsonLocation tokenLocation, JsonLocation currentLocation) {
+	public LocationObjectNode(JsonNodeFactory value, TokenStreamLocation tokenLocation, TokenStreamLocation currentLocation) {
 		super(value);
 		this.locationDetails = new LocationDetails(tokenLocation, currentLocation);
 	}

@@ -66,9 +66,8 @@ public class UAAAuthenticationSuccessHandler extends SavedRequestAwareAuthentica
 	private static final Logger LOGGER = LoggerFactory.getLogger(UAAAuthenticationSuccessHandler.class);
 
 	public static final String TOKEN_KEY = "access_token";
-	@Deprecated(since = "8.2.2", forRemoval = true)
-	public static final String TOKEN_EXPIRATION_KEY = "access_token_expiration";
 	public static final String TOKEN_RENEW_IN_SECONDS = "token_renew_in_seconds";
+	public static final String TOKEN_EXPIRATION_IN_SECONDS = "token_expiration_in_seconds";
 
 	@Inject
 	protected JwtTokenGenerator jwtTokenGeneratorSupport;
@@ -106,11 +105,11 @@ public class UAAAuthenticationSuccessHandler extends SavedRequestAwareAuthentica
 
 	protected void generateJwtTokenAndStoreToHeader(HttpServletResponse response, UserDetails principal) {
 		JwtTokenData jwtTokenData = generateJwtToken(principal);
-		String expiration = String.valueOf(jwtTokenData.getExpirationTime().toEpochMilli());
 		String tokenRenewInSeconds = String.valueOf(jwtTokenData.getExpirationSeconds() - jwtTokenData.getTokenRenewThresholdInSeconds());
+		String tokenExpirationInSeconds = String.valueOf(jwtTokenData.getExpirationSeconds());
 		response.addHeader(TOKEN_KEY, jwtTokenData.getToken());
-		response.addHeader(TOKEN_EXPIRATION_KEY, expiration);
 		response.addHeader(TOKEN_RENEW_IN_SECONDS, tokenRenewInSeconds);
+		response.addHeader(TOKEN_EXPIRATION_IN_SECONDS, tokenExpirationInSeconds);
 	}
 
 	protected JwtTokenData generateJwtToken(UserDetails principal) {

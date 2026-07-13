@@ -31,19 +31,23 @@
  */
 package com.mgmtp.a12.uaa.example.config;
 
-import com.fasterxml.jackson.core.Version;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.mgmtp.a12.uaa.authentication.principal.internal.serialization.UAAJacksonModule;
+import com.mgmtp.a12.uaa.authentication.principal.UAAJacksonModule;
+
+import tools.jackson.core.Version;
+import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 
 public class JavaTimeUAAJacksonModule extends UAAJacksonModule {
-	JavaTimeModule javaTimeModule = new JavaTimeModule();
 
 	public JavaTimeUAAJacksonModule() {
 		super(JavaTimeUAAJacksonModule.class.getName(), new Version(1, 0, 0, null, null, null));
 	}
 
+	@Override public void configurePolymorphicTypeValidator(BasicPolymorphicTypeValidator.Builder builder) {
+
+	}
+
 	@Override
 	public void setupModule(SetupContext context) {
-		javaTimeModule.setupModule(context);
+		super.setupModule(context);
 	}
 }

@@ -49,7 +49,7 @@ import com.mgmtp.a12.uaa.authentication.local.UAAExtendedPrincipalDataLoader;
 import com.mgmtp.a12.uaa.authentication.principal.UAAPrincipal;
 import com.mgmtp.a12.uaa.authentication.utils.TokenTester;
 import com.mgmtp.a12.uaa.authentication.utils.UserDataCreator;
-import com.mgmtp.a12.uaa.authentication.utils.UserDataCreator.TestExtededData;
+import com.mgmtp.a12.uaa.authentication.utils.UserDataCreator.TestExtendedData;
 
 @ExtendWith(SpringExtension.class)
 public class JwtTokenPrincipalCreatorHardCodeTest {
@@ -65,9 +65,9 @@ public class JwtTokenPrincipalCreatorHardCodeTest {
 
 	@Test
 	public void testGetPrincipalHardCodeSupport() {
-		UAAPrincipal<TestExtededData> user = UserDataCreator.createUser("test", "N/A");
+		UAAPrincipal<TestExtendedData> user = UserDataCreator.createUser("test", "N/A");
 		JwtTokenData tokenData = jwtTokenVerifier.unpackToken(jwtTokenGenerator.generateToken(user).getToken());
-		UAAPrincipal<TestExtededData> rtnUserDetails = (UAAPrincipal<TestExtededData>) jwtTokenPrincipalCreator.createPrincipal(tokenData);
+		UAAPrincipal<TestExtendedData> rtnUserDetails = (UAAPrincipal<TestExtendedData>) jwtTokenPrincipalCreator.createPrincipal(tokenData);
 		Assertions.assertEquals(rtnUserDetails.getAuthorities().size(), user.getAuthorities().size());
 		TokenTester.assertPrincipal(user, rtnUserDetails);
 	}

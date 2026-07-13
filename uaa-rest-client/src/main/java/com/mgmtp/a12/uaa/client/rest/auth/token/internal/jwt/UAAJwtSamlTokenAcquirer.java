@@ -45,7 +45,6 @@ import org.htmlunit.WebRequest;
 import org.htmlunit.util.NameValuePair;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mgmtp.a12.uaa.client.rest.auth.AuthorizationDataStore;
 import com.mgmtp.a12.uaa.client.rest.auth.TokenRefresher;
 import com.mgmtp.a12.uaa.client.rest.auth.internal.data.AuthorizeData;
@@ -57,6 +56,8 @@ import com.mgmtp.a12.uaa.client.rest.auth.token.internal.UAALoginPageTokenAcquir
 import com.mgmtp.a12.uaa.client.rest.config.properties.SsoProperties;
 import com.mgmtp.a12.uaa.client.rest.config.properties.UAARestClientAuthenticationProperties;
 import com.mgmtp.a12.uaa.client.rest.config.properties.UAARestClientProperties;
+
+import tools.jackson.databind.ObjectMapper;
 
 public class UAAJwtSamlTokenAcquirer extends UAALoginPageTokenAcquirer {
 	private static final String EXCHANGE_AUTHORIZATION_CODE_TO_TOKEN_PARAM = "exchangeAuthorizationCodeToToken";

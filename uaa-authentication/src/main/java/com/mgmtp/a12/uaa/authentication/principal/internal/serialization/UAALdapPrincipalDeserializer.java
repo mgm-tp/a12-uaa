@@ -31,18 +31,19 @@
  */
 package com.mgmtp.a12.uaa.authentication.principal.internal.serialization;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mgmtp.a12.uaa.authentication.principal.UAAPrincipal;
 import com.mgmtp.a12.uaa.authentication.principal.internal.UAALdapPrincipal;
 
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.ObjectReadContext;
+import tools.jackson.databind.JsonNode;
+
 public class UAALdapPrincipalDeserializer extends UAAPrincipalDeserializer {
+
 	@Override
-	UAALdapPrincipal<?> deserializeInternal(ObjectMapper mapper, JsonNode jsonNode) throws IOException, JsonProcessingException {
-		UAAPrincipal<?> uaaUser = super.deserializeInternal(mapper, jsonNode);
+	protected UAALdapPrincipal<?> deserializeInternal(ObjectReadContext rc, JsonNode jsonNode) throws JacksonException {
+		UAAPrincipal<?> uaaUser = super.deserializeInternal(rc, jsonNode);
+
 		UAALdapPrincipal<?> uaaLdapUser = UAALdapPrincipal.createLdapUser(uaaUser);
 		uaaLdapUser.setDn(readJsonNode(jsonNode, "dn").asText());
 		return uaaLdapUser;

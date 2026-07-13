@@ -60,7 +60,7 @@ import com.mgmtp.a12.uaa.example.principal.basic.BasicPrincipal;
 
 @Component
 @Profile("!principal")
-@ConditionalOnAuthentication(AuthenticationType.API_KEY)
+@ConditionalOnAuthentication(AuthenticationType.CERTIFICATE)
 public class CertificatePrincipalConverter implements CertificateConverter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(CertificatePrincipalConverter.class);

@@ -73,8 +73,6 @@ import com.mgmtp.a12.uaa.authentication.web.internal.TokenFormData;
 public class TokenEndpoint {
 	private static final String TOKEN = Utils.readFile("token/token.txt");
 	private static final String TOKEN_KEY = "access_token";
-	@Deprecated(since = "8.2.2", forRemoval = true)
-	private static final String TOKEN_EXPIRATION_KEY = "access_token_expiration";
 	private static final String TOKEN_RENEW_IN_SECONDS = "token_renew_in_seconds";
 	private static final Integer FIFTEEN_SECONDS = 15;
 
@@ -87,11 +85,9 @@ public class TokenEndpoint {
 			.map(renewTokenService -> {
 				JwtTokenData tokenData = renewTokenService.generateNewToken(code);
 				state.renewTokenStorage.storeTokenHint("code", TOKEN);
-				String expiration = String.valueOf(tokenData.getExpirationTime().toEpochMilli());
 				String tokenRenewInSeconds = String.valueOf(tokenData.getExpirationSeconds() - tokenData.getTokenRenewThresholdInSeconds());
 				HashMap<String, String> responseBody = new HashMap<>();
 				responseBody.put(TOKEN_KEY, tokenData.getToken());
-				responseBody.put(TOKEN_EXPIRATION_KEY, expiration);
 				responseBody.put(TOKEN_RENEW_IN_SECONDS, tokenRenewInSeconds);
 				return ResponseEntity.status(HttpStatus.OK).body(responseBody);
 			}).orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());

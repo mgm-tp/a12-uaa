@@ -15,7 +15,7 @@
     {
       "name": "Repository_Admin_Guest_RegionManager_Policy",
       "description": "Repos",
-      "template-refs": [
+      "templates": [
         "Admin_Guest_RegionManager"
       ]
     }

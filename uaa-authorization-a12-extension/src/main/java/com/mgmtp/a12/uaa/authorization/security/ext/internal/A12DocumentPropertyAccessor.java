@@ -32,10 +32,6 @@
 package com.mgmtp.a12.uaa.authorization.security.ext.internal;
 
 import java.util.Optional;
-import java.util.Set;
-
-import jakarta.annotation.PostConstruct;
-import jakarta.inject.Inject;
 
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
@@ -43,33 +39,11 @@ import org.springframework.expression.PropertyAccessor;
 import org.springframework.expression.TypedValue;
 import org.springframework.stereotype.Component;
 
-import com.mgmtp.a12.kernel.md.document.api.IDocument;
-import com.mgmtp.a12.kernel.md.document.api.IEntityInstance;
-import com.mgmtp.a12.kernel.md.document.api.IFieldInstance;
-import com.mgmtp.a12.kernel.md.document.api.IGroupInstance;
-import com.mgmtp.a12.kernel.md.document.api.services.IDocumentSearchService;
 import com.mgmtp.a12.kernel.md.document.apiV2.immutable.DocumentV2;
 import com.mgmtp.a12.kernel.md.document.apiV2.immutable.GroupInstanceV2;
-import com.mgmtp.a12.kernel.md.facade.DocumentServiceFactory;
-import com.mgmtp.a12.kernel.md.model.api.services.IDocumentModelResolver;
 
 @Component
 public class A12DocumentPropertyAccessor implements PropertyAccessor {
-
-	private static final String SLASH = "/";
-
-	//we need it here because current kernel API doesn't provide API which can list all children of the group. 
-	private static final String SEARCH_SERVICE = "___searchService";
-
-	@Inject
-	private IDocumentModelResolver documentModelResolver;
-
-	private DocumentServiceFactory documentServiceFactory;
-
-	@PostConstruct
-	void init() {
-		documentServiceFactory = new DocumentServiceFactory(documentModelResolver);
-	}
 
 	@Override
 	public Class<?>[] getSpecificTargetClasses() {
@@ -78,21 +52,6 @@ public class A12DocumentPropertyAccessor implements PropertyAccessor {
 
 	@Override
 	public boolean canRead(EvaluationContext context, Object target, String name) throws AccessException {
-		if (target instanceof IDocument document) {
-			IDocumentSearchService documentSearchService = documentServiceFactory.createDocumentSearchService(document);
-			Set<IEntityInstance> set = documentSearchService.get(SLASH + name, null);
-			if (set.size() != 1) {
-				return false;
-			}
-			context.setVariable(SEARCH_SERVICE, documentSearchService);
-			return true;
-		}
-		if (target instanceof IGroupInstance instance) {
-			Optional<IEntityInstance> childrenByName = findChild(context, instance, name);
-			return childrenByName.isPresent();
-
-		}
-
 		// documentV2
 		if (target instanceof DocumentV2 documentV2) {
 			return Optional.ofNullable(documentV2.group(name))
@@ -110,17 +69,6 @@ public class A12DocumentPropertyAccessor implements PropertyAccessor {
 
 	@Override
 	public TypedValue read(EvaluationContext context, Object target, String name) throws AccessException {
-		if (target instanceof IDocument document) {
-			IDocumentSearchService documentSearchService = documentServiceFactory.createDocumentSearchService(document);
-			Set<IEntityInstance> set = documentSearchService.get(SLASH + name, null);
-			return new TypedValue(set.iterator().next());
-		}
-		if (target instanceof IGroupInstance instance) {
-			Optional<IEntityInstance> child = findChild(context, instance, name);
-			TypedValue typedValue = child.map(this::convert).orElse(null);
-			return typedValue;
-		}
-
 		// documentV2
 		if (target instanceof DocumentV2 documentV2) {
 			return Optional.ofNullable(documentV2.group(name))
@@ -140,31 +88,13 @@ public class A12DocumentPropertyAccessor implements PropertyAccessor {
 		return null;
 	}
 
-	private TypedValue convert(IEntityInstance entity) {
-		if (entity instanceof IFieldInstance instance) {
-			return new TypedValue(instance.getValue().orElse(null));
-		}
-		return new TypedValue(entity);
-	}
-
-	private Optional<IEntityInstance> findChild(EvaluationContext context, IGroupInstance group, String name) {
-		IDocumentSearchService documentSearchService = (IDocumentSearchService) context.lookupVariable(SEARCH_SERVICE);
-		String childName = group.getPath() + SLASH + name;
-		Set<IEntityInstance> children = documentSearchService.getChildren(group.getPath(), null);
-		Optional<IEntityInstance> childrenByName = children.stream()
-			.filter(child -> child.getPath().equals(childName))
-			.findFirst();
-
-		return childrenByName;
-	}
-
 	@Override
-	public boolean canWrite(EvaluationContext context, Object target, String name) throws AccessException {
+	public boolean canWrite(EvaluationContext context, Object target, String name) {
 		return false;
 	}
 
 	@Override
-	public void write(EvaluationContext context, Object target, String name, Object newValue) throws AccessException {
+	public void write(EvaluationContext context, Object target, String name, Object newValue) {
 
 	}
 

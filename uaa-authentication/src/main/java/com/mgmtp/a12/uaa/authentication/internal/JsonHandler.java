@@ -31,15 +31,13 @@
  */
 package com.mgmtp.a12.uaa.authentication.internal;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
 
 public interface JsonHandler {
-	String convertToJson(Object value) throws JsonProcessingException;
+	String convertToJson(Object value) throws JacksonException;
 
-	<T> T convertFromJson(String content, Class<T> valueType) throws IOException;
+	<T> T convertFromJson(String content, Class<T> valueType) throws JacksonException;
 
-	JsonNode readTree(String jsonDocument) throws IOException;
+	JsonNode readTree(String jsonDocument) throws JacksonException;
 }

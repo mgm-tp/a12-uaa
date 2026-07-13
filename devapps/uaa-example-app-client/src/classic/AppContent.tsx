@@ -34,13 +34,13 @@ import {
   ApplicationFrame,
   ApplicationHeader,
 } from "@com.mgmtp.a12.widgets/widgets-core";
-import { provider as DeviceDetector } from "@com.mgmtp.a12.widgets/widgets-core/lib/common/index.js";
+import { provider as DeviceDetector } from "@com.mgmtp.a12.widgets/widgets-core";
 import {
   addPrefix,
   joinClassNames,
-} from "@com.mgmtp.a12.widgets/widgets-core/lib/common/main/utils.js";
+} from "@com.mgmtp.a12.widgets/widgets-core";
 import { UserInfoHeader } from "@com.mgmtp.a12.uaa/uaa-authentication-client";
-import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react/lib/main/index.js";
+import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react";
 import { currentVersion } from "../common/version.js";
 import { EditableRowTable } from "../common/components/EditableRowTable.js";
 import { ImageComponent } from "../common/components/ImageComponent.js";

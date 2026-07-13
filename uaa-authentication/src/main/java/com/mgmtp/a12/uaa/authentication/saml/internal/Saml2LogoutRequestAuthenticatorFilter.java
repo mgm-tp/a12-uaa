@@ -66,7 +66,7 @@ import org.springframework.security.saml2.provider.service.authentication.Saml2A
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration;
 import org.springframework.security.saml2.provider.service.registration.Saml2MessageBinding;
 import org.springframework.security.saml2.provider.service.web.RelyingPartyRegistrationResolver;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.w3c.dom.Document;
@@ -83,7 +83,7 @@ public class Saml2LogoutRequestAuthenticatorFilter extends OncePerRequestFilter 
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Saml2LogoutRequestAuthenticatorFilter.class);
 
-	private RequestMatcher logoutRequestMatcher = new AntPathRequestMatcher("/logout/saml2/slo");
+	private RequestMatcher logoutRequestMatcher = PathPatternRequestMatcher.withDefaults().matcher("/logout/saml2/slo");
 	private RelyingPartyRegistrationResolver relyingPartyRegistrationResolver;
 	private SamlJwtTokenStorage samlJwtTokenStorage;
 	private final AuthenticationManagerResolver<HttpServletRequest> authenticationManagerResolver;

@@ -72,7 +72,7 @@ public class RenewTokenCleanerForExpiredTest {
 		renewTokenStorage.storeCode("code", calculateExpirationTime(2));
 		Assertions.assertTrue(renewTokenStorage.loadCode("code").isPresent());
 
-		UAAPrincipal<UserDataCreator.TestExtededData> user = UserDataCreator.createUser("test1", "password");
+		UAAPrincipal<UserDataCreator.TestExtendedData> user = UserDataCreator.createUser("test1", "password");
 		String tokenHint = jwtTokenGenerator.generateToken(user).getToken();
 		renewTokenStorage.storeTokenHint("code", tokenHint);
 		Assertions.assertTrue(renewTokenStorage.loadTokenHintByCode("code").isPresent());

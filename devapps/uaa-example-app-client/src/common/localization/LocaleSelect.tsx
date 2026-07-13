@@ -29,12 +29,16 @@
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
-import { useDispatch, useSelector } from "react-redux";
+import {
+	useDispatch,
+	useSelector
+} from "react-redux";
+import type { Action as ReduxAction } from "redux";
 
-import { LocalizedModelText } from "@com.mgmtp.a12.utils/utils-localization/lib/main/index.js";
+import { LocalizedModelText } from "@com.mgmtp.a12.utils/utils-localization";
 import { Select } from "@com.mgmtp.a12.widgets/widgets-core";
 import { Localization } from "./localization.js";
-import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react/lib/main/index.js";
+import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react";
 import React from "react";
 
 const listSupportLocales: LocalizedModelText = [
@@ -71,7 +75,7 @@ export const LocaleSelect = function () {
 				);
 				if (option) {
 					sessionStorage.setItem("locale", value);
-					dispatch(Localization.setLocale(option.locale));
+					dispatch(Localization.setLocale(option.locale) as ReduxAction);
 				}
 			}}
 		/>

@@ -33,16 +33,12 @@ import { RestRequestPayload } from "@com.mgmtp.a12.utils/utils-connector";
 
 import { AuthenticationType } from "../interfaces/index.js";
 
-const ACCEPT_JSON_HEADER = ["Accept", "application/json"];
 const ACCEPT_ALL_HEADER = ["Accept", "*/*"];
-const CONTENT_TYPE_JSON_HEADER = [
-	"Content-Type",
-	"application/json;charset=utf8"
-];
 const APPLICATION_FORM_URLENCODED_VALUE = [
 	"Content-Type",
 	"application/x-www-form-urlencoded"
 ];
+const NO_CONTENT_TYPE_HEADER = ["Content-Type"];
 export const RELATIVE_LOGOUT_URL = "user/logout";
 export const RELATIVE_LOCAL_LOGIN_URL = `user/${AuthenticationType.LOCAL.toLowerCase()}/login`;
 export const RELATIVE_ACTIVE_DIRECTORY_LDAP_LOGIN_URL = `user/${AuthenticationType.ACTIVE_DIRECTORY_LDAP.toLowerCase()}/login`;
@@ -68,7 +64,6 @@ export function buildLoginRequest(
 		method: "POST",
 		relativeUrl: relativeUrl ?? `user/${type.toLowerCase()}/login`,
 		body: JSON.stringify(loginRequest),
-		customHeaders: [ACCEPT_JSON_HEADER, CONTENT_TYPE_JSON_HEADER],
 		extendedData: {
 			unAuthorizeRequest: true
 		}
@@ -82,7 +77,7 @@ export function buildGetSelfconfigure(): RestRequestPayload {
 	return {
 		method: "GET",
 		relativeUrl: "uaa-authentication/selfconfigure",
-		customHeaders: [ACCEPT_JSON_HEADER]
+		customHeaders: [NO_CONTENT_TYPE_HEADER]
 	};
 }
 
@@ -99,7 +94,7 @@ export function buildLogoutRequest(
 	return {
 		method,
 		relativeUrl: logoutRelativeUrl ?? RELATIVE_LOGOUT_URL,
-		customHeaders: [ACCEPT_JSON_HEADER]
+		customHeaders: [NO_CONTENT_TYPE_HEADER]
 	};
 }
 
@@ -116,7 +111,7 @@ export function buildGetUserRequest(
 		relativeUrl: url
 			? url.pathname + url.search + url.hash
 			: "uaa-authentication/currentUser",
-		customHeaders: [ACCEPT_JSON_HEADER]
+		customHeaders: [NO_CONTENT_TYPE_HEADER]
 	};
 }
 
@@ -134,7 +129,7 @@ export function buildExchangeCodeRequestAuthorize({
 	return {
 		method: "POST",
 		relativeUrl: `uaa-authentication/exchangeAuthorizationCodeToToken/authorize`,
-		customHeaders: [ACCEPT_ALL_HEADER, ["Content-Type", "application/json"]],
+		customHeaders: [ACCEPT_ALL_HEADER],
 		body: `{
 			"code_challenge": "${code_c}",
 			"state": "${state}"
@@ -155,7 +150,7 @@ export function buildExchangeCodeRequest(code_v: string): RestRequestPayload {
 	return {
 		method: "POST",
 		relativeUrl: `uaa-authentication/exchangeAuthorizationCodeToToken`,
-		customHeaders: [ACCEPT_ALL_HEADER],
+		customHeaders: [ACCEPT_ALL_HEADER, APPLICATION_FORM_URLENCODED_VALUE],
 		body,
 		extendedData: {
 			unAuthorizeRequest: false
@@ -173,7 +168,7 @@ export function buildTokenValidRequest(token: string): RestRequestPayload {
 		method: "POST",
 		relativeUrl: "uaa-authentication/tokenValid",
 		body: token,
-		customHeaders: [ACCEPT_JSON_HEADER],
+		customHeaders: [NO_CONTENT_TYPE_HEADER],
 		extendedData: {
 			unAuthorizeRequest: true
 		}
@@ -191,7 +186,7 @@ export function buildOauth2TokenValidRequest(
 		method: "POST",
 		relativeUrl: "uaa-authentication/oauth2TokenValid",
 		body: token,
-		customHeaders: [ACCEPT_JSON_HEADER],
+		customHeaders: [NO_CONTENT_TYPE_HEADER],
 		extendedData: {
 			unAuthorizeRequest: true
 		}
@@ -218,7 +213,6 @@ export function buildAuthorizeRequest({
 	return {
 		method: "POST",
 		relativeUrl: `uaa-authentication/authorize`,
-		customHeaders: [ACCEPT_JSON_HEADER, ["Content-Type", "application/json"]],
 		body: `{
 			"code_challenge": "${code_c}",
 			"state": "${state}",

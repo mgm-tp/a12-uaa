@@ -32,7 +32,9 @@
 package com.mgmtp.a12.uaa.client.rest.auth.token.internal;
 
 import java.io.IOException;
+import java.net.URI;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
 
@@ -44,8 +46,8 @@ public class PassingErrorHandler implements ResponseErrorHandler {
 	}
 
 	@Override
-	public void handleError(ClientHttpResponse response) throws IOException {
-
+	public void handleError(URI url, HttpMethod method, ClientHttpResponse response) throws IOException {
+		// Do nothing - pass all errors through
 	}
 
 }

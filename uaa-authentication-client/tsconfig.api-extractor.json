@@ -1,0 +1,43 @@
+{
+	// Self-contained tsconfig used ONLY by api-extractor (npm run test:api / update:api).
+	//
+	// api-extractor 7.55.2 bundles TypeScript 5.8.2, which does not know the "es2025"
+	// lib/target that @com.mgmtp.a12.devtools/tsconfig declares. We cannot simply extend
+	// the project tsconfig and override here, because TS 5.8.2 validates lib/target
+	// literally in every file of the extends chain and rejects "es2025" in the parent.
+	//
+	// So this config mirrors the project's effective compilerOptions (see `tsc -p
+	// tsconfig.json --showConfig`) but pins lib/target down to "es2024". This only affects
+	// the API analysis pass; the real build (tsc -b) still uses tsconfig.json with es2025.
+	"compilerOptions": {
+		"declaration": true,
+		"declarationMap": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"isolatedModules": true,
+		"jsx": "react-jsx",
+		"lib": ["dom", "es2024"],
+		"module": "nodenext",
+		"moduleDetection": "force",
+		"moduleResolution": "nodenext",
+		"newLine": "lf",
+		"noEmitOnError": false,
+		"noErrorTruncation": true,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitReturns": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": false,
+		"preserveConstEnums": true,
+		"resolveJsonModule": true,
+		"sourceMap": true,
+		"stripInternal": true,
+		"target": "es2024",
+		"verbatimModuleSyntax": false,
+		"noEmit": false,
+		"skipLibCheck": true,
+		"rootDir": "./src",
+		"outDir": "./lib"
+	},
+	"include": ["./src/**/*.ts", "./src/**/*.tsx", "./src/**/*.json"],
+	"exclude": ["./lib"]
+}

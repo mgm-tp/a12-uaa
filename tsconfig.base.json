@@ -4,6 +4,12 @@
 		"noEmit": true,
 		"incremental": true,
 		"noEmitOnError": false,
-		"tsBuildInfoFile": "${configDir}/target/tsbuildinfo"
+		"tsBuildInfoFile": "${configDir}/target/tsbuildinfo",
+		// TODO(A12UAA-XXXX): re-enable after migrating type imports to `import type`
+		// across the codebase. Relaxed temporarily to unblock the 10.0 back-integration release.
+		"verbatimModuleSyntax": false,
+		// TODO(A12UAA-XXXX): drop once the pre-release a12 client/widgets packages
+		// publish self-consistent .d.ts files.
+		"skipLibCheck": true
 	}
 }

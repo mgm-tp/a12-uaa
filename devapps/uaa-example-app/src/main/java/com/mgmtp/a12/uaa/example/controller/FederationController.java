@@ -31,22 +31,18 @@
  */
 package com.mgmtp.a12.uaa.example.controller;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.inject.Inject;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
 import com.mgmtp.a12.uaa.authentication.AuthenticationType;
 import com.mgmtp.a12.uaa.authentication.ConditionalOnAuthentication;
@@ -84,14 +80,14 @@ public class FederationController {
 		String jwtToken = jwtTokenService.generateToken(extendedPrincipal).getToken();
 
 		// With above jwt token, it can communicate with other systems which understands uaa token
-		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.set("Authorization", "%s %s".formatted(TokenType.UAABEARER, jwtToken));
-		HttpEntity<String> entity = new HttpEntity<>(headers);
-		RestTemplate restTemplate = new RestTemplate();
 		String requestUrl = "http://localhost:%s/loadAllCompanies".formatted(serverPort);
-		restTemplate.exchange(requestUrl, HttpMethod.GET, entity, String.class).getBody();
+		RestClient restClient = RestClient.create();
+		restClient.get()
+			.uri(requestUrl)
+			.accept(MediaType.APPLICATION_JSON)
+			.header("Authorization", "%s %s".formatted(TokenType.UAABEARER, jwtToken))
+			.retrieve()
+			.body(String.class);
 
 		return "OK";
 

@@ -31,6 +31,7 @@
  */
 import type { FC, ReactNode } from "react";
 import { useStore } from "react-redux";
+import { Action } from "redux";
 
 import {
 	type A12ApplicationConfig,
@@ -43,7 +44,7 @@ import {
 	setConfigured,
 	withApplicationResetTriggers,
 	withReducerMap
-} from "@com.mgmtp.a12.client/client-core/lib/core/application/index.js";
+} from "@com.mgmtp.a12.client/client-core";
 import {
 	type UaaClientConfiguration,
 	UaaActions,
@@ -74,7 +75,7 @@ export type UaaConfig = {
 };
 
 // Module augmentation
-declare module "@com.mgmtp.a12.client/client-core/lib/core/application/internal/factories/applicationConfig.js" {
+declare module "@com.mgmtp.a12.client/client-core" {
 	interface A12ApplicationConfig {
 		readonly uaa?: UaaConfig;
 	}
@@ -104,7 +105,7 @@ const addUaaBusyTriggers = <T extends ApplicationWithUaaConfig>(cfg: T) =>
 const addUaaResetTriggers = <T extends ApplicationWithUaaConfig>(cfg: T) =>
 	withApplicationResetTriggers<T>({
 		resetRequested: [UaaActions.logoutRequested],
-		resetConfirmed: UaaActions.loggingOut(),
+		resetConfirmed: UaaActions.loggingOut() as unknown as Action,
 		reset: [UaaActions.loggedOut]
 	})(cfg);
 
@@ -146,7 +147,7 @@ const addUaaProvider = <T extends ApplicationWithUaaConfig>(cfg: T) => {
  * - **UaaProvider** - Wraps the application with UaaProvider for UAA client initialization
  *
  * @example
- * ```typescript
+ * ```TypeScript
  * createA12ApplicationSetup(
  *   combineFeatures(
  *     withModel(appModel),

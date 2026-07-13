@@ -10,5 +10,4 @@
 		"out": "build/docs/typedoc",
 		"theme": "default"
 	}
-
 }

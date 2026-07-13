@@ -49,7 +49,7 @@ import {
 } from "../../../../src/internal/utils/index.js";
 
 import {
-	accessTokenExpirationMock as access_token_expiration,
+	tokenRenewInSecondsMock as token_renew_in_seconds,
 	accessTokenMock as access_token,
 	mockSamlState,
 	uaaUserMock
@@ -213,7 +213,7 @@ describe("SAML authenticating test", function () {
 					"uaa-authentication/exchangeAuthorizationCodeToToken?authorizationCode=authorizationCodeSample",
 					{
 						status: 200,
-						headers: { access_token, access_token_expiration }
+						headers: { access_token, token_renew_in_seconds }
 					}
 				);
 				cleanup();

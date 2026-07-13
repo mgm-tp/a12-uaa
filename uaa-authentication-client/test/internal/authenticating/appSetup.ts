@@ -97,7 +97,6 @@ export const offlineSelfConfigure: SelfConfigure = {
 			authorizationHeaderName: "wrong authorization",
 			tokenType: "UAABEARER",
 			generatedTokenHeaderName: "wrong token name",
-			generatedTokenExpirationHeaderName: "wrong token expiration",
 			allowCredentials: false
 		}
 	],
@@ -162,7 +161,6 @@ export const uaaClientConfiguration: UaaClientConfiguration = {
 				authorizationHeaderName: "Authorization",
 				tokenType: "UAABEARER",
 				generatedTokenHeaderName: "access_token",
-				generatedTokenExpirationHeaderName: "access_token_expiration",
 				allowCredentials: true
 			},
 			{

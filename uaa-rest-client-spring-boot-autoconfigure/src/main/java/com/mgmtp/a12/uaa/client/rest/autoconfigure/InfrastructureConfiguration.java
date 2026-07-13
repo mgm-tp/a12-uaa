@@ -45,8 +45,8 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.web.client.ResponseErrorHandler;
 
+import com.mgmtp.a12.connector.rest.ResponseErrorHandler;
 import com.mgmtp.a12.connector.rest.RestDeleteConnector;
 import com.mgmtp.a12.connector.rest.RestGetConnector;
 import com.mgmtp.a12.connector.rest.RestHeadConnector;

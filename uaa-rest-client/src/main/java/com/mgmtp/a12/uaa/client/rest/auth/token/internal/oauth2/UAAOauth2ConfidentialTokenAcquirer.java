@@ -79,7 +79,7 @@ public class UAAOauth2ConfidentialTokenAcquirer extends UAAHttpTokenAcquirer {
 	protected Request createLoginRequest() throws MalformedURLException {
 		UAARestClientAuthenticationProperties uaaRestClientAuthenticationProperties = uaaRestClientProperties.getAuthenticationConfiguration();
 		UriComponentsBuilder uriComponentsBuilder =
-			UriComponentsBuilder.fromHttpUrl(getFullUrlWithIdpBasePrefix(getOauth2ConfidentialProperties().getLoginRelative().getUrl()));
+			UriComponentsBuilder.fromUriString(getFullUrlWithIdpBasePrefix(getOauth2ConfidentialProperties().getLoginRelative().getUrl()));
 
 		String loginUrl = uriComponentsBuilder.build().toUriString();
 		WebRequest request = new WebRequest(new URL(loginUrl), HttpMethod.POST);

@@ -40,8 +40,6 @@ public class TokenConfiguration {
 	private String authorizationHeaderName;
 	private TokenType tokenType;
 	private String generatedTokenHeaderName;
-	@Deprecated(since = "8.2.2", forRemoval = true)
-	private String generatedTokenExpirationHeaderName;
 	private Boolean allowCredentials = false;
 
 	public TokenConfiguration() {
@@ -51,7 +49,6 @@ public class TokenConfiguration {
 		this.authorizationHeaderName = builder.authorizationHeaderName;
 		this.tokenType = builder.tokenType;
 		this.generatedTokenHeaderName = builder.generatedTokenHeaderName;
-		this.generatedTokenExpirationHeaderName = builder.generatedTokenExpirationHeaderName;
 		this.allowCredentials = builder.allowCredentials;
 	}
 
@@ -79,13 +76,6 @@ public class TokenConfiguration {
 		this.generatedTokenHeaderName = generatedTokenHeaderName;
 	}
 
-	public String getGeneratedTokenExpirationHeaderName() {
-		return generatedTokenExpirationHeaderName;
-	}
-
-	public void setGeneratedTokenExpirationHeaderName(String generatedTokenExpirationHeaderName) {
-		this.generatedTokenExpirationHeaderName = generatedTokenExpirationHeaderName;
-	}
 
 	public Boolean getAllowCredentials() {
 		return allowCredentials;
@@ -112,7 +102,6 @@ public class TokenConfiguration {
 			"authorizationHeaderName='" + authorizationHeaderName + '\'' +
 			", tokenType=" + tokenType +
 			", generatedTokenHeaderName='" + generatedTokenHeaderName + '\'' +
-			", generatedTokenExpirationHeaderName='" + generatedTokenExpirationHeaderName + '\'' +
 			", allowCredentials=" + allowCredentials +
 			'}';
 	}
@@ -121,8 +110,6 @@ public class TokenConfiguration {
 		private String authorizationHeaderName;
 		private TokenType tokenType;
 		private String generatedTokenHeaderName;
-		@Deprecated(since = "8.2.2", forRemoval = true)
-		private String generatedTokenExpirationHeaderName;
 		private Boolean allowCredentials = false;
 
 		private Builder() {
@@ -143,12 +130,6 @@ public class TokenConfiguration {
 			return this;
 		}
 
-		@Deprecated(since = "8.2.2", forRemoval = true)
-		public Builder withGeneratedTokenExpirationHeaderName(String generatedTokenExpirationHeaderName) {
-			this.generatedTokenExpirationHeaderName = generatedTokenExpirationHeaderName;
-			return this;
-		}
-
 		public Builder withAllowCredentials(Boolean allowCredentials) {
 			this.allowCredentials = allowCredentials;
 			return this;
@@ -165,7 +146,6 @@ public class TokenConfiguration {
 			.withTokenType(TokenType.UAABEARER)
 			.withAllowCredentials(false)
 			.withGeneratedTokenHeaderName(UAAAuthenticationSuccessHandler.TOKEN_KEY)
-			.withGeneratedTokenExpirationHeaderName(UAAAuthenticationSuccessHandler.TOKEN_EXPIRATION_KEY)
 			.build();
 
 	private static final TokenConfiguration DEFAULT_BEARER_TOKEN_CONFIGURATION =

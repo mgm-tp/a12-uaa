@@ -40,7 +40,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.web.filter.CorsFilter;
 
 import com.mgmtp.a12.uaa.authentication.AuthenticationProperties;
@@ -77,14 +77,14 @@ class JwtTokenSecurityConfigurer extends UAASecurityConfigurer<JwtTokenSecurityC
 					configurer.logoutSuccessHandler(jwtLogoutSuccessHandler);
 					String logoutUrl = authenticationProperties.getContextPath() + "/user/logout";
 					LOGGER.info("Registering logout endpoint to [{}]", logoutUrl);
-					configurer.logoutRequestMatcher(new AntPathRequestMatcher(logoutUrl, "POST"));
+					configurer.logoutRequestMatcher(PathPatternRequestMatcher.withDefaults().matcher(org.springframework.http.HttpMethod.POST, logoutUrl));
 					configurer.addLogoutHandler(jwtTokenLogoutHandler);
 				});
 		}
 	}
 
 	@Override
-	public void configure(HttpSecurity builder) throws Exception {
+	public void configure(HttpSecurity builder) {
 		builder.addFilterAfter(jwtTokenFilter(getAuthenticationManager(builder)), CorsFilter.class);
 	}
 
@@ -93,7 +93,7 @@ class JwtTokenSecurityConfigurer extends UAASecurityConfigurer<JwtTokenSecurityC
 		return Optional.of(new JwtAuthenticationProvider(principalCreator, jwtTokenVerifier));
 	}
 
-	private JwtTokenAuthenticationFilter jwtTokenFilter(AuthenticationManager authenticationManager) throws Exception {
+	private JwtTokenAuthenticationFilter jwtTokenFilter(AuthenticationManager authenticationManager) {
 		UAALoginEntryPoint loginEntryPoint = new UAALoginEntryPoint(authenticationProperties.getUnauthorizedCode());
 		JwtTokenAuthenticationFilter filter = new JwtTokenAuthenticationFilter(authenticationTokenLocator, authenticationManager, loginEntryPoint);
 		return filter;

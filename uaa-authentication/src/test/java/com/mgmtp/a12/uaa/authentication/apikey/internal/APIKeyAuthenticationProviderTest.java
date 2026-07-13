@@ -55,7 +55,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import com.mgmtp.a12.uaa.authentication.certificate.CertificateConverter;
+import com.mgmtp.a12.uaa.authentication.apikey.APIKeyConverter;
 import com.mgmtp.a12.uaa.authentication.principal.UAAPrincipal;
 import com.nimbusds.jose.util.Base64;
 import com.nimbusds.jose.util.StandardCharset;
@@ -68,7 +68,7 @@ public class APIKeyAuthenticationProviderTest {
 	private DefaultResourceLoader resourceLoader = new DefaultResourceLoader();
 
 	@Mock
-	private CertificateConverter apiKeyConverter;
+	private APIKeyConverter apiKeyConverter;
 
 	private APIKeyAuthenticationProvider apiKeyAuthenticationProvider;
 

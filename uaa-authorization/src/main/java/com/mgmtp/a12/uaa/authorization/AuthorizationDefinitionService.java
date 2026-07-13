@@ -47,8 +47,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
 import com.mgmtp.a12.uaa.authorization.exception.InvalidAuthorizationDefinitionException;
 import com.mgmtp.a12.uaa.authorization.internal.InMemoryAuthorizationDefinitionDataHolder;
 import com.mgmtp.a12.uaa.authorization.internal.RuntimeAuthorizationDefinitionRepository;
@@ -58,12 +56,18 @@ import com.mgmtp.a12.uaa.authorization.model.AuthorizationDefinition;
 import com.mgmtp.a12.uaa.authorization.model.internal.AuthorizationDefinitionAdapter;
 import com.mgmtp.a12.uaa.authorization.schema.internal.SchemaValidator;
 
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectReader;
+import tools.jackson.databind.json.JsonMapper;
+
 public class AuthorizationDefinitionService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AuthorizationDefinitionService.class);
 	private final String parentPath;
 	private final List<String> childPaths;
 
-	private static final ObjectMapper mapper = new ObjectMapper().setDefaultMergeable(false);
+	private static final ObjectMapper mapper = JsonMapper.builder()
+		.defaultMergeable(Boolean.FALSE)
+		.build();
 
 	@Inject
 	private ApplicationContext applicationContext;

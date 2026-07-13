@@ -31,8 +31,6 @@
  */
 package com.mgmtp.a12.uaa.authentication.backend;
 
-import java.util.concurrent.ExecutionException;
-
 import jakarta.inject.Inject;
 
 import org.junit.jupiter.api.Assertions;
@@ -57,7 +55,7 @@ public class ChildThreadAuthenticatedAspectTest {
 	}
 
 	@Test
-	public void checkUser() throws InterruptedException, ExecutionException {
+	public void checkUser() {
 		try {
 			asynchronousTestJobRunner.executeJob();
 		} catch (Exception e) {
@@ -76,7 +74,7 @@ public class ChildThreadAuthenticatedAspectTest {
 	}
 
 	@Test
-	public void checkUserAnnotatedAsync() throws InterruptedException, ExecutionException {
+	public void checkUserAnnotatedAsync() {
 		try {
 			annotatedAsynchronousTestJobRunner.executeJob();
 		} catch (Exception e) {

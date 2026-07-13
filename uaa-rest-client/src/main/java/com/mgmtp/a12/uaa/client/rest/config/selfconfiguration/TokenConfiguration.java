@@ -37,8 +37,6 @@ public class TokenConfiguration {
 	private String authorizationHeaderName;
 	private TokenType tokenType;
 	private String generatedTokenHeaderName;
-	@Deprecated(since = "8.2.2", forRemoval = true)
-	private String generatedTokenExpirationHeaderName;
 
 	public String getAuthorizationHeaderName() {
 		return authorizationHeaderName;
@@ -64,23 +62,12 @@ public class TokenConfiguration {
 		this.generatedTokenHeaderName = generatedTokenHeaderName;
 	}
 
-	@Deprecated(since = "8.2.2", forRemoval = true)
-	public String getGeneratedTokenExpirationHeaderName() {
-		return generatedTokenExpirationHeaderName;
-	}
-
-	@Deprecated(since = "8.2.2", forRemoval = true)
-	public void setGeneratedTokenExpirationHeaderName(String generatedTokenExpirationHeaderName) {
-		this.generatedTokenExpirationHeaderName = generatedTokenExpirationHeaderName;
-	}
-
 	@Override
 	public String toString() {
 		return "TokenConfiguration{" +
 			", authorizationHeaderName='" + authorizationHeaderName + '\'' +
 			", tokenType='" + tokenType + '\'' +
 			", generatedTokenHeaderName='" + generatedTokenHeaderName + '\'' +
-			", generatedTokenExpirationHeaderName='" + generatedTokenExpirationHeaderName + '\'' +
 			'}';
 	}
 }

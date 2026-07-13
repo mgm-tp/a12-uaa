@@ -38,7 +38,6 @@ import com.mgmtp.a12.kernel.md.model.api.services.IDocumentModelResolver;
 import com.mgmtp.a12.uaa.authorization.AuthorizationDefinitionRepository;
 import com.mgmtp.a12.uaa.authorization.property.internal.ResourceConverter;
 import com.mgmtp.a12.uaa.authorization.security.DataMasking;
-import com.mgmtp.a12.uaa.authorization.security.ext.property.internal.DocumentResourceConverter;
 import com.mgmtp.a12.uaa.authorization.security.ext.property.internal.DocumentUAADataMasking;
 import com.mgmtp.a12.uaa.authorization.security.ext.property.internal.documentv2.DocumentV2FilterTargetAdapter;
 import com.mgmtp.a12.uaa.authorization.security.ext.property.internal.documentv2.DocumentV2ResourceConverter;
@@ -51,11 +50,6 @@ public class AuthorizationA12ExtensionConfiguration {
 	public DataMasking createDataMaskingWithDocumentSupport(AuthorizationDefinitionRepository authorizationRepository,
 		IDocumentModelResolver documentModelResolver) {
 		return new DocumentUAADataMasking(authorizationRepository, documentModelResolver);
-	}
-	
-	@Bean
-	public ResourceConverter<?, ?> createResourceConverter() {
-		return new DocumentResourceConverter();
 	}
 
 	@Bean

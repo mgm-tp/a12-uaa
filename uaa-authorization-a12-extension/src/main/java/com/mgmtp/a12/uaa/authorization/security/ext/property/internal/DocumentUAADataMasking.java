@@ -33,17 +33,13 @@ package com.mgmtp.a12.uaa.authorization.security.ext.property.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mgmtp.a12.kernel.md.document.api.IDocument;
-import com.mgmtp.a12.kernel.md.document.api.IDocumentIndexed;
 import com.mgmtp.a12.kernel.md.document.apiV2.immutable.DocumentV2;
 import com.mgmtp.a12.kernel.md.document.apiV2.immutable.GroupInstanceV2;
 import com.mgmtp.a12.kernel.md.document.apiV2.immutable.RepetitionsV2;
@@ -54,7 +50,6 @@ import com.mgmtp.a12.uaa.authorization.AuthorizationContext;
 import com.mgmtp.a12.uaa.authorization.AuthorizationContextHolder;
 import com.mgmtp.a12.uaa.authorization.AuthorizationDefinitionRepository;
 import com.mgmtp.a12.uaa.authorization.model.internal.ResourceWrapper;
-import com.mgmtp.a12.uaa.authorization.property.internal.AccessiblePropertiesFactory;
 import com.mgmtp.a12.uaa.authorization.property.internal.PropertyTree;
 import com.mgmtp.a12.uaa.authorization.property.internal.PropertyTreeRoot;
 import com.mgmtp.a12.uaa.authorization.property.internal.UAADataMasking;
@@ -64,29 +59,14 @@ public class DocumentUAADataMasking extends UAADataMasking {
 	private final static Logger LOGGER = LoggerFactory.getLogger(DocumentUAADataMasking.class);
 
 	private IDocumentModelResolver documentModelResolver;
-	private DocumentPropertyValueResolver documentPropertyValueResolver;
 
 	public DocumentUAADataMasking(AuthorizationDefinitionRepository authorizationDefinitionRepository, IDocumentModelResolver documentModelResolver) {
 		super(authorizationDefinitionRepository);
 		this.documentModelResolver = documentModelResolver;
-		documentPropertyValueResolver = new DocumentPropertyValueResolver(documentModelResolver);
 	}
 
 	@Override
 	protected <T> void performDataMasking(T resource, PropertyTree accessiblePropertiesParent) {
-		if (resource instanceof IDocument document) {
-			Collection<String> allProperties = getAllPropertyPaths(document);
-			Collection<String> accessibleProperties = ((PropertyTreeRoot) accessiblePropertiesParent).getProperties();
-			List<String> propertiesToMask = allProperties.stream()
-				.filter(property -> !accessibleProperties.contains(property))
-				.collect(Collectors.toList());
-			PropertyTreeRoot propTomask = AccessiblePropertiesFactory.createPropertyPermissions(propertiesToMask, Collections.emptyList());
-
-			maskDocumentProperties(document, propTomask);
-
-			return;
-		}
-
 		// DocumentV2 for PostFilter operation
 		if (resource instanceof ResourceWrapper resourceWrapper && resourceWrapper.getResource() instanceof DocumentV2 documentV2) {
 			resourceWrapper.setResource(documentV2Masking(documentV2, accessiblePropertiesParent));
@@ -100,21 +80,6 @@ public class DocumentUAADataMasking extends UAADataMasking {
 			return;
 		}
 		super.performDataMasking(resource, accessiblePropertiesParent);
-	}
-
-	private IDocument maskDocumentProperties(IDocument document, PropertyTreeRoot propertiesToMask) {
-		IDocumentIndexed indexedDoc = (IDocumentIndexed) document;
-		// repetitions can be null if you want to change all field instances in a repeatable group (javadoc should be helpful)
-		List<DocumentPropertyValue> valuesToMask = documentPropertyValueResolver.findAllValues(indexedDoc, propertiesToMask);
-		valuesToMask.stream()
-			.filter(propertyValue -> propertyValue.getField().isPresent())
-			.forEach(propertyValue -> {
-				LOGGER.debug("Resource class[{}]: Masking property [{}], repetitions [{}] ", document.getClass().getCanonicalName(),
-					propertyValue.getPropertyPath(), propertyValue.getRepetitions());
-				propertyValue.getField().get().setValue(null);
-			});
-
-		return indexedDoc;
 	}
 
 	private DocumentV2 documentV2Masking(DocumentV2 documentV2, PropertyTree accessiblePropertiesParent) {
@@ -176,10 +141,6 @@ public class DocumentUAADataMasking extends UAADataMasking {
 		}
 
 		return repetitions;
-	}
-
-	private Collection<String> getAllPropertyPaths(IDocument document) {
-		return getAllPropertyPaths(documentModelResolver.getDocumentModelById(document.getDocumentModelId()));
 	}
 
 	private Collection<String> getAllPropertyPaths(DocumentV2 document) {

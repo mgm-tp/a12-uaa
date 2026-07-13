@@ -29,15 +29,6 @@
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
-/*
-	 * (c) copyright 2012-2022 mgm technology partners GmbH
- *
- * This software, the underlying source code and other artifacts are protected by copyright.
- * All rights, in particular the right to use, reproduce, publish and edit are reserved.
- * A simple right of use (license) can be acquired for use, duplication, publication, editing etc..
- *
- * Requests for this can be made at A12-license@mgm-tp.com or other official channels of the copyright holder.
- */
 package com.mgmtp.a12.uaa.authorization.model;
 
 import java.io.Serializable;

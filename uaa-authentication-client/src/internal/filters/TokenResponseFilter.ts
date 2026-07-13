@@ -65,26 +65,27 @@ export class TokenResponseFilter implements ResponseFilter {
 		const access_token = response.headers.get(
 			this.tokenConfigure?.generatedTokenHeaderName ?? "access_token"
 		);
-		const access_token_expiration = response.headers.get(
-			this.tokenConfigure?.generatedTokenExpirationHeaderName ??
-				"access_token_expiration"
-		);
 		if (access_token) {
+			const token_expiration_in_seconds = response.headers.get(
+				"token_expiration_in_seconds"
+			);
 			const token_renew_in_seconds = response.headers.get(
 				"token_renew_in_seconds"
 			);
 			sessionStorage.setItem(SessionStorageKeys.ACCESS_TOKEN, access_token);
-			if (access_token_expiration) {
+			if (token_expiration_in_seconds) {
 				sessionStorage.setItem(
-					SessionStorageKeys.ACCESS_TOKEN_EXPIRATION,
-					access_token_expiration
+					SessionStorageKeys.TOKEN_EXPIRATION_IN_SECONDS,
+					token_expiration_in_seconds
+				);
+				const token_expiration_timestamp =
+					Date.now() + Number(token_expiration_in_seconds) * 1000;
+				sessionStorage.setItem(
+					SessionStorageKeys.TOKEN_EXPIRATION_TIMESTAMP,
+					token_expiration_timestamp.toString()
 				);
 			}
 			if (token_renew_in_seconds) {
-				sessionStorage.setItem(
-					SessionStorageKeys.TOKEN_RENEW_IN_SECONDS,
-					token_renew_in_seconds
-				);
 				const token_renew_timestamp =
 					Date.now() + Number(token_renew_in_seconds) * 1000;
 				sessionStorage.setItem(

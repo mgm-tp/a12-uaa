@@ -12,6 +12,10 @@ tasks.withType(JavaCompile) {
     options.compilerArgs.add("-parameters")
 }
 
+tasks.withType(Test) {
+    useJUnitPlatform()
+}
+
 dependencies {
 	api project(':uaa-rest-client-spring-boot-autoconfigure')
 

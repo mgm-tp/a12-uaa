@@ -41,14 +41,14 @@ import java.util.concurrent.ScheduledFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import com.mgmtp.a12.uaa.client.rest.auth.AuthorizationData;
 import com.mgmtp.a12.uaa.client.rest.auth.AuthorizationDataStore;
 import com.mgmtp.a12.uaa.client.rest.auth.TokenRefresher;
 import com.mgmtp.a12.uaa.client.rest.auth.TokenValidator;
 import com.mgmtp.a12.uaa.client.rest.auth.token.internal.RefreshTokenScheduler;
+
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 public class PersistingAuthorizationDataStore implements AuthorizationDataStore {
 
@@ -65,9 +65,7 @@ public class PersistingAuthorizationDataStore implements AuthorizationDataStore 
 		this.store = store;
 		this.tokenRefresher = tokenRefresher;
 		this.tokenValidator = tokenValidator;
-		this.objectMapper = new ObjectMapper()
-			.registerModule(new JavaTimeModule())
-			.registerModule(new ParameterNamesModule());
+		this.objectMapper = JsonMapper.builder().build();
 	}
 
 	@Override

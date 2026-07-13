@@ -31,7 +31,6 @@
  */
 package com.mgmtp.a12.uaa.client.rest.auth;
 
-import java.time.Instant;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -45,9 +44,6 @@ public class AuthorizationData {
 
 	@JsonProperty
 	private String authenticationToken;
-	@JsonProperty
-	@Deprecated(since = "8.2.2", forRemoval = true)
-	private Instant authenticationTokenExpiration;
 	private Integer tokenRenewInSeconds;
 	@JsonProperty
 	private TokenType authenticationTokenType;
@@ -61,21 +57,6 @@ public class AuthorizationData {
 	private String uniqueUserIdentification;
 
 	public AuthorizationData() {
-	}
-
-	@Deprecated(since = "8.2.2", forRemoval = true)
-	public AuthorizationData(String authenticationToken, Instant authenticationTokenExpiration, TokenType authenticationTokenType, String sessionId) {
-		this(authenticationToken, authenticationTokenExpiration, authenticationTokenType, sessionId, UUID.randomUUID().toString());
-	}
-
-	@Deprecated(since = "8.2.2", forRemoval = true)
-	public AuthorizationData(String authenticationToken, Instant authenticationTokenExpiration, TokenType authenticationTokenType, String sessionId,
-		String uniqueUserIdentification) {
-		this.authenticationToken = authenticationToken;
-		this.authenticationTokenExpiration = authenticationTokenExpiration;
-		this.authenticationTokenType = authenticationTokenType;
-		this.sessionId = sessionId;
-		this.uniqueUserIdentification = uniqueUserIdentification;
 	}
 
 	public AuthorizationData(String authenticationToken, TokenType authenticationTokenType, String sessionId, Integer tokenRenewInSeconds) {
@@ -93,11 +74,6 @@ public class AuthorizationData {
 
 	public String getAuthenticationToken() {
 		return authenticationToken;
-	}
-
-	@Deprecated(since = "8.2.2", forRemoval = true)
-	public Instant getAuthenticationTokenExpiration() {
-		return authenticationTokenExpiration;
 	}
 
 	public Integer getTokenRenewInSeconds() {
@@ -174,8 +150,8 @@ public class AuthorizationData {
 
 	@Override
 	public String toString() {
-		return "AuthorizationData [authenticationToken=" + "*****" + ", authenticationTokenExpiration=" + authenticationTokenExpiration
-			+ ", authenticationTokenType=" + authenticationTokenType + ", sessionId=" + sessionId + ", refreshToken=" + "*****" + "]";
+		return "AuthorizationData [authenticationToken=" + "*****" + ", authenticationTokenType=" + authenticationTokenType + "," +
+			"sessionId=" + sessionId + ", refreshToken=" + "*****" + "]";
 	}
 
 }

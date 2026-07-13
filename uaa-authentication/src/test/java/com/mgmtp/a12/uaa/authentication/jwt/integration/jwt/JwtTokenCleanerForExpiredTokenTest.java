@@ -64,7 +64,7 @@ public class JwtTokenCleanerForExpiredTokenTest {
 
 	@Test
 	public void testRemoveTokenExpiration() throws InterruptedException {
-		UAAPrincipal<UserDataCreator.TestExtededData> user = UserDataCreator.createUser("test1", "password");
+		UAAPrincipal<UserDataCreator.TestExtendedData> user = UserDataCreator.createUser("test1", "password");
 		String tokenString = jwtGeneratorTokenSupport.generateToken(user).getToken();
 		jwtTokenStorage.storeToken(tokenString);
 		Assertions.assertTrue(jwtTokenStorage.loadToken(tokenString).isPresent());

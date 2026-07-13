@@ -44,7 +44,7 @@ import com.mgmtp.a12.uaa.authentication.principal.UAAPrincipal;
 
 public class UserDataCreator {
 
-	public static UAAPrincipal<TestExtededData> createUser(String userName, String password) {
+	public static UAAPrincipal<TestExtendedData> createUser(String userName, String password) {
 
 		Map<String, String> departmentActions = new HashMap<>();
 		departmentActions.put("P01", "Technical Development");
@@ -56,12 +56,12 @@ public class UserDataCreator {
 		return customUser;
 	}
 
-	public static TestExtededData createTestSubData() {
+	public static TestExtendedData createTestSubData() {
 		TestSubData subData = new TestSubData();
 		subData.setSubOne("oneData");
 		subData.setSubTwo("twoData");
 
-		TestExtededData extData = new TestExtededData();
+		TestExtendedData extData = new TestExtendedData();
 		extData.setDataOne("firstData");
 		extData.setDataTwo("secondData");
 		extData.setSubData(subData);
@@ -70,7 +70,7 @@ public class UserDataCreator {
 	}
 
 	@UAAJsonSerialization
-	public static class TestExtededData {
+	public static class TestExtendedData {
 		private String dataOne;
 		private String dataTwo;
 		private TestSubData subData;

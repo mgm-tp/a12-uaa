@@ -1,0 +1,40 @@
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: com.mgmtp.a12.uaa.openrewrite.UpgradeUaa_10_0
+displayName: UAA 10.0 auto-migration
+description: >-
+  Migrates breaking changes of the 2026.06 release (UAA 10.0). Renames the
+  getters/setters/constants of deprecated APIs that were removed in this release.
+  Uses only license-compatible core OpenRewrite recipes (rewrite-java / rewrite-properties).
+recipeList:
+  # --- uaa-authentication-principal-extension : ExternalPrincipalImpl misspelled eMail removed ---
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: com.mgmtp.a12.uaa.authentication.principal.ExternalPrincipalImpl geteMail()
+      newMethodName: getEmail
+      matchOverrides: true
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: com.mgmtp.a12.uaa.authentication.principal.ExternalPrincipalImpl seteMail(java.lang.String)
+      newMethodName: setEmail
+      matchOverrides: true
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: com.mgmtp.a12.uaa.authentication.principal.ExternalPrincipalImpl$Builder withEMail(java.lang.String)
+      newMethodName: withEmail
+      matchOverrides: true
+  # --- uaa-rest-client : TokenData.accessTokenExpiration removed ---
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: com.mgmtp.a12.uaa.client.rest.auth.internal.data.TokenData getAccessTokenExpiration()
+      newMethodName: getTokenRenewInSeconds
+      matchOverrides: true
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: com.mgmtp.a12.uaa.client.rest.auth.internal.data.TokenData setAccessTokenExpiration(java.lang.String)
+      newMethodName: setTokenRenewInSeconds
+      matchOverrides: true
+  # --- uaa-rest-client : UAARestClientProperties.generatedTokenExpirationHeaderName removed ---
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: com.mgmtp.a12.uaa.client.rest.config.properties.UAARestClientProperties getGeneratedTokenExpirationHeaderName()
+      newMethodName: getGeneratedTokenRenewInSecondsHeaderName
+      matchOverrides: true
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: com.mgmtp.a12.uaa.client.rest.config.properties.UAARestClientProperties setGeneratedTokenExpirationHeaderName(java.lang.String)
+      newMethodName: setGeneratedTokenRenewInSecondsHeaderName
+      matchOverrides: true

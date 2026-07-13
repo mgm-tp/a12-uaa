@@ -106,6 +106,35 @@ public class Oauth2SecurityAutoConfiguration {
 		return new DelegatedJWTDecoder(jwtDecoders.toArray(new JwtDecoder[0]));
 	}
 
+	//	/**
+	//	 * Fallback JwtDecoder for single-tenant configuration using standard Spring Boot OAuth2 properties.
+	//	 * This is needed because Spring Boot 4/Spring Security 7 no longer auto-configures JwtDecoder.
+	//	 */
+	//	@Bean
+	//	@ConditionalOnMissingBean(JwtDecoder.class)
+	//	@ConditionalOnProperty(name = "spring.security.oauth2.resourceserver.jwt.jwk-set-uri")
+	//	JwtDecoder jwtDecoderByJwkSetUri(
+	//			@Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}") String jwkSetUri,
+	//			@Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri:}") String issuerUri) {
+	//		NimbusJwtDecoder decoder = NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
+	//		if (StringUtils.isNotBlank(issuerUri)) {
+	//			decoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(issuerUri));
+	//		}
+	//		return decoder;
+	//	}
+	//
+	//	/**
+	//	 * Fallback JwtDecoder for single-tenant configuration using issuer-uri only.
+	//	 * This is needed because Spring Boot 4/Spring Security 7 no longer auto-configures JwtDecoder.
+	//	 */
+	//	@Bean
+	//	@ConditionalOnMissingBean(JwtDecoder.class)
+	//	@ConditionalOnProperty(name = "spring.security.oauth2.resourceserver.jwt.issuer-uri", matchIfMissing = false)
+	//	JwtDecoder jwtDecoderByIssuerUri(
+	//			@Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}") String issuerUri) {
+	//		return NimbusJwtDecoder.withIssuerLocation(issuerUri).build();
+	//	}
+
 	private Optional<JwtDecoder> createFromJwt(Tenant.Jwt jwt) throws Exception {
 		String issuerUri = jwt.getIssuerUri();
 		String jwkSetUri = jwt.getJwkSetUri();
@@ -165,7 +194,11 @@ public class Oauth2SecurityAutoConfiguration {
 		String clientId = opaqueToken.getClientId();
 		String clientSecret = opaqueToken.getClientSecret();
 		if (StringUtils.isNoneBlank(introspectionUri, clientId, clientSecret)) {
-			SpringOpaqueTokenIntrospector introspector = new SpringOpaqueTokenIntrospector(introspectionUri, clientId, clientSecret);
+			SpringOpaqueTokenIntrospector introspector = SpringOpaqueTokenIntrospector
+				.withIntrospectionUri(introspectionUri)
+				.clientId(clientId)
+				.clientSecret(clientSecret)
+				.build();
 			return Optional.of(new OpaqueTokenDecoder(introspector));
 		}
 		return Optional.empty();

@@ -32,7 +32,6 @@
 package com.mgmtp.a12.uaa.client.rest.cache;
 
 import java.net.URI;
-import java.time.Instant;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -78,7 +77,7 @@ public class CacheServiceTest {
 	@BeforeEach
 	void setUp() {
 		cacheService = new CacheService(authorizationDataStore, cacheManager, Arrays.asList(cacheNameMapper));
-		AuthorizationData authData = new AuthorizationData("token", Instant.now(), TokenType.UAABEARER, "session", "userID");
+		AuthorizationData authData = new AuthorizationData("token", TokenType.UAABEARER, "session", "userID", 300);
 		Mockito.when(authorizationDataStore.getAuthorizationData()).thenReturn(authData);
 		Mockito.when(cacheNameMapper.computeCacheName(Mockito.any())).thenReturn("cacheRegion");
 		Mockito.when(cacheNameMapper.match(Mockito.any())).thenReturn(true);

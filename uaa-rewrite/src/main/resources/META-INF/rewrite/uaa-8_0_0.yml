@@ -1,0 +1,168 @@
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: com.mgmtp.a12.uaa.openrewrite.UpgradeUaa_8_0
+displayName: User API refactoring
+recipeList:
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.internal.RoleDefinition
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.RoleDefinition
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.internal.RoleMappingDataHolder
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.RoleMappingDataHolder
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.UserDetailConvertor
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.UserDetailConverter
+  - com.mgmtp.a12.uaa.rewrite.ReplaceMethodCall:
+      existingMethodPattern: "com.mgmtp.a12.uaa.authentication.jwt.TokenSupport generateToken(org.springframework.security.core.userdetails.UserDetails)"
+      newMethodTemplate: "#{any(com.mgmtp.a12.uaa.authentication.jwt.TokenSupport)}.generateToken(#{any(org.springframework.security.core.userdetails.UserDetails)}).getToken()"
+      parameterIndexes: [0]
+  - com.mgmtp.a12.uaa.rewrite.ReplaceMethodCall:
+      existingMethodPattern: "com.mgmtp.a12.uaa.authentication.saml.LogoutRequestData getExpirationiDate()"
+      newMethodTemplate: "#{any(com.mgmtp.a12.uaa.authentication.saml.LogoutRequestData)}.getExpirationDate()))"
+      parameterIndexes: []
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.jwt.TokenSupport
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.jwt.JwtTokenService
+  - org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_2
+  - org.openrewrite.java.spring.security6.UpgradeSpringSecurity_6_2
+  - com.mgmtp.a12.uaa.rewrite.ChangeUaaSamlConfigurationKeys
+ # User -> Principal
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: com.mgmtp.a12.uaa.authentication.anonymous.AnonymousUserFactory createAnonymousUser(..)
+      newMethodName: createAnonymousPrincipal
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.anonymous.internal.PlainAnonymousUserFactory
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.anonymous.internal.PlainAnonymousPrincipalFactory
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.UAAExternalUserDetails
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.principal.ExternalPrincipal
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.PrincipalFactory
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.principal.PrincipalAdapter
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.PrincipalCreator
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.principal.PrincipalCreator      
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.UAAJsonSerialization
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.principal.UAAJsonSerialization
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.saml.SamlUserDetails
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.saml.SamlPrincipal
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: com.mgmtp.a12.uaa.authentication.user.internal.UAAUser getExtendedUserData()
+      newMethodName: getExtendedPrincipalData
+      matchOverrides: true
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: com.mgmtp.a12.uaa.authentication.user.internal.UAAUser setExtendedUserData(..)
+      newMethodName: setExtendedPrincipalData
+      matchOverrides: true
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.internal.UAAUser
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.principal.UAAPrincipal
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.AbstractExtendedUser
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.principal.AbstractExtendedPrincipal
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.AccessRight
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.principal.AccessRight
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.AccessRightDefinition
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.principal.AccessRightDefinition
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.ExtendedUser
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.principal.ExtendedPrincipal
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.ExternalUser
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.principal.ExternalPrincipalImpl
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.PropertyExtractor
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.principal.PropertyExtractor
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.Role
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.principal.Role
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.RoleDefinition
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.principal.RoleDefinition
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.RoleMappingDataHolder
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.principal.RoleMappingDataHolder
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.RoleMappingLoader
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.principal.RoleMappingLoader
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.UnableToUpdateMappingException
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.principal.UnableToUpdateMappingException
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: com.mgmtp.a12.uaa.authentication.user.UserFactory createUser(..)
+      newMethodName: createPrincipal
+      matchOverrides: true
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.UserFactory
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.principal.PrincipalFactory
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: com.mgmtp.a12.uaa.authentication.user.UserProcessor createUser(..)
+      newMethodName: createPrincipal
+      matchOverrides: true
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.UserProcessor
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.principal.PrincipalProcessor
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: com.mgmtp.a12.uaa.authentication.anonymous.AnonymousUserFactory createAnonymousUser(..)
+      newMethodName: createPrincipal
+      matchOverrides: true
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.anonymous.AnonymousUserFactory
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.anonymous.AnonymousPrincipalAdapter
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.anonymous.AnonymousUserFactoryWithAccessRights
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.principal.anonymous.AnonymousPrincipalFactoryWithAccessRights
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.certificate.CertificateUtils
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.principal.certificate.CertificateUtils
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.local.LocalUser
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.LocalUser
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.local.LocalUserLoader
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.LocalUserLoader
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: com.mgmtp.a12.uaa.authentication.user.local.LocalUserManager createUser(..)
+      newMethodName: createPrincipal
+      matchOverrides: true
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.local.LocalUserManager
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.LocalUserManager
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: com.mgmtp.a12.uaa.authentication.user.UserDetailConverter convertUser(..)
+      newMethodName: convertPrincipal
+      matchOverrides: true
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.UserDetailConverter
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.principal.PrincipalConverter
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: com.mgmtp.a12.uaa.authentication.local.UAAExtendedUserDataLoader loadExtendedUserData(..)
+      newMethodName: loadExtendedPrincipalData
+      matchOverrides: true
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.local.UAAExtendedUserDataLoader
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.local.UAAExtendedPrincipalDataLoader
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: com.mgmtp.a12.uaa.authentication.user.local.LocalUserManager createUser(..)
+      newMethodName: createPrincipal
+      matchOverrides: true
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: com.mgmtp.a12.uaa.authentication.user.local
+      newPackageName: com.mgmtp.a12.uaa.authentication.user
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: com.mgmtp.a12.uaa.authentication.user.local.internal
+      newPackageName: com.mgmtp.a12.uaa.authentication.user.internal
+  - org.openrewrite.properties.ChangePropertyKey:
+      oldPropertyKey: mgmtp\.a12\.uaa\.authentication\.user\.(.*)
+      newPropertyKey: mgmtp.a12.uaa.authentication.principal.$1
+      regex: true
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.autoconfigure.AuthenticationUserExtensionProperties
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.principal.autoconfigure.AuthenticationPrincipalExtensionProperties
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.user.anonymous.AnonymousUserFactoryWithAccessRights
+      newFullyQualifiedTypeName: com.mgmtp.a12.uaa.authentication.principal.anonymous.AnonymousPrincipalAdapterWithAccessRights

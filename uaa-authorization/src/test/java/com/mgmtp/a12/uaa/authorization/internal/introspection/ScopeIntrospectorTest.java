@@ -48,9 +48,10 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mgmtp.a12.uaa.authorization.AuthorizationDefinitionService;
 import com.mgmtp.a12.uaa.authorization.internal.RuntimeAuthorizationDefinitionRepository;
+
+import tools.jackson.databind.ObjectMapper;
 
 @ExtendWith(SpringExtension.class)
 public class ScopeIntrospectorTest {

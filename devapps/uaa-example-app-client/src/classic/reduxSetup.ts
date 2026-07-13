@@ -34,6 +34,7 @@ import {
   applyMiddleware,
   combineReducers,
   createStore,
+  type Store,
 } from "redux";
 import { putResolve } from "typed-redux-saga";
 import {
@@ -62,7 +63,7 @@ const createRootReducer = () =>
     uaa: UaaReducer,
   });
 
-export const store = createStore(
+export const store: Store = createStore(
   createRootReducer(),
   getComposeWithDevTools()(applyMiddleware(...UaaMiddlewares([logoutIDP()]))),
 );

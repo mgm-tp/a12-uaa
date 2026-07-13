@@ -24,7 +24,7 @@
       "dataPreload": [
         "#username = ((hasRole('admin') || #resource != 'DomainCaseType') ? '' : principal.username)"
       ],
-      "template-refs": [
+      "templates": [
         "Domain Authorization Filter"
       ]
     }

@@ -55,7 +55,6 @@ public class RequestAuthorizationDataLocatorTest {
 		AuthorizationData authorizationData = requestAuthorizationDataLocator.convert(request);
 
 		Assertions.assertEquals(authToken, authorizationData.getAuthenticationToken());
-		Assertions.assertNull(authorizationData.getAuthenticationTokenExpiration());
 		Assertions.assertEquals(TokenType.DELEGATED, authorizationData.getAuthenticationTokenType());
 		Assertions.assertEquals("sessionData", authorizationData.getSessionId());
 	}

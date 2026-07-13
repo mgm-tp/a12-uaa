@@ -1,13 +1,13 @@
 {
   "applicationBaseUrl" : "application_base_url",
-  "uaaBaseUrl" : "uaa_base_url",
   "authorizationDataStore" : "authorization_data_store",
   "excludedDelegatedContexts" : [ "context1", "context2" ],
   "local" : {
     "loginRelativeUrl" : "user/local/login",
-    "logoutRelativeUrl" : "user/logout",
     "logoutMethod" : "POST",
+    "logoutRelativeUrl" : "user/logout",
     "tokenType" : "UAABEARER"
   },
-  "tokens" : [ ]
+  "tokens" : [ ],
+  "uaaBaseUrl" : "uaa_base_url"
 }

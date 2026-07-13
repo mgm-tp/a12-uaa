@@ -34,7 +34,7 @@ package com.mgmtp.a12.uaa.client.rest.auth.token.internal.jwt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
 import com.mgmtp.a12.connector.rest.UrlBuilderSupport;
 import com.mgmtp.a12.uaa.client.rest.auth.TokenValidator;
@@ -46,7 +46,7 @@ public class JwtTokenValidator implements TokenValidator {
 	private static final String CONTEXT = "uaa-authentication";
 	private static final String ENDPOINT_TOKEN_VALID = "tokenValid";
 
-	private RestTemplate restTemplate = new RestTemplate();
+	private RestClient restClient = RestClient.create();
 	private UrlBuilderSupport urlBuilderSupport;
 
 	public JwtTokenValidator(String baseUrl) {
@@ -57,7 +57,11 @@ public class JwtTokenValidator implements TokenValidator {
 	public boolean isTokenValid(String token) {
 		String url = urlBuilderSupport.createBuilder().pathSegment(ENDPOINT_TOKEN_VALID).toUriString();
 		try {
-			restTemplate.postForEntity(url, token, String.class);
+			restClient.post()
+				.uri(url)
+				.body(token)
+				.retrieve()
+				.toBodilessEntity();
 			LOGGER.info("JWT Authentication token is valid");
 			return true;
 		} catch (HttpClientErrorException e) {

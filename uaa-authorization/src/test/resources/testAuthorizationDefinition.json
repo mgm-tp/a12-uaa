@@ -113,9 +113,6 @@
 		{
 			"name": "RepositoryPolicyRef",
 			"description": "Repos",
-			"template-refs": [
-				"RepositoryPolicy"
-			],
 			"templates": [
 				"'The template must have'"
 			]

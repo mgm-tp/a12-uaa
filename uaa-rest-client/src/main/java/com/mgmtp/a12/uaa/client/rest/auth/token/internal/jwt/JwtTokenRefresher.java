@@ -33,13 +33,11 @@ package com.mgmtp.a12.uaa.client.rest.auth.token.internal.jwt;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
 import com.mgmtp.a12.connector.rest.UrlBuilderSupport;
 import com.mgmtp.a12.uaa.client.rest.auth.AuthorizationData;
@@ -66,12 +64,12 @@ public class JwtTokenRefresher implements TokenRefresher {
 
 	private AuthorizationDataStore authorizationDataStore;
 	private UrlBuilderSupport urlBuilderSupport;
-	private RestTemplate restTemplate;
+	private RestClient restClient;
 
 	public JwtTokenRefresher(UAARestClientProperties clientConfiguration, AuthorizationDataStore authorizationDataStore) {
 		this.urlBuilderSupport = UrlBuilderSupport.withBaseUrl(clientConfiguration.getUaaBase().getUrl(), CONTEXT);
 		this.authorizationDataStore = authorizationDataStore;
-		this.restTemplate = new RestTemplate();
+		this.restClient = RestClient.create();
 	}
 
 	@Override
@@ -99,10 +97,12 @@ public class JwtTokenRefresher implements TokenRefresher {
 			.build()
 			.toString();
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		HttpEntity<String> entity = new HttpEntity<>(EXCHANGE_TOKEN_AUTHORIZE_BODY.formatted(codeChallenge, state, idTokenHint), headers);
-		return restTemplate.postForObject(url, entity, AuthorizeData.class);
+		return restClient.post()
+			.uri(url)
+			.contentType(MediaType.APPLICATION_JSON)
+			.body(EXCHANGE_TOKEN_AUTHORIZE_BODY.formatted(codeChallenge, state, idTokenHint))
+			.retrieve()
+			.body(AuthorizeData.class);
 	}
 
 	private TokenData requestToken(String code, String codeVerifier) {
@@ -111,14 +111,17 @@ public class JwtTokenRefresher implements TokenRefresher {
 		String url = urlBuilderSupport.createBuilder().pathSegment(ENDPOINT_TOKEN)
 			.build()
 			.toString();
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
 		MultiValueMap<String, Object> requestBody = new LinkedMultiValueMap<>();
 		requestBody.add(PARAM_CODE, code);
 		requestBody.add(PARAM_CODE_VERIFIER, codeVerifier);
-		HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
 
-		return restTemplate.postForObject(url, requestEntity, TokenData.class);
+		return restClient.post()
+			.uri(url)
+			.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+			.body(requestBody)
+			.retrieve()
+			.body(TokenData.class);
 	}
 
 }

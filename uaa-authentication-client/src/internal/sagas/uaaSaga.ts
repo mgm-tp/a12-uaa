@@ -29,9 +29,10 @@
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
-import { Action } from "typescript-fsa";
-import { takeEvery } from "typed-redux-saga";
-import createSagaMiddleware, { SagaIterator, Task } from "redux-saga";
+import { SagaGenerator, takeEvery } from "typed-redux-saga";
+import createSagaMiddleware, { Task } from "redux-saga";
+
+import type { Action } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 
 import { UaaSagaDescriptor } from "../interfaces/index.js";
 
@@ -94,7 +95,7 @@ export class UaaSaga {
  *
  * @param sagas
  */
-function* watchDispatchSaga(sagas: UaaSagaDescriptor[]): SagaIterator<void> {
+function* watchDispatchSaga(sagas: UaaSagaDescriptor[]): SagaGenerator<void> {
 	yield* takeEvery(() => true, dispatch, sagas);
 }
 

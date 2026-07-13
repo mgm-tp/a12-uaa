@@ -37,11 +37,16 @@ import jakarta.inject.Inject;
 
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.Version;
 import com.mgmtp.a12.uaa.authentication.AuthenticationType;
 import com.mgmtp.a12.uaa.authentication.ConditionalOnAuthentication;
+import com.mgmtp.a12.uaa.authentication.principal.AccessRight;
+import com.mgmtp.a12.uaa.authentication.principal.ExtendedPrincipal;
 import com.mgmtp.a12.uaa.authentication.principal.PrincipalFactory;
-import com.mgmtp.a12.uaa.authentication.principal.internal.serialization.UAAJacksonModule;
+import com.mgmtp.a12.uaa.authentication.principal.Role;
+import com.mgmtp.a12.uaa.authentication.principal.UAAJacksonModule;
+
+import tools.jackson.core.Version;
+import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 
 @Component
 @ConditionalOnAuthentication({ AuthenticationType.LOCAL, AuthenticationType.ACTIVE_DIRECTORY_LDAP, AuthenticationType.SAML,
@@ -55,8 +60,16 @@ public class UserExtensionJacksonModule extends UAAJacksonModule {
 		super(UserExtensionJacksonModule.class.getName(), new Version(1, 0, 0, null, null, null));
 	}
 
+	@Override public void configurePolymorphicTypeValidator(BasicPolymorphicTypeValidator.Builder builder) {
+		builder
+			.allowIfSubType(AccessRight.class)
+			.allowIfSubType(Role.class)
+			.allowIfSubType(ExtendedPrincipal.class);
+	}
+
 	@Override
 	public void setupModule(SetupContext context) {
-		context.setMixInAnnotations(userFactory.createPrincipal(getClass().getName(), Collections.emptyList()).getClass(), UaaExtendedUserMixin.class);
+		context.setMixIn(userFactory.createPrincipal(getClass().getName(), Collections.emptyList()).getClass(), UaaExtendedUserMixin.class);
 	}
+
 }

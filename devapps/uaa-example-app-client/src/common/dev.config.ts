@@ -36,8 +36,7 @@
  */
 
 import { ConsoleLoggingStrategy } from "@com.mgmtp.a12.utils/utils-logging";
-import { LogLevel } from "@com.mgmtp.a12.utils/utils-logging/api.js";
 
-import { Settings } from "@com.mgmtp.a12.utils/utils-logging/lib/Settings.js";
+import { Settings } from "@com.mgmtp.a12.utils/utils-logging";
 
-Settings.LogStrategy = new ConsoleLoggingStrategy(console, LogLevel.LOG);
+Settings.LogStrategy = new ConsoleLoggingStrategy(console, "log");

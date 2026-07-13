@@ -35,10 +35,11 @@ import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.web.client.ResponseErrorHandler;
 
+import com.mgmtp.a12.connector.rest.ResponseErrorHandler;
 import com.mgmtp.a12.uaa.client.rest.UAARestClientException;
 
 public class UAAResponseErrorHandler implements ResponseErrorHandler {
@@ -48,15 +49,12 @@ public class UAAResponseErrorHandler implements ResponseErrorHandler {
 
 
 	@Override
-	public boolean hasError(ClientHttpResponse response) throws IOException {
+	public void handleError(HttpRequest request, ClientHttpResponse response) throws IOException {
 		HttpStatus statusCode = HttpStatus.resolve(response.getStatusCode().value());
-		return statusCode == HttpStatus.FORBIDDEN || statusCode == HttpStatus.UNAUTHORIZED;
-	}
-
-	@Override
-	public void handleError(ClientHttpResponse response) throws IOException {
-		LOGGER.error("Request failed with code: [{}]", response.getStatusCode().value());
-		throw new UAARestClientException(HttpStatus.resolve(response.getStatusCode().value()), response.getStatusText());
+		if (statusCode == HttpStatus.FORBIDDEN || statusCode == HttpStatus.UNAUTHORIZED) {
+			LOGGER.error("Request failed with code: [{}]", response.getStatusCode().value());
+			throw new UAARestClientException(statusCode, response.getStatusText());
+		}
 	}
 
 }

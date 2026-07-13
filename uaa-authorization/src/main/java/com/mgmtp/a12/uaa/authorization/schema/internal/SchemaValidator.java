@@ -36,20 +36,12 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mgmtp.a12.uaa.authorization.schema.internal.collector.GlobalRefsCollector;
 import com.mgmtp.a12.uaa.authorization.schema.internal.collector.RefsCollectors;
 import com.mgmtp.a12.uaa.authorization.schema.internal.listener.RefsListener;
@@ -58,55 +50,67 @@ import com.mgmtp.a12.uaa.authorization.schema.internal.validator.ExpressionTypeK
 import com.mgmtp.a12.uaa.authorization.schema.internal.validator.IdentityPropertyKeyword;
 import com.mgmtp.a12.uaa.authorization.schema.internal.validator.RefInKeyword;
 import com.networknt.schema.CollectorContext;
+import com.networknt.schema.Error;
 import com.networknt.schema.ExecutionContext;
-import com.networknt.schema.JsonMetaSchema;
-import com.networknt.schema.JsonSchema;
-import com.networknt.schema.JsonSchemaFactory;
-import com.networknt.schema.PathType;
-import com.networknt.schema.SchemaValidatorsConfig;
-import com.networknt.schema.SpecVersion.VersionFlag;
-import com.networknt.schema.ValidationMessage;
-import com.networknt.schema.ValidatorTypeCode;
+import com.networknt.schema.OutputFormat;
+import com.networknt.schema.Schema;
+import com.networknt.schema.SchemaLocation;
+import com.networknt.schema.SchemaRegistry;
+import com.networknt.schema.SchemaRegistryConfig;
+import com.networknt.schema.dialect.Dialect;
+import com.networknt.schema.dialect.Dialects;
+import com.networknt.schema.keyword.KeywordType;
+import com.networknt.schema.path.PathType;
+import com.networknt.schema.walk.PropertyWalkHandler;
+
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 public class SchemaValidator {
-	
+
 	public static final String FILENAME_FIELD = "name";
 
 	private static final String SCHEMA_FILE_PATH = "classpath:schema/authorization-definition-schema.json";
-	private ObjectMapper mapper;
-	private ResourceLoader resourceLoader;
 
-	private JsonSchemaFactory schemaFactory;
-	private SchemaValidatorsConfig config;
+	private final ObjectMapper mapper;
+	private final ResourceLoader resourceLoader;
+	private final SchemaRegistry schemaFactory;
+	private final SchemaRegistryConfig config;
 
 	public SchemaValidator(ResourceLoader loader, ObjectMapper mapper) {
 		this.resourceLoader = loader;
 		this.mapper = mapper;
-		// Create Json meta schema
-		JsonMetaSchema extendingMeta = JsonMetaSchema.builder(JsonMetaSchema.getV7())
+
+		Dialect extendingMeta = Dialect.builder(Dialects.getDraft7())
 			.keyword(new ExpressionTypeKeyword())
 			.keyword(new IdentityPropertyKeyword())
 			.keyword(new RefInKeyword())
 			.build();
 
-		// Create Json Schema Factory
-		schemaFactory = JsonSchemaFactory
-			.getInstance(VersionFlag.V7, builder -> {
-				builder.metaSchema(extendingMeta);
-				builder.jsonMapper(mapper);
-			});
+		this.config = SchemaRegistryConfig.builder()
+			.pathType(PathType.JSON_POINTER)
+			.executionContextCustomizer((executionContext, schemaContext) -> {
+				executionContext.walkConfig(walkConfig -> walkConfig.propertyWalkHandler(
+					PropertyWalkHandler.builder()
+						.propertyWalkListener(new RefsListener())
+						.build()
+				));
 
-		// Create config
-		config = new SchemaValidatorsConfig();
-		config.addPropertyWalkListener(new RefsListener());
-		config.setPathType(PathType.JSON_POINTER);
-		config.setExecutionContextCustomizer((executionContext, validationContext) -> {
-			CollectorContext collectorContext = executionContext.getCollectorContext();
-			collectorContext.add(RefsCollectors.POLICIES.getId(), new GlobalRefsCollector());
-			collectorContext.add(RefsCollectors.PROPERTY_RIGHT.getId(), new GlobalRefsCollector());
-			collectorContext.add(RefsCollectors.REPOSITORY_POLICY.getId(), new GlobalRefsCollector());
-		});
+				CollectorContext collectorContext = executionContext.getCollectorContext();
+				collectorContext.put(RefsCollectors.POLICIES.getId(), new GlobalRefsCollector());
+				collectorContext.put(RefsCollectors.PROPERTY_RIGHT.getId(), new GlobalRefsCollector());
+				collectorContext.put(RefsCollectors.REPOSITORY_POLICY.getId(), new GlobalRefsCollector());
+			})
+			.build();
 
+		this.schemaFactory = SchemaRegistry.withDialect(extendingMeta, builder ->
+			builder
+				.schemaRegistryConfig(this.config)
+				.nodeReader(nodeReader -> nodeReader.jsonMapper(mapper))
+		);
 	}
 
 	public List<String> validateAuthorizationFile(String parentPath, List<String> childPaths) {
@@ -123,29 +127,29 @@ public class SchemaValidator {
 			.collect(Collectors.toList());
 	}
 
-	/**
-	 *
-	 * @param paths the first path will be granted to a main authorization definition
-	 */
 	private List<ErrorMessageProducer> validate(List<String> paths) {
 		List<JsonNode> nodes = parse(paths);
 
-		// Walk all node to collect the refs information to the CollectorContext
 		ExecutionContext walkExecutionContext = walk(nodes);
+		Schema jsonSchema = calculateSchema(walkExecutionContext);
 
-		// Calculating the schema with the CollectorContext
-		JsonSchema jsonSchema = calculateSchema(walkExecutionContext);
-
-		// Validate
-		ExecutionContext validationExecutionContext = jsonSchema.createExecutionContext();
-		validationExecutionContext.setCollectorContext(walkExecutionContext.getCollectorContext());
 		List<ErrorMessageProducer> producers = new ArrayList<>();
+
 		nodes.forEach(node -> {
-			Set<ValidationMessage> errors = jsonSchema.validate(validationExecutionContext, node);
+			ExecutionContext validationExecutionContext = jsonSchema.createExecutionContext();
+			validationExecutionContext.setCollectorContext(walkExecutionContext.getCollectorContext());
+
+			List<Error> errors = jsonSchema.validate(
+				validationExecutionContext,
+				node,
+				OutputFormat.DEFAULT
+			);
+
 			if (!errors.isEmpty()) {
 				producers.add(new ErrorMessageProducer(errors, node));
 			}
 		});
+
 		return producers;
 	}
 
@@ -156,20 +160,23 @@ public class SchemaValidator {
 	}
 
 	private JsonNode parse(String filePath) {
-		try {
-			JsonParser parser = mapper.getFactory().createParser(getInputStream(filePath));
-			ObjectReader reader = mapper.reader(new LocationJsonNodeFactory(parser));
-			ObjectNode node = reader.readValue(parser, ObjectNode.class);
-			node.put(SchemaValidator.FILENAME_FIELD, filePath);
+		try (InputStream inputStream = getInputStream(filePath);
+			JsonParser parser = mapper.createParser(inputStream)) {
+
+			ObjectNode node = mapper
+				.reader(new LocationJsonNodeFactory(parser))
+				.forType(ObjectNode.class)
+				.readValue(parser);
+
+			node.put(FILENAME_FIELD, filePath);
 			return node;
 		} catch (Exception e) {
 			throw new RuntimeException("Unable parse file %s".formatted(filePath), e);
 		}
-
 	}
 
 	private ExecutionContext walk(List<JsonNode> nodes) {
-		JsonSchema walkerSchema = schemaFactory.getSchema(getInputStream(SCHEMA_FILE_PATH), this.config);
+		Schema walkerSchema = schemaFactory.getSchema(SchemaLocation.of(SCHEMA_FILE_PATH));
 		ExecutionContext executionContext = walkerSchema.createExecutionContext();
 
 		nodes.forEach(node -> walkerSchema.walk(executionContext, node, false));
@@ -184,28 +191,30 @@ public class SchemaValidator {
 		}
 	}
 
-	private JsonSchema calculateSchema(ExecutionContext executionContext) {
-		try {
-			ObjectNode schemaNode = mapper.readValue(getInputStream(SCHEMA_FILE_PATH), ObjectNode.class);
-			// Get allOf node in the authorization-definition-schema.json, allOf node is always array
-			ArrayNode allOf = ((ArrayNode) schemaNode.get(ValidatorTypeCode.ALL_OF.getValue()));
-			Iterator<JsonNode> iterator = allOf.iterator();
-			while (iterator.hasNext()) {
-				JsonNode element = iterator.next();
-				// Required Property in all, {... "then": { "required": ["repositoryPolicies"] } ...}
-				String requiredProperty = element.at("/then/required/0").asText();
-				@SuppressWarnings("unchecked")
-				Set<JsonNode> collectedData = ((Set<JsonNode>) executionContext.getCollectorContext().get("/" + requiredProperty));
-				// If there are any existing global refs, remove required property validator in 'allOf' condition of root schema
-				if (Objects.nonNull(collectedData) && !collectedData.isEmpty()) {
-					iterator.remove();
-				}
-			}
-			Resource resource = resourceLoader.getResource(SCHEMA_FILE_PATH);
-			return schemaFactory.getSchema(resource.getURI(), schemaNode, this.config);
-		} catch (IOException e) {
-			throw new RuntimeException("Unable to read file %s".formatted(SCHEMA_FILE_PATH), e);
-		}
-	}
+	private Schema calculateSchema(ExecutionContext executionContext) {
+		ObjectNode schemaNode = mapper.readValue(getInputStream(SCHEMA_FILE_PATH), ObjectNode.class);
 
+		ArrayNode allOf = (ArrayNode) schemaNode.get(KeywordType.ALL_OF.getValue());
+		Iterator<JsonNode> iterator = allOf.iterator();
+
+		while (iterator.hasNext()) {
+			JsonNode element = iterator.next();
+			String requiredProperty = element.at("/then/required/0").asString();
+
+			GlobalRefsCollector collector =
+				executionContext.getCollectorContext().get("/" + requiredProperty);
+
+			Set<JsonNode> collectedData =
+				collector != null ? collector.collect() : Set.of();
+
+			if (!collectedData.isEmpty()) {
+				iterator.remove();
+			}
+		}
+
+		return schemaFactory.getSchema(
+			SchemaLocation.of(SCHEMA_FILE_PATH),
+			schemaNode
+		);
+	}
 }

@@ -48,10 +48,10 @@ import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.config.annotation.ObjectPostProcessor;
+import org.springframework.security.config.ObjectPostProcessor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.saml2.provider.service.authentication.OpenSaml5AuthenticationProvider;
-import org.springframework.security.saml2.provider.service.metadata.OpenSamlMetadataResolver;
+import org.springframework.security.saml2.provider.service.metadata.OpenSaml5MetadataResolver;
 import org.springframework.security.saml2.provider.service.registration.InMemoryRelyingPartyRegistrationRepository;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration.Builder;
@@ -126,50 +126,52 @@ public class SamlSecurityConfigurer extends UAASecurityConfigurer<SamlSecurityCo
 
 	@Override
 	public void configureHttpSecurity(HttpSecurity http) throws Exception {
-		http.requestCache(customizer -> {
-			customizer.requestCache(new HttpSessionRequestCache());
-		});
+		http.requestCache(customizer -> customizer.requestCache(new HttpSessionRequestCache()));
 
 		http.logout(logoutConfigurer -> {
-			LogoutSuccessHandler logoutSuccessHandler = logoutConfigurer.getLogoutSuccessHandler();
+			logoutConfigurer.addLogoutHandler(createLogoutParametersHandler());
+			LogoutSuccessHandler current = logoutConfigurer.getLogoutSuccessHandler();
 			logoutConfigurer.logoutSuccessHandler(
-				new SamlInvalidatingLogoutSuccessHandler(logoutSuccessHandler, createLogoutRequestRepository()));
+				new SamlInvalidatingLogoutSuccessHandler(current, createLogoutRequestRepository()));
 		});
 
-		// we need to ensure that we use post binding. There is no way to do it by
-		// configuration. We need to re-instantiate regiatration repository
 		List<RelyingPartyRegistration> empty = Collections.emptyList();
 		Iterable<RelyingPartyRegistration> iterable = () -> relyingPartyRegistrationRepository
 			.map((repository) -> ((InMemoryRelyingPartyRegistrationRepository) repository).iterator())
 			.orElse(empty.iterator());
+
 		List<RelyingPartyRegistration> updatedRegistrations = StreamSupport.stream(iterable.spliterator(), false)
 			.map(registration -> {
 				RelyingPartyRegistration existingRegistration = relyingPartyRegistrationRepository.get()
 					.findByRegistrationId(registration.getRegistrationId());
-				// the update is only for spring based registration.
+
 				Builder builder = existingRegistration.mutate()
 					.assertingPartyMetadata(party -> {
-						party.signingAlgorithms((alg) -> alg.add(authenticationProperties.getSaml().getSigningAlgorithm().getUrl()));
+						party.signingAlgorithms((alg) ->
+							alg.add(authenticationProperties.getSaml().getSigningAlgorithm().getUrl()));
 					});
-				RelyingPartyRegistration updatedRegistration = builder.build();
 
-				return updatedRegistration;
+				return builder.build();
 			}).collect(Collectors.toList());
 
-		RelyingPartyRegistrationRepository relyingRepository = new InMemoryRelyingPartyRegistrationRepository(
-			updatedRegistrations);
+		RelyingPartyRegistrationRepository relyingRepository =
+			new InMemoryRelyingPartyRegistrationRepository(updatedRegistrations);
 
-		relyingPartyRegistrationResolver = new DefaultRelyingPartyRegistrationResolver(
-			relyingRepository);
+		relyingPartyRegistrationResolver = new DefaultRelyingPartyRegistrationResolver(relyingRepository);
 
-		Saml2MetadataFilter metadataFilter = new Saml2MetadataFilter(relyingPartyRegistrationResolver,
-			new OpenSamlMetadataResolver());
+		Saml2MetadataFilter metadataFilter = new Saml2MetadataFilter(
+			relyingPartyRegistrationResolver,
+			new OpenSaml5MetadataResolver()
+		);
 
-		OpenSaml5AuthenticationRequestResolver authenticationRequestResolver = new OpenSaml5AuthenticationRequestResolver(
-			relyingPartyRegistrationResolver);
+		OpenSaml5AuthenticationRequestResolver authenticationRequestResolver =
+			new OpenSaml5AuthenticationRequestResolver(relyingPartyRegistrationResolver);
+
 		boolean isForceAuth = authenticationProperties.getSaml().getForceAuth().isEnabled();
 		authenticationRequestResolver.setAuthnRequestCustomizer(
-			new UAAAuthnRequestConsumer(isForceAuth, extensionDataGenerator, requestContextDataGenerator));
+			new UAAAuthnRequestConsumer(isForceAuth, extensionDataGenerator, requestContextDataGenerator)
+		);
+
 		http
 			.saml2Login(saml2 -> {
 				saml2.successHandler(createSamlAuthenticationSuccessHandler());
@@ -178,38 +180,68 @@ public class SamlSecurityConfigurer extends UAASecurityConfigurer<SamlSecurityCo
 				saml2.authenticationRequestResolver(authenticationRequestResolver);
 			})
 			.saml2Logout(saml2 -> {
-				OpenSaml5LogoutRequestResolver logoutRequestResolver = new OpenSaml5LogoutRequestResolver(
-					relyingPartyRegistrationResolver);
+				OpenSaml5LogoutRequestResolver logoutRequestResolver =
+					new OpenSaml5LogoutRequestResolver(relyingPartyRegistrationResolver);
+
 				saml2.relyingPartyRegistrationRepository(relyingRepository);
 				saml2.logoutUrl("/user/logout");
 				saml2.logoutRequest(customizer -> {
 					customizer.logoutRequestRepository(createLogoutRequestRepository());
 				});
+
 				saml2.addObjectPostProcessor(new ObjectPostProcessor<LogoutFilter>() {
+					@Override
 					public LogoutFilter postProcess(LogoutFilter filter) {
-						Field successHandlerField = ReflectionUtils.findField(LogoutFilter.class, "logoutSuccessHandler");
-						successHandlerField.setAccessible(true);
+						Field successHandlerField = findLogoutSuccessHandlerField();
+						ReflectionUtils.makeAccessible(successHandlerField);
+
 						LogoutSuccessHandler logoutSuccessHandler = jwtLogoutSuccessHandler;
+
 						if (authenticationProperties.getSaml().getIdpLogout().isEnabled()) {
-							Saml2RelyingPartyInitiatedLogoutSuccessHandler successHandler = (Saml2RelyingPartyInitiatedLogoutSuccessHandler) ReflectionUtils
-								.getField(successHandlerField, filter);
-							successHandler.setLogoutRequestRepository(createLogoutRequestRepository());
-							logoutSuccessHandler = new SamlDelegatedLogoutSuccessHandler(logoutRequestResolver,
-								jwtLogoutSuccessHandler, successHandler);
+							Object current = ReflectionUtils.getField(successHandlerField, filter);
+
+							Saml2RelyingPartyInitiatedLogoutSuccessHandler rpInitiated;
+							if (current instanceof Saml2RelyingPartyInitiatedLogoutSuccessHandler existing) {
+								rpInitiated = existing;
+							} else {
+								rpInitiated = new Saml2RelyingPartyInitiatedLogoutSuccessHandler(logoutRequestResolver);
+							}
+
+							rpInitiated.setLogoutRequestRepository(createLogoutRequestRepository());
+
+							logoutSuccessHandler = new SamlDelegatedLogoutSuccessHandler(
+								logoutRequestResolver,
+								jwtLogoutSuccessHandler,
+								rpInitiated
+							);
 						}
+
 						ReflectionUtils.setField(successHandlerField, filter, logoutSuccessHandler);
 						return filter;
 					}
+
+					private Field findLogoutSuccessHandlerField() {
+						for (Field f : LogoutFilter.class.getDeclaredFields()) {
+							if (LogoutSuccessHandler.class.isAssignableFrom(f.getType())) {
+								return f;
+							}
+						}
+						throw new IllegalStateException("Cannot find LogoutSuccessHandler field in LogoutFilter");
+					}
 				});
-			}).addFilterBefore(metadataFilter, Saml2WebSsoAuthenticationFilter.class)
+			})
+			.addFilterBefore(metadataFilter, Saml2WebSsoAuthenticationFilter.class)
 			.addFilterBefore(
-				new UAASamlAuthenticationRequestFilter(authenticationProperties.getContextPath(),
-					loginRedirectSupport, authenticationProperties.getCookie().getHttpOnly().isEnabled(),
-					authenticationProperties.getCookie().getSecured().isEnabled(),
+				new UAASamlAuthenticationRequestFilter(authenticationProperties.getContextPath(), loginRedirectSupport,
+					authenticationProperties.getCookie().getHttpOnly().isEnabled(), authenticationProperties.getCookie().getSecured().isEnabled(),
 					authenticationProperties.getCookie().getLifetimeSeconds()),
-				Saml2WebSsoAuthenticationRequestFilter.class)
-			.addFilterBefore(new SameSiteFilter(authenticationProperties.getCookie().getSameSite()),
-				UAASamlAuthenticationRequestFilter.class);
+				Saml2WebSsoAuthenticationRequestFilter.class
+			)
+			.addFilterBefore(
+				new SameSiteFilter(authenticationProperties.getCookie().getSameSite()),
+				UAASamlAuthenticationRequestFilter.class
+			);
+
 		LOGGER.info("SAML: Using SamlGrantedAuthorityConverter: [{}]",
 			ClassNameUtils.resolveShortClassName(samlGrantedAuthorityConverter));
 		LOGGER.info("SAML: Using SamlAssertionExtractor: [{}]",
@@ -217,7 +249,7 @@ public class SamlSecurityConfigurer extends UAASecurityConfigurer<SamlSecurityCo
 	}
 
 	@Override
-	public void configure(HttpSecurity builder) throws Exception {
+	public void configure(HttpSecurity builder) {
 		builder.addFilterBefore(
 			new Saml2LogoutRequestAuthenticatorFilter(relyingPartyRegistrationResolver, createSamlJwtTokenStorage(), getAuthenticationManager(builder)),
 			CsrfFilter.class);
@@ -295,6 +327,11 @@ public class SamlSecurityConfigurer extends UAASecurityConfigurer<SamlSecurityCo
 			repository = new CacheableSamlLogoutRequestRepository(repository, cacheManager.get());
 		}
 		return repository;
+	}
+
+	@Bean
+	public SamlLogoutParametersHandler createLogoutParametersHandler() {
+		return new SamlLogoutParametersHandler();
 	}
 
 	@Bean

@@ -31,13 +31,15 @@
  */
 package com.mgmtp.a12.uaa.authentication.web.internal;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CodeExchangeRequest {
+	@JsonProperty("code_challenge")
 	private String codeChallenge;
+
 	private String state;
+
+	@JsonProperty("id_token_hint")
 	private String idTokenHint;
 
 	public String getCodeChallenge() {

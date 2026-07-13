@@ -33,17 +33,19 @@ import * as React from "react";
 import { useContext, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
-import { LoginLayout } from "@com.mgmtp.a12.widgets/widgets-core/lib/layout/login-layout/main/login-layout.view.js";
-import { MessageBox } from "@com.mgmtp.a12.widgets/widgets-core/lib/message-box/main/message-box.view.js";
-import { Icon } from "@com.mgmtp.a12.widgets/widgets-core/lib/icon/main/icon.view.js";
-import { TextLineStateless } from "@com.mgmtp.a12.widgets/widgets-core/lib/input/text-line/main/template/text-line.tpl.view.js";
-import { Button } from "@com.mgmtp.a12.widgets/widgets-core/lib/button/main/button.view.js";
-import { provider as DeviceDetector } from "@com.mgmtp.a12.widgets/widgets-core/lib/common/main/device-detector.js";
+import {
+	Button,
+	Icon,
+	LoginLayout,
+	MessageBox,
+	TextField,
+	provider as DeviceDetector
+} from "@com.mgmtp.a12.widgets/widgets-core";
 import {
 	localizableFromLocalizationTreeMap,
 	LocalizationTreeMap
-} from "@com.mgmtp.a12.utils/utils-localization/lib/main/index.js";
-import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react/lib/main/index.js";
+} from "@com.mgmtp.a12.utils/utils-localization";
+import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react";
 
 import {
 	UaaActions,
@@ -313,7 +315,7 @@ export const LoginPage = (loginPageProps: LoginPageProps) => {
 					</LoginLayout.FormItem>
 				)}
 				<LoginLayout.FormItem key="username">
-					<TextLineStateless
+					<TextField
 						id="username"
 						inputRef={ref => {
 							usernameInputRef.current = ref;
@@ -329,7 +331,7 @@ export const LoginPage = (loginPageProps: LoginPageProps) => {
 					/>
 				</LoginLayout.FormItem>
 				<LoginLayout.FormItem key="password">
-					<TextLineStateless
+					<TextField
 						id="password"
 						inputRef={ref => {
 							passwordInputRef.current = ref;

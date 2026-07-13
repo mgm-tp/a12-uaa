@@ -29,10 +29,10 @@
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
-import { Action, AnyAction } from "typescript-fsa";
-import { call, put } from "typed-redux-saga";
-import { SagaIterator } from "redux-saga";
+import { call, put, SagaGenerator } from "typed-redux-saga";
+import type { Action as ReduxAction } from "redux";
 
+import type { Action } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging";
 
 import * as UaaActions from "../actions.js";
@@ -78,7 +78,7 @@ function hasAdditionalProperties(
 /**
  * @param action
  */
-function* modifyUser(action: Action<UaaOidcUser>): SagaIterator<void> {
+function* modifyUser(action: Action<UaaOidcUser>): SagaGenerator<void> {
 	const user = action.payload as UaaOidcUser;
 
 	try {
@@ -111,7 +111,7 @@ function* modifyUser(action: Action<UaaOidcUser>): SagaIterator<void> {
 
 const oidcClientSaga: UaaSagaDescriptor[] = [
 	{
-		canHandle: (action: AnyAction) =>
+		canHandle: (action: ReduxAction) =>
 			UaaActions.modifyingOidcUser.match(action),
 		handle: (action: Action<UaaOidcUser>) => modifyUser(action)
 	}

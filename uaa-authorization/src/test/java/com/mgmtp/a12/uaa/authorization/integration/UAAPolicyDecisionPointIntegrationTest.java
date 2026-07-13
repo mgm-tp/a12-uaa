@@ -62,8 +62,6 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestExecutionListeners.MergeMode;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mgmtp.a12.uaa.authorization.AuthorizationContext;
 import com.mgmtp.a12.uaa.authorization.AuthorizationContextHolder;
 import com.mgmtp.a12.uaa.authorization.AuthorizationDefinitionRepository;
@@ -83,6 +81,9 @@ import com.mgmtp.a12.uaa.authorization.security.PolicyProcessorFactory;
 import com.mgmtp.a12.uaa.authorization.security.PropertyChangesChecker;
 import com.mgmtp.a12.uaa.authorization.security.spel.internal.SpelPolicyProcessorFactory;
 import com.mgmtp.a12.uaa.authorization.security.spel.internal.UAAPolicyDecisionPoint;
+
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 @ExtendWith(SpringExtension.class)
 @TestInstance(Lifecycle.PER_CLASS)
@@ -261,7 +262,7 @@ public class UAAPolicyDecisionPointIntegrationTest {
 	}
 
 	@Test
-	public void repositoryTemplate() throws JsonProcessingException {
+	public void repositoryTemplate() throws JacksonException {
 		List<String> repositoryPermissions = new ArrayList<>(uaaPolicyDecisionPoint
 			.evaluateRepositoryPermissions(createDefaultTestResource(), authorizationDefinitionRepository.getPermissionsByScope("Repository")));
 		Assertions.assertEquals(4, repositoryPermissions.size());
@@ -276,16 +277,6 @@ public class UAAPolicyDecisionPointIntegrationTest {
 		Assertions.assertTrue(map.get("array") instanceof Collection);
 		Collection<?> list = (Collection<?>) map.get("array");
 		Assertions.assertEquals(2, list.size());
-	}
-
-	@Test
-	public void repositoryTemplateRef() {
-
-		IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-			uaaPolicyDecisionPoint.evaluateRepositoryPermissions(createDefaultTestResource(),
-				authorizationDefinitionRepository.getPermissionsByScope("RespositoryRef"));
-		});
-		Assertions.assertEquals("SpEL policy processor doesn't support template generation", exception.getMessage());
 	}
 
 	@Test

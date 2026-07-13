@@ -182,10 +182,10 @@ public class AuthenticationPrincipalExtensionProperties {
 		}
 	}
 
-	public static class CertificateConfig extends KeyConfig{
+	public static class CertificateConfig extends KeyConfig {
 	}
 
-	public static class APIKeyConfig extends KeyConfig{
+	public static class APIKeyConfig extends KeyConfig {
 	}
 
 	public static class KeyConfig {

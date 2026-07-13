@@ -32,7 +32,6 @@
 package com.mgmtp.a12.uaa.authentication.principal.internal.jackson;
 
 import java.beans.PropertyDescriptor;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -40,45 +39,49 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.MissingNode;
 import com.mgmtp.a12.uaa.authentication.principal.AbstractExtendedPrincipal;
 import com.mgmtp.a12.uaa.authentication.principal.PrincipalFactory;
 import com.mgmtp.a12.uaa.authentication.principal.Role;
 
-public class UAAExtendedUserDeserializer extends JsonDeserializer<AbstractExtendedPrincipal<?>> {
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.ObjectReadContext;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ValueDeserializer;
+import tools.jackson.databind.node.MissingNode;
+
+public class UAAExtendedUserDeserializer extends ValueDeserializer<AbstractExtendedPrincipal<?>> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UAAExtendedUserDeserializer.class);
 
 	@Override
-	public AbstractExtendedPrincipal<?> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+	public AbstractExtendedPrincipal<?> deserialize(JsonParser p, DeserializationContext ctxt) throws JacksonException {
 		PrincipalFactory userFactory = ApplicationContextProvider.getPrincipalFactory();
-		ObjectMapper mapper = (ObjectMapper) p.getCodec();
-		JsonNode jsonNode = mapper.readTree(p);
+		ObjectReadContext rc = p.objectReadContext();
+		if (rc == null) {
+			rc = ctxt;
+		}
+		JsonNode jsonNode = rc.readTree(p);
 		Set<? extends Role> authorities =
-			mapper.convertValue(
-				jsonNode.get("authorities"),
+			rc.readValue(
+				jsonNode.get("authorities").traverse(rc),
 				new TypeReference<Set<Role>>() {
 				});
-		Object extendedData = mapper.convertValue(jsonNode.get("extendedPrincipalData"), Object.class);
+		Object extendedData = rc.readValue(jsonNode.get("extendedPrincipalData").traverse(rc), Object.class);
 		JsonNode password = readJsonNode(jsonNode, "password");
 		AbstractExtendedPrincipal<?> userObject =
 			userFactory.createPrincipal(readJsonNode(jsonNode, "username").asText(), password.asText(), authorities, extendedData);
-		return populateObject(userObject, jsonNode, mapper);
+		return populateObject(userObject, jsonNode, rc);
 	}
 
-	private AbstractExtendedPrincipal<?> populateObject(AbstractExtendedPrincipal<?> user, JsonNode jsonNode, ObjectMapper mapper) {
+	private AbstractExtendedPrincipal<?> populateObject(AbstractExtendedPrincipal<?> user, JsonNode jsonNode, ObjectReadContext rc) {
 		PropertyDescriptor[] propertyDescriptors = PropertyUtils.getPropertyDescriptors(user);
-		Arrays.asList(propertyDescriptors).stream()
+		Arrays.stream(propertyDescriptors)
 			.forEach(descriptor -> {
-				Object convertValue = mapper.convertValue(jsonNode.get(descriptor.getName()), descriptor.getPropertyType());
 				try {
+					Object convertValue = rc.readValue(jsonNode.get(descriptor.getName()).traverse(rc), descriptor.getPropertyType());
 					if (PropertyUtils.isWriteable(user, descriptor.getName())) {
 						PropertyUtils.setSimpleProperty(user, descriptor.getName(), convertValue);
 					}

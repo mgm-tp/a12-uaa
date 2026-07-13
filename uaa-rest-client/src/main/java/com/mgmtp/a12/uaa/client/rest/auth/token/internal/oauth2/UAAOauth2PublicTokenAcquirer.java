@@ -104,7 +104,7 @@ public class UAAOauth2PublicTokenAcquirer extends UAALoginPageTokenAcquirer {
 		// Main login url
 		UriComponentsBuilder uriComponentsBuilder =
 			UriComponentsBuilder
-				.fromHttpUrl(getFullUrlWithIdpBasePrefix(getOauth2PublicProperties().getLoginRelative().getUrl()))
+				.fromUriString(getFullUrlWithIdpBasePrefix(getOauth2PublicProperties().getLoginRelative().getUrl()))
 				.queryParam(PARAM_CLIENT_ID, URLUtils.urlEncode(getOauth2PublicProperties().getClientId()))
 				.queryParam(PARAM_REDIRECT_URI, "{redirectUri}")
 				.queryParam(PARAM_RESPONSE_TYPE, VALUE_CODE)
@@ -128,7 +128,7 @@ public class UAAOauth2PublicTokenAcquirer extends UAALoginPageTokenAcquirer {
 	protected Page exchangeAuthorizationCode(WebClient webClient, Page authenticatedPage, Request loginRequest)
 		throws FailingHttpStatusCodeException, IOException {
 		String responseHeaderValue = authenticatedPage.getWebResponse().getResponseHeaderValue(HttpHeaders.LOCATION);
-		UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(responseHeaderValue).build();
+		UriComponents uriComponents = UriComponentsBuilder.fromUriString(responseHeaderValue).build();
 		String state = uriComponents.getQueryParams().get(PARAM_STATE).get(0);
 		String generatedState = loginRequest.getParameters().get(PARAM_STATE).toString();
 		if (!StringUtils.equals(generatedState, state)) {
@@ -169,7 +169,7 @@ public class UAAOauth2PublicTokenAcquirer extends UAALoginPageTokenAcquirer {
 		LogoutConfig logoutConfig = getLogoutConfig();
 		UriComponentsBuilder logoutUriComponentsBuilder =
 			UriComponentsBuilder
-				.fromHttpUrl(getFullUrlWithIdpBasePrefix(logoutConfig.getRelativeLogoutUrl()))
+				.fromUriString(getFullUrlWithIdpBasePrefix(logoutConfig.getRelativeLogoutUrl()))
 				.queryParam(PARAM_ID_TOKEN_HINT, authorizationData.getOauth2IdToken());
 		WebRequest logoutRequest = new WebRequest(new URL(logoutUriComponentsBuilder.toUriString()), logoutConfig.getMethod());
 		return new Request

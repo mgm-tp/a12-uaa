@@ -43,8 +43,8 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.web.client.ResponseErrorHandler;
 
+import com.mgmtp.a12.connector.rest.ResponseErrorHandler;
 import com.mgmtp.a12.uaa.client.rest.config.common.UrlProperty;
 import com.mgmtp.a12.uaa.client.rest.config.properties.UAARestClientAuthenticationProperties;
 import com.mgmtp.a12.uaa.client.rest.config.properties.UAARestClientProperties;

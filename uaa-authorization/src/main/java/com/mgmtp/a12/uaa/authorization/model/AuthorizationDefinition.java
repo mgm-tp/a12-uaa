@@ -38,7 +38,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonMerge;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import tools.jackson.databind.annotation.JsonDeserialize;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -136,6 +137,7 @@ public class AuthorizationDefinition extends NamedElement {
 	void setRepositoryPolicies(Set<RepositoryPolicy> repositoryPolicies) {
 		this.repositoryPolicies = repositoryPolicies;
 	}
+
 	@Override
 	public String toString() {
 		return super.toString() + "AuthorizationDefinition [description=" + description + ", policies=" + policies + ", permissions=" + permissions

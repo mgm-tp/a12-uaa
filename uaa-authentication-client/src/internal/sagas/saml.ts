@@ -29,9 +29,10 @@
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
-import { SagaIterator } from "redux-saga";
-import { call, put } from "typed-redux-saga";
-import { Action, AnyAction } from "typescript-fsa";
+import { call, put, SagaGenerator } from "typed-redux-saga";
+import type { Action as ReduxAction } from "redux";
+
+import type { Action } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 
 import { UaaClient } from "../../index.js";
 
@@ -64,7 +65,7 @@ function getUser(): Promise<UaaUser | UaaExtendedUser> {
  */
 function* restoreSuccessSaga(
 	action: Action<UaaActions.RestorePayload>
-): SagaIterator {
+): SagaGenerator<void> {
 	if (action.payload.authenticationType === AuthenticationType.SAML) {
 		try {
 			const user: UaaUser | UaaExtendedUser = yield* call(getUser);
@@ -80,7 +81,7 @@ function* restoreSuccessSaga(
 /**
  * @param action
  */
-function* userLoggingInSaga(): SagaIterator {
+function* userLoggingInSaga(): SagaGenerator<void> {
 	try {
 		const { loginRelativeUrl } = uaaClient.getSamlConfiguration();
 		const baseUrl =
@@ -109,11 +110,11 @@ function* userLoggingInSaga(): SagaIterator {
 
 const samlClientSaga: UaaSagaDescriptor[] = [
 	{
-		canHandle: (action: AnyAction) => UaaActions.loggingInSAML.match(action),
+		canHandle: (action: ReduxAction) => UaaActions.loggingInSAML.match(action),
 		handle: () => userLoggingInSaga()
 	},
 	{
-		canHandle: (action: AnyAction) => UaaActions.restoreSuccess.match(action),
+		canHandle: (action: ReduxAction) => UaaActions.restoreSuccess.match(action),
 		handle: (action: Action<UaaActions.RestorePayload>) =>
 			restoreSuccessSaga(action)
 	}

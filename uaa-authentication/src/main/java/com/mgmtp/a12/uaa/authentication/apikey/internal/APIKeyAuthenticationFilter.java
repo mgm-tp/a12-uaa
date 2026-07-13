@@ -48,7 +48,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -68,7 +68,7 @@ public class APIKeyAuthenticationFilter extends OncePerRequestFilter {
 		AuthenticationManager authenticationManager, AuthenticationEntryPoint authenticationEntryPoint) {
 		this.authenticationTokenLocator = authenticationTokenLocator;
 		this.whiteListMatchers = whiteListUrls.stream()
-			.map(urlPattern -> new AntPathRequestMatcher(context + urlPattern))
+			.map(urlPattern -> PathPatternRequestMatcher.withDefaults().matcher(context + urlPattern))
 			.collect(Collectors.toList());
 		this.authenticationEntryPoint = authenticationEntryPoint;
 		this.authenticationManagerResolver = (request) -> authenticationManager;

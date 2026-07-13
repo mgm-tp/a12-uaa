@@ -1,7 +1,7 @@
 THIRD_PARTY_NOTICES
 
 Component: A12 UAA
-Generated: 2026-05-05 for mgm A12 Platform 2025.06-ext5
+Generated: 2026-06-23 for mgm A12 Platform 2026.06
 
 The mgm A12 Platform is developed by mgm technology partners GmbH.
 
@@ -17,17 +17,25 @@ Component Overview
 The following third-party components are included in this distribution:
 
 
-
-- ajv 8.18.0, licensed under MIT
+- ajv 8.20.0, licensed under MIT
 	Copyright (c) 2015-2021 Evgeny Poberezkin
 	Source: https://github.com/ajv-validator/ajv
-- @com.mgmtp.a12.devtools/eslint-config 3.1.0, licensed under EUPL v1.2
+- @com.mgmtp.a12.devtools/eslint-config 3.1.2, licensed under EUPL v1.2
 	Copyright (C) 2012-2026 mgm technology partners GmbH
 	Source: https://github.com/mgm-tp
-- @com.mgmtp.a12.devtools/prettier-config 1.1.0, licensed under EUPL v1.2
+- @com.mgmtp.a12.devtools/prettier-config 1.1.1, licensed under EUPL v1.2
 	Copyright (C) 2012-2026 mgm technology partners GmbH
 	Source: https://github.com/mgm-tp
-- @com.mgmtp.a12.devtools/tsconfig 1.1.0, licensed under EUPL v1.2
+- @com.mgmtp.a12.devtools/tsconfig 2.0.1, licensed under EUPL v1.2
+	Copyright (C) 2012-2026 mgm technology partners GmbH
+	Source: https://github.com/mgm-tp
+- @com.mgmtp.a12.kernel/kernel-core-runtime-api-ts 31.1.0, licensed under EUPL v1.2
+	Copyright (C) 2012-2026 mgm technology partners GmbH
+	Source: https://github.com/mgm-tp
+- @com.mgmtp.a12.kernel/kernel-md-facade 31.1.0, licensed under EUPL v1.2
+	Copyright (C) 2012-2026 mgm technology partners GmbH
+	Source: https://github.com/mgm-tp
+- @com.mgmtp.a12.utils/utils-collections 7.0.1, licensed under EUPL v1.2
 	Copyright (C) 2012-2026 mgm technology partners GmbH
 	Source: https://github.com/mgm-tp
 - @cyclonedx/cyclonedx-npm 4.2.1, licensed under Apache-2.0
@@ -53,10 +61,10 @@ The following third-party components are included in this distribution:
 - npm-run-all 4.1.5, licensed under MIT
 	Copyright (c) 2015 Toru Nagashima
 	Source: https://github.com/mysticatea/npm-run-all
-- prettier 3.8.1, licensed under MIT
+- prettier 3.8.4, licensed under MIT
 	Copyright © James Long and contributors
 	Source: https://github.com/prettier/prettier
-- redux-saga 1.2.3, licensed under MIT
+- redux-saga 1.3.0, licensed under MIT
 	Copyright (c) Redux-Saga team and other contributors
 	Source: https://github.com/redux-saga/redux-saga
 - @stylistic/eslint-plugin 5.10.0, licensed under MIT
@@ -66,25 +74,13 @@ The following third-party components are included in this distribution:
 	Copyright (c) 2021-Present Vitest Team
 	Source: https://github.com/vitest-dev/vitest
 
-- com.fasterxml.jackson.core/jackson-annotations 2.20, licensed under Apache-2.0
+- com.fasterxml.jackson.core/jackson-annotations 2.21, licensed under Apache-2.0
 	Copyright 2007-, Tatu Saloranta (tatu.saloranta@iki.fi)
 	Source: https://github.com/FasterXML/jackson-annotations
-- com.fasterxml.jackson.core/jackson-core 2.20.1, licensed under Apache-2.0
-	Copyright 2007-, Tatu Saloranta (tatu.saloranta@iki.fi)
-	Source: https://github.com/FasterXML/jackson-core
-- com.fasterxml.jackson.core/jackson-databind 2.20.1, licensed under Apache-2.0
-	Copyright 2013 FasterXML.com
-	Source: https://github.com/FasterXML/jackson-databind
-- com.fasterxml.jackson.dataformat/jackson-dataformat-properties 2.20.1, licensed under Apache-2.0
-	Copyright 2022 FasterXML.com
-	Source: https://github.com/FasterXML/jackson-dataformats-text
-- com.fasterxml.jackson.dataformat/jackson-dataformat-yaml 2.20.1, licensed under Apache-2.0
-	Copyright 2022 FasterXML.com
-	Source: https://github.com/FasterXML/jackson-dataformat-yaml
-- com.fasterxml.jackson.datatype/jackson-datatype-jsr310 2.20.1, licensed under Apache-2.0
+- com.fasterxml.jackson.datatype/jackson-datatype-jsr310 2.21.1, licensed under Apache-2.0
 	Copyright 2013 FasterXML.com
 	Source: https://github.com/FasterXML/jackson-datatype-jsr310
-- com.fasterxml.jackson.module/jackson-module-parameter-names 2.20.1, licensed under Apache-2.0
+- com.fasterxml.jackson.module/jackson-module-parameter-names 2.21.1, licensed under Apache-2.0
 	Copyright 2021 FasterXML.com
 	Source: https://github.com/FasterXML/jackson-modules-java8
 - com.flipkart.zjsonpatch/zjsonpatch 0.4.16, licensed under Apache-2.0
@@ -95,28 +91,16 @@ The following third-party components are included in this distribution:
 - com.h2database/h2 2.2.224, licensed under MPL-2.0
 	Copyright 2004-2025 H2 Group. Multiple-Licensed under the MPL 2.0, and the EPL 1.0 (https://h2database.com/html/license.html)
 	Source: https://github.com/h2database/h2database
-- com.mgmtp.a12.kernel/kernel-core-facade 30.8.1, licensed under EUPL v1.2
+- com.mgmtp.a12.kernel/kernel-md-facade 31.1.0, licensed under EUPL v1.2
 	Copyright (C) 2012-2026 mgm technology partners GmbH
 	Source: https://github.com/mgm-tp
-- com.mgmtp.a12.kernel/kernel-core-parser 30.8.1, licensed under EUPL v1.2
+- com.mgmtp.a12.utils/utils-rest-server-connector 9.0.1, licensed under EUPL v1.2
 	Copyright (C) 2012-2026 mgm technology partners GmbH
 	Source: https://github.com/mgm-tp
-- com.mgmtp.a12.kernel/kernel-md-document-service 30.8.1, licensed under EUPL v1.2
+- com.mgmtp.a12.utils/utils-rest-server-connector-spring-boot-autoconfigure 9.0.1, licensed under EUPL v1.2
 	Copyright (C) 2012-2026 mgm technology partners GmbH
 	Source: https://github.com/mgm-tp
-- com.mgmtp.a12.kernel/kernel-md-facade 30.8.1, licensed under EUPL v1.2
-	Copyright (C) 2012-2026 mgm technology partners GmbH
-	Source: https://github.com/mgm-tp
-- com.mgmtp.a12.kernel/kernel-md-model 30.8.1, licensed under EUPL v1.2
-	Copyright (C) 2012-2026 mgm technology partners GmbH
-	Source: https://github.com/mgm-tp
-- com.mgmtp.a12.utils/utils-rest-server-connector 8.2.1, licensed under EUPL v1.2
-	Copyright (C) 2012-2026 mgm technology partners GmbH
-	Source: https://github.com/mgm-tp
-- com.mgmtp.a12.utils/utils-rest-server-connector-spring-boot-autoconfigure 8.2.1, licensed under EUPL v1.2
-	Copyright (C) 2012-2026 mgm technology partners GmbH
-	Source: https://github.com/mgm-tp
-- commons-beanutils/commons-beanutils 1.9.4, licensed under Apache-2.0
+- commons-beanutils/commons-beanutils 1.11.0, licensed under Apache-2.0
 	Copyright 2000-2019 The Apache Software Foundation
 	Source: https://github.com/apache/commons-beanutils
 - commons-io/commons-io 2.16.1, licensed under Apache-2.0
@@ -125,7 +109,7 @@ The following third-party components are included in this distribution:
 - commons-logging/commons-logging 1.3.1, licensed under Apache-2.0
 	Copyright 2001-2026 The Apache Software Foundation
 	Source: https://github.com/apache/commons-logging
-- com.networknt/json-schema-validator 1.4.0, licensed under Apache-2.0
+- com.networknt/json-schema-validator 3.0.0, licensed under Apache-2.0
 	Copyright (c) 2016 and onwards Network New Technologies Inc.
 	Source: https://github.com/networknt/json-schema-validator
 - com.nimbusds/nimbus-jose-jwt 9.37.4, licensed under Apache-2.0
@@ -152,7 +136,7 @@ The following third-party components are included in this distribution:
 - jakarta.persistence/jakarta.persistence-api 3.1.0, licensed under EPL-2.0
 	Copyright (c) 2018, 2025 Oracle and/or its affiliates. All rights reserved.
 	Source: https://github.com/eclipse-ee4j/jpa-api
-- jakarta.servlet/jakarta.servlet-api 6.0.0, licensed under EPL-2.0
+- jakarta.servlet/jakarta.servlet-api 6.1.0, licensed under EPL-2.0
 	Copyright (c) 1997, 2023 Oracle and/or its affiliates and others.
 	Source: https://github.com/eclipse-ee4j/servlet-api
 - jakarta.validation/jakarta.validation-api 3.0.2, licensed under Apache-2.0
@@ -173,12 +157,15 @@ The following third-party components are included in this distribution:
 - org.apache.commons/commons-lang3 3.14.0, licensed under Apache-2.0
 	Copyright The Apache Software Foundation
 	Source: https://github.com/apache/commons-lang
-- org.apache.httpcomponents.client5/httpclient5 5.4.1, licensed under Apache-2.0
-	Copyright 1999-2025 The Apache Software Foundation
+- org.apache.httpcomponents.client5/httpclient5 5.4.3, licensed under Apache-2.0
+	Copyright 1999-2023 The Apache Software Foundation
 	Source: https://github.com/apache/httpcomponents-client
 - org.aspectj/aspectjweaver 1.9.21.1, licensed under EPL-2.0
 	Copyright (c) Contributors to the Eclipse Foundation
 	Source: https://github.com/eclipse-aspectj/aspectj
+- org.assertj/assertj-core 3.25.3, licensed under Apache-2.0
+	Copyright 2012-2025 the original author or authors.
+	Source: https://github.com/assertj/assertj
 - org.ehcache/ehcache 3.10.8, licensed under Apache-2.0
 	Copyright 2014-2023 Terracotta, Inc.; Copyright IBM Corp. 2024, 2025
 	Source: https://github.com/ehcache/ehcache3
@@ -191,34 +178,31 @@ The following third-party components are included in this distribution:
 - org.htmlunit/htmlunit 4.0.0, licensed under Apache-2.0
 	Copyright HtmlUnit team
 	Source: https://github.com/HtmlUnit/htmlunit
-- org.influxdb/influxdb-java 2.24, licensed under MIT
+- org.influxdb/influxdb-java 2.25, licensed under MIT
 	Copyright (c) 2014-2017 Stefan Majer
 	Source: https://github.com/influxdata/influxdb-java
-- org.jacoco/org.jacoco.agent 0.8.13, licensed under EPL-2.0
-	Copyright (c) 2009, 2025 Mountainminds GmbH & Co. KG and Contributors
+- org.jacoco/org.jacoco.agent 0.8.14, licensed under EPL-2.0
+	Copyright (c) 2009, 2026 Mountainminds GmbH & Co. KG and Contributors
 	Source: https://github.com/jacoco/jacoco
-- org.jacoco/org.jacoco.ant 0.8.13, licensed under EPL-2.0
-	Copyright (c) 2009, 2025 Mountainminds GmbH & Co. KG and Contributors
+- org.jacoco/org.jacoco.ant 0.8.14, licensed under EPL-2.0
+	Copyright (c) 2009, 2026 Mountainminds GmbH & Co. KG and Contributors
 	Source: https://github.com/jacoco/jacoco
 - org.javers/javers-core 7.7.0, licensed under Apache-2.0
 	Copyright JaVers contributors
 	Source: https://github.com/javers/javers
-- org.junit.jupiter/junit-jupiter 5.10.2, licensed under EPL-2.0
-	Copyright JUnit team
+- org.junit.jupiter/junit-jupiter 5.12.2, licensed under EPL-2.0
+	Copyright 2015-2026 the original author or authors.
 	Source: https://github.com/junit-team/junit5
-- org.junit.jupiter/junit-jupiter 5.8.2, licensed under EPL-2.0
-	Copyright JUnit team
-	Source: https://github.com/junit-team/junit5
-- org.junit.platform/junit-platform-engine 1.10.2, licensed under EPL-2.0
+- org.junit.jupiter/junit-jupiter 6.0.2, licensed under EPL-2.0
 	Copyright 2015-2025 the original author or authors
 	Source: https://github.com/junit-team/junit-framework
-- org.junit.platform/junit-platform-launcher 1.10.2, licensed under EPL-2.0
+- org.junit.platform/junit-platform-engine 6.0.2, licensed under EPL-2.0
 	Copyright 2015-2025 the original author or authors
 	Source: https://github.com/junit-team/junit-framework
-- org.mockito/mockito-inline 5.2.0, licensed under MIT
-	Copyright (c) 2007 Mockito
-	Source: https://github.com/mockito/mockito
-- org.mockito/mockito-junit-jupiter 5.11.0, licensed under MIT
+- org.junit.platform/junit-platform-launcher 6.0.2, licensed under EPL-2.0
+	Copyright 2015-2025 the original author or authors
+	Source: https://github.com/junit-team/junit-framework
+- org.mockito/mockito-junit-jupiter 5.20.0, licensed under MIT
 	Copyright (c) 2007 Mockito
 	Source: https://github.com/mockito/mockito
 - org.openjdk.jmh/jmh-core 1.36, licensed under GPL-2.0-only WITH Classpath-exception-2.0
@@ -244,125 +228,165 @@ The following third-party components are included in this distribution:
 - org.slf4j/slf4j-log4j12 2.0.13, licensed under MIT
 	Copyright (c) 2004-2022 QOS.ch Sarl (Switzerland)
 	Source: https://github.com/qos-ch/slf4j
-- org.springframework.boot/spring-boot-autoconfigure 3.5.9, licensed under Apache-2.0
+- org.springframework.boot/spring-boot-autoconfigure 4.0.6, licensed under Apache-2.0
 	Copyright (c) 2012-2026 VMware, Inc.
 	Source: https://github.com/spring-projects/spring-boot
-- org.springframework.boot/spring-boot-configuration-processor 3.5.9, licensed under Apache-2.0
+- org.springframework.boot/spring-boot-configuration-processor 4.0.6, licensed under Apache-2.0
 	Copyright (c) 2012-2026 VMware, Inc.
 	Source: https://github.com/spring-projects/spring-boot
-- org.springframework.boot/spring-boot-devtools 3.5.9, licensed under Apache-2.0
+- org.springframework.boot/spring-boot-devtools 4.0.6, licensed under Apache-2.0
 	Copyright (c) 2012-2026 VMware, Inc.
 	Source: https://github.com/spring-projects/spring-boot
-- org.springframework.boot/spring-boot-starter-actuator 3.5.9, licensed under Apache-2.0
+- org.springframework.boot/spring-boot-starter-actuator 4.0.6, licensed under Apache-2.0
 	Copyright (c) 2012-2026 VMware, Inc.
 	Source: https://github.com/spring-projects/spring-boot
-- org.springframework.boot/spring-boot-starter-cache 3.5.9, licensed under Apache-2.0
+- org.springframework.boot/spring-boot-starter-cache 4.0.6, licensed under Apache-2.0
 	Copyright (c) 2012-2026 VMware, Inc.
 	Source: https://github.com/spring-projects/spring-boot
-- org.springframework.boot/spring-boot-starter-data-jpa 3.5.9, licensed under Apache-2.0
+- org.springframework.boot/spring-boot-starter-data-jpa 4.0.6, licensed under Apache-2.0
 	Copyright (c) 2012-2026 VMware, Inc.
 	Source: https://github.com/spring-projects/spring-boot
-- org.springframework.boot/spring-boot-starter-logging 3.5.9, licensed under Apache-2.0
+- org.springframework.boot/spring-boot-starter-logging 4.0.6, licensed under Apache-2.0
 	Copyright (c) 2012-2026 VMware, Inc.
 	Source: https://github.com/spring-projects/spring-boot
-- org.springframework.boot/spring-boot-starter-security 3.5.9, licensed under Apache-2.0
+- org.springframework.boot/spring-boot-starter-oauth2-client 4.0.6, licensed under Apache-2.0
 	Copyright (c) 2012-2026 VMware, Inc.
 	Source: https://github.com/spring-projects/spring-boot
-- org.springframework.boot/spring-boot-starter-test 3.5.9, licensed under Apache-2.0
+- org.springframework.boot/spring-boot-starter-oauth2-resource-server 4.0.6, licensed under Apache-2.0
 	Copyright (c) 2012-2026 VMware, Inc.
 	Source: https://github.com/spring-projects/spring-boot
-- org.springframework.boot/spring-boot-starter-thymeleaf 3.5.9, licensed under Apache-2.0
+- org.springframework.boot/spring-boot-starter-security 4.0.6, licensed under Apache-2.0
 	Copyright (c) 2012-2026 VMware, Inc.
 	Source: https://github.com/spring-projects/spring-boot
-- org.springframework.boot/spring-boot-starter-validation 3.5.9, licensed under Apache-2.0
+- org.springframework.boot/spring-boot-starter-security-saml2 4.0.6, licensed under Apache-2.0
 	Copyright (c) 2012-2026 VMware, Inc.
 	Source: https://github.com/spring-projects/spring-boot
-- org.springframework.boot/spring-boot-starter-web 3.5.9, licensed under Apache-2.0
+- org.springframework.boot/spring-boot-starter-test 4.0.6, licensed under Apache-2.0
 	Copyright (c) 2012-2026 VMware, Inc.
 	Source: https://github.com/spring-projects/spring-boot
-- org.springframework.boot/spring-boot-starter-webflux 3.5.9, licensed under Apache-2.0
+- org.springframework.boot/spring-boot-starter-thymeleaf 4.0.6, licensed under Apache-2.0
 	Copyright (c) 2012-2026 VMware, Inc.
 	Source: https://github.com/spring-projects/spring-boot
-- org.springframework.boot/spring-boot-test 3.5.9, licensed under Apache-2.0
+- org.springframework.boot/spring-boot-starter-validation 4.0.6, licensed under Apache-2.0
 	Copyright (c) 2012-2026 VMware, Inc.
 	Source: https://github.com/spring-projects/spring-boot
-- org.springframework.ldap/spring-ldap-core 3.3.2, licensed under Apache-2.0
+- org.springframework.boot/spring-boot-starter-web 4.0.6, licensed under Apache-2.0
+	Copyright (c) 2012-2026 VMware, Inc.
+	Source: https://github.com/spring-projects/spring-boot
+- org.springframework.boot/spring-boot-starter-webflux 4.0.6, licensed under Apache-2.0
+	Copyright (c) 2012-2026 VMware, Inc.
+	Source: https://github.com/spring-projects/spring-boot
+- org.springframework.boot/spring-boot-test 4.0.6, licensed under Apache-2.0
+	Copyright (c) 2012-2026 VMware, Inc.
+	Source: https://github.com/spring-projects/spring-boot
+- org.springframework.ldap/spring-ldap-core 4.0.1, licensed under Apache-2.0
 	Copyright 2004-present the original author or authors
 	Source: https://github.com/spring-projects/spring-ldap
-- org.springframework.security/spring-security-config 6.5.7, licensed under Apache-2.0
+- org.springframework.security/spring-security-config 7.0.5, licensed under Apache-2.0
 	Copyright 2004-present the original author or authors
 	Source: https://github.com/spring-projects/spring-security
-- org.springframework.security/spring-security-core 6.5.7, licensed under Apache-2.0
+- org.springframework.security/spring-security-core 7.0.5, licensed under Apache-2.0
 	Copyright 2004-present the original author or authors
 	Source: https://github.com/spring-projects/spring-security
-- org.springframework.security/spring-security-data 6.5.7, licensed under Apache-2.0
+- org.springframework.security/spring-security-data 7.0.5, licensed under Apache-2.0
 	Copyright 2004-present the original author or authors
 	Source: https://github.com/spring-projects/spring-security
-- org.springframework.security/spring-security-ldap 6.5.7, licensed under Apache-2.0
+- org.springframework.security/spring-security-ldap 7.0.5, licensed under Apache-2.0
 	Copyright 2004-present the original author or authors
 	Source: https://github.com/spring-projects/spring-security
-- org.springframework.security/spring-security-oauth2-client 6.5.7, licensed under Apache-2.0
+- org.springframework.security/spring-security-oauth2-client 7.0.5, licensed under Apache-2.0
 	Copyright 2004-present the original author or authors
 	Source: https://github.com/spring-projects/spring-security
-- org.springframework.security/spring-security-oauth2-jose 6.5.7, licensed under Apache-2.0
+- org.springframework.security/spring-security-oauth2-jose 7.0.5, licensed under Apache-2.0
 	Copyright 2004-present the original author or authors
 	Source: https://github.com/spring-projects/spring-security
-- org.springframework.security/spring-security-oauth2-resource-server 6.5.7, licensed under Apache-2.0
+- org.springframework.security/spring-security-oauth2-resource-server 7.0.5, licensed under Apache-2.0
 	Copyright 2004-present the original author or authors
 	Source: https://github.com/spring-projects/spring-security
-- org.springframework.security/spring-security-saml2-service-provider 6.5.7, licensed under Apache-2.0
+- org.springframework.security/spring-security-saml2-service-provider 7.0.5, licensed under Apache-2.0
 	Copyright 2004-present the original author or authors
 	Source: https://github.com/spring-projects/spring-security
-- org.springframework.security/spring-security-taglibs 6.5.7, licensed under Apache-2.0
+- org.springframework.security/spring-security-taglibs 7.0.5, licensed under Apache-2.0
 	Copyright 2004-present the original author or authors
 	Source: https://github.com/spring-projects/spring-security
-- org.springframework.security/spring-security-test 6.5.7, licensed under Apache-2.0
+- org.springframework.security/spring-security-test 7.0.5, licensed under Apache-2.0
 	Copyright 2004-present the original author or authors
 	Source: https://github.com/spring-projects/spring-security
-- org.springframework.security/spring-security-web 6.5.7, licensed under Apache-2.0
+- org.springframework.security/spring-security-web 7.0.5, licensed under Apache-2.0
 	Copyright 2004-present the original author or authors
 	Source: https://github.com/spring-projects/spring-security
-- org.springframework/spring-aspects 6.2.15, licensed under Apache-2.0
+- org.springframework/spring-aspects 7.0.7, licensed under Apache-2.0
 	Copyright 2002-present the original author or authors
 	Source: https://github.com/spring-projects/spring-framework
-- org.springframework/spring-context 6.2.15, licensed under Apache-2.0
+- org.springframework/spring-context 7.0.7, licensed under Apache-2.0
 	Copyright 2002-present the original author or authors
 	Source: https://github.com/spring-projects/spring-framework
-- org.springframework/spring-context-support 6.2.15, licensed under Apache-2.0
+- org.springframework/spring-context-support 7.0.7, licensed under Apache-2.0
 	Copyright 2002-present the original author or authors
 	Source: https://github.com/spring-projects/spring-framework
-- org.springframework/spring-core 6.2.15, licensed under Apache-2.0
+- org.springframework/spring-core 7.0.7, licensed under Apache-2.0
 	Copyright 2002-present the original author or authors
 	Source: https://github.com/spring-projects/spring-framework
-- org.springframework/spring-jdbc 6.2.15, licensed under Apache-2.0
+- org.springframework/spring-jdbc 7.0.7, licensed under Apache-2.0
 	Copyright 2002-present the original author or authors
 	Source: https://github.com/spring-projects/spring-framework
-- org.springframework/spring-test 6.2.15, licensed under Apache-2.0
+- org.springframework/spring-test 7.0.7, licensed under Apache-2.0
 	Copyright 2002-present the original author or authors
 	Source: https://github.com/spring-projects/spring-framework
-- org.springframework/spring-tx 6.2.15, licensed under Apache-2.0
+- org.springframework/spring-tx 7.0.7, licensed under Apache-2.0
 	Copyright 2002-present the original author or authors
 	Source: https://github.com/spring-projects/spring-framework
-- org.springframework/spring-web 6.2.15, licensed under Apache-2.0
+- org.springframework/spring-web 7.0.7, licensed under Apache-2.0
 	Copyright 2002-present the original author or authors
 	Source: https://github.com/spring-projects/spring-framework
-- org.springframework/spring-webflux 6.2.15, licensed under Apache-2.0
+- org.springframework/spring-webflux 7.0.7, licensed under Apache-2.0
 	Copyright 2002-present the original author or authors
 	Source: https://github.com/spring-projects/spring-framework
-- org.springframework/spring-webmvc 6.2.15, licensed under Apache-2.0
+- org.springframework/spring-webmvc 7.0.7, licensed under Apache-2.0
 	Copyright 2002-present the original author or authors
 	Source: https://github.com/spring-projects/spring-framework
 - org.xmlunit/xmlunit-core 2.9.1, licensed under Apache-2.0
 	Source: https://github.com/xmlunit/xmlunit
-- project /devapps uaa-example-app, licensed under EUPL v1.2
-	Copyright (C) 2012-2026 mgm technology partners GmbH
-	Source: https://github.com/mgm-tp
-- project /devapps uaa-example-rest-client, licensed under EUPL v1.2
-	Copyright (C) 2012-2026 mgm technology partners GmbH
-	Source: https://github.com/mgm-tp 
 - se.swedenconnect.opensaml/opensaml-security-ext 4.1.2, licensed under Apache-2.0
 	Copyright © 2016-2026, Sweden Connect
 	Source: https://github.com/swedenconnect/opensaml-security-ext
+- tools.jackson.core/jackson-core 3.1.3, licensed under Apache-2.0
+	Copyright 2007-, Tatu Saloranta (tatu.saloranta@iki.fi)
+	Source: https://github.com/FasterXML/jackson-core
+- tools.jackson.core/jackson-databind 3.1.3, licensed under Apache-2.0
+	Copyright 2007-, Tatu Saloranta (tatu.saloranta@iki.fi)
+	Source: https://github.com/FasterXML/jackson-databind
+- tools.jackson.dataformat/jackson-dataformat-properties 3.1.3, licensed under Apache-2.0
+	Copyright 2022 FasterXML.com
+	Source: https://github.com/FasterXML/jackson-dataformats-text
+- tools.jackson.dataformat/jackson-dataformat-yaml 3.1.3, licensed under Apache-2.0
+	Source: https://github.com/FasterXML/jackson-dataformat-yaml
+
+Code or code snippets of the following projects have been used in this distribution:
+
+- clipboard.js v2.0.11, licensed under MIT
+	© Zeno Rocha
+	Source: https://github.com/zenorocha/clipboard.js
+
+- jsonServerMain.ts, licensed under MIT
+	Copyright (c) Microsoft Corporation
+	Source: https://github.com/microsoft/vscode/blob/1.66.0/extensions/json-language-features/server/src/node/jsonServerMain.ts
+
+- vscode-extension-samples, licensed under MIT
+	Copyright (c) Microsoft Corporation
+	Source: https://github.com/microsoft/vscode-extension-samples/blob/main/lsp-embedded-language-service/server/src/languageModelCache.ts
+
+- runner.ts, licensed under Apache-2.0
+	Copyright Amazon.com, Inc. or its affiliates AND Copyright (c) Microsoft Corporation
+	Source: https://github.com/aws/aws-toolkit-vscode/blob/master/packages/core/src/shared/lsp/utils/runner.ts
+
+- MethodSecurityEvaluationContext.java 4.2.11 by spring-security, licensed under Apache-2.0
+	Copyright 2002-2016 the original author or authors
+	Source: https://github.com/spring-projects/spring-security/blob/4.2.11.RELEASE/core/src/main/java/org/springframework/security/access/expression/method/MethodSecurityEvaluationContext.java
+
+- ReschedulingRunnable.java by spring-framework, licensed under Apache-2.0
+	Copyright 2002-present the original author or authors
+	Source: https://github.com/spring-projects/spring-framework/blob/main/spring-context/src/main/java/org/springframework/scheduling/concurrent/ReschedulingRunnable.java
 
 
 NOTICE file of cyclonedx
@@ -373,52 +397,6 @@ Copyright (c) OWASP Foundation. All Rights Reserved.
 
 This product includes software developed by the
 CycloneDX community (https://cyclonedx.org/).
-
-
-NOTICE file of cyclonedx
----------------------------
-
-CycloneDX generator for NPM projects
-Copyright (c) OWASP Foundation. All Rights Reserved.
-
-This product includes software developed by the
-CycloneDX community (https://cyclonedx.org/).
-
-
-NOTICE file of cyclonedx
----------------------------
-
-CycloneDX generator for NPM projects
-Copyright (c) OWASP Foundation. All Rights Reserved.
-
-This product includes software developed by the
-CycloneDX community (https://cyclonedx.org/).
-
-
-NOTICE file of com.fasterxml.jackson.dataformat
----------------------------
-
-# Jackson JSON processor
-
-Jackson is a high-performance, Free/Open Source JSON processing library.
-It was originally written by Tatu Saloranta (tatu.saloranta@iki.fi), and has
-been in development since 2007.
-It is currently developed by a community of developers.
-
-## Copyright
-
-Copyright 2007-, Tatu Saloranta (tatu.saloranta@iki.fi)
-
-## Licensing
-
-Jackson components are licensed under Apache (Software) License, version 2.0,
-as per accompanying LICENSE file.
-
-## Credits
-
-A list of contributors may be found from CREDITS file, which is included
-in some artifacts (usually source distributions); but is always available
-from the source code management (SCM) system project uses.
 
 
 NOTICE file of commons-beanutils
@@ -576,7 +554,7 @@ NOTICE file of org.apache.httpcomponents.client5
 ---------------------------
 
 Apache HttpComponents Client
-Copyright 1999-2025 The Apache Software Foundation
+Copyright 1999-2023 The Apache Software Foundation
 
 This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
@@ -624,32 +602,6 @@ Copyright (c) OWASP Foundation. All Rights Reserved.
 
 This product includes software developed by the
 CycloneDX community (https://cyclonedx.org/).
-
-
-NOTICE file of com.fasterxml.jackson.dataformat
----------------------------
-
-# Jackson JSON processor
-
-Jackson is a high-performance, Free/Open Source JSON processing library.
-It was originally written by Tatu Saloranta (tatu.saloranta@iki.fi), and has
-been in development since 2007.
-It is currently developed by a community of developers.
-
-## Copyright
-
-Copyright 2007-, Tatu Saloranta (tatu.saloranta@iki.fi)
-
-## Licensing
-
-Jackson components are licensed under Apache (Software) License, version 2.0,
-as per accompanying LICENSE file.
-
-## Credits
-
-A list of contributors may be found from CREDITS file, which is included
-in some artifacts (usually source distributions); but is always available
-from the source code management (SCM) system project uses.
 
 
 NOTICE file of commons-beanutils
@@ -801,51 +753,6 @@ Copyright 2001-2019 The Apache Software Foundation
 
 This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
-
-
-NOTICE file of org.apache.httpcomponents.client5
----------------------------
-
-Apache HttpComponents Client
-Copyright 1999-2025 The Apache Software Foundation
-
-This product includes software developed at
-The Apache Software Foundation (http://www.apache.org/).
-
-This product includes a copy of in https://publicsuffix.org/list/effective_tld_names.dat
-in httpclient5/src/test/resources/org/publicsuffix/list/effective_tld_names.dat 
-This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at https://mozilla.org/MPL/2.0/.
-
-
-NOTICE file of org.ehcache
----------------------------
-
-Ehcache V3
-Copyright 2014-2023 Terracotta, Inc.
-Copyright IBM Corp. 2024, 2025
-
-The product includes software from the Apache Commons Lang project,
-under the Apache License 2.0 (see: org.ehcache.impl.internal.classes.commonslang)
-
-
-NOTICE file of org.seleniumhq.selenium
----------------------------
-
-Copyright 2011-2024 Software Freedom Conservancy
-Copyright 2004-2011 Selenium committers
-
-
-NOTICE file of org.springframework.boot
----------------------------
-
-Spring Boot ${version}
-Copyright (c) 2012-2026 VMware, Inc.
-
-This product is licensed to you under the Apache License, Version 2.0
-(the "License"). You may not use this product except in compliance with
-the License.
 
 
 License Texts

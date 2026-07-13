@@ -34,7 +34,6 @@ package com.mgmtp.a12.uaa.client.rest.auth.internal;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -81,8 +80,8 @@ public class AuthorizationInterceptorTest {
 		MockClientHttpRequest request = new MockClientHttpRequest();
 		byte[] body = "data body test".getBytes(StandardCharsets.UTF_8);
 
-		Mockito.when(authenticationHandler.authenticate()).thenReturn(new AuthorizationData("tokenData", Instant.now(),
-			TokenType.BEARER, "sessionData"));
+		Mockito.when(authenticationHandler.authenticate()).thenReturn(new AuthorizationData("tokenData",
+			TokenType.BEARER, "sessionData", 300));
 		Mockito.when(clientHttpRequestExecution.execute(Mockito.any(), Mockito.any())).thenReturn(new MockClientHttpResponse(body, HttpStatus.OK));
 
 		ClientHttpResponse response = authorizationInterceptor.intercept(request, body, clientHttpRequestExecution);
@@ -100,7 +99,7 @@ public class AuthorizationInterceptorTest {
 		MockClientHttpRequest request = new MockClientHttpRequest();
 		byte[] body = "data body test".getBytes(StandardCharsets.UTF_8);
 
-		Mockito.when(authenticationHandler.authenticate()).thenReturn(new AuthorizationData("UAABearer tokenData", Instant.now(), TokenType.DELEGATED, null));
+		Mockito.when(authenticationHandler.authenticate()).thenReturn(new AuthorizationData("UAABearer tokenData", TokenType.DELEGATED, null, 300));
 		Mockito.when(clientHttpRequestExecution.execute(Mockito.any(), Mockito.any())).thenReturn(new MockClientHttpResponse(body, HttpStatus.OK));
 
 		authorizationInterceptor.intercept(request, body, clientHttpRequestExecution);
@@ -129,9 +128,9 @@ public class AuthorizationInterceptorTest {
 	void interceptTestLogout() throws IOException {
 		MockClientHttpRequest request = new MockClientHttpRequest();
 		byte[] body = "data body test".getBytes(StandardCharsets.UTF_8);
-		request.setURI(UriComponentsBuilder.fromHttpUrl("http://localhost:8080/user/logout").build().toUri());
-		Mockito.when(authenticationHandler.authenticate()).thenReturn(new AuthorizationData("tokenData", Instant.now(),
-			TokenType.BEARER, "sessionData"));
+		request.setURI(UriComponentsBuilder.fromUriString("http://localhost:8080/user/logout").build().toUri());
+		Mockito.when(authenticationHandler.authenticate()).thenReturn(new AuthorizationData("tokenData",
+			TokenType.BEARER, "sessionData", 300));
 
 		Mockito.when(clientHttpRequestExecution.execute(Mockito.any(), Mockito.any())).thenReturn(new MockClientHttpResponse(body, HttpStatus.OK));
 

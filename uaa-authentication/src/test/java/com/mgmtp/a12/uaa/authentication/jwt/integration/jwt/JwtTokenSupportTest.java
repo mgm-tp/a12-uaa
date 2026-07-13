@@ -46,6 +46,7 @@ import com.mgmtp.a12.uaa.authentication.internal.UAASpringJsonHandler;
 import com.mgmtp.a12.uaa.authentication.jwt.JwtTokenStorage;
 import com.mgmtp.a12.uaa.authentication.jwt.encryption.internal.BypassingEncoder;
 import com.mgmtp.a12.uaa.authentication.jwt.encryption.internal.HuffmanEncoder;
+import com.mgmtp.a12.uaa.authentication.jwt.integration.TestExtendedJacksonModule;
 import com.mgmtp.a12.uaa.authentication.jwt.internal.JwtTokenGenerator;
 import com.mgmtp.a12.uaa.authentication.jwt.internal.JwtTokenVerifier;
 import com.mgmtp.a12.uaa.authentication.jwt.internal.SimpleJwtTokenStorage;
@@ -248,5 +249,9 @@ public class JwtTokenSupportTest {
 			return new AuthenticationProperties();
 		}
 
+		@Bean
+		public TestExtendedJacksonModule createTestExtendedJacksonModule() {
+			return new TestExtendedJacksonModule();
+		}
 	}
 }

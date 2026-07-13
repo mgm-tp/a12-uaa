@@ -33,7 +33,7 @@ import {
   LoginPage,
   UaaClient,
 } from "@com.mgmtp.a12.uaa/uaa-authentication-client";
-import { Button } from "@com.mgmtp.a12.widgets/widgets-core/lib/button/main/button.view.js";
+import { Button } from "@com.mgmtp.a12.widgets/widgets-core";
 import { LocaleSelect } from "../localization/LocaleSelect.js";
 
 function getLoginInfo(): { username: string; password: string } {

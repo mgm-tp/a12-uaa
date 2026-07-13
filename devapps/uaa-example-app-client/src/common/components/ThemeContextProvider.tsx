@@ -29,10 +29,10 @@
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
-import { Container } from "@com.mgmtp.a12.widgets/widgets-core/lib/common/main/base-props.js";
-import { shouldForwardProp } from "@com.mgmtp.a12.widgets/widgets-core/lib/common/main/should-forward-prop.js";
-import { GlobalStyles } from "@com.mgmtp.a12.widgets/widgets-core/lib/theme/base/global-styles.js";
-import { flatTheme } from "@com.mgmtp.a12.widgets/widgets-core/lib/theme/flat/flat-theme.js";
+import { Container } from "@com.mgmtp.a12.widgets/widgets-core";
+import { shouldForwardProp } from "@com.mgmtp.a12.widgets/widgets-core";
+import { GlobalStyles } from "@com.mgmtp.a12.widgets/widgets-core";
+import { flatTheme } from "@com.mgmtp.a12.widgets/widgets-core";
 import { StyleSheetManager, ThemeProvider } from "styled-components";
 
 export const ThemeContextProvider: React.FC<Container> = ({ children }) => (

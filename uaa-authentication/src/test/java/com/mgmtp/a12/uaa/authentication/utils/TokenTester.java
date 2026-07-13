@@ -85,7 +85,7 @@ public class TokenTester {
 
 	public static void checkTokenData(JwtTokenGenerator jwtTokenGenerator, JwtTokenVerifier jwtTokenVerifier,
 		boolean isStoredUser) {
-		UAAPrincipal<UserDataCreator.TestExtededData> principal = UserDataCreator.createUser("test1", "password");
+		UAAPrincipal<UserDataCreator.TestExtendedData> principal = UserDataCreator.createUser("test1", "password");
 		JwtTokenData tokenData = jwtTokenGenerator.generateToken(principal);
 		JwtTokenData unpackedTokenData = jwtTokenVerifier.unpackToken(tokenData.getToken());
 		assertTokenData(tokenData, isStoredUser);
@@ -94,8 +94,8 @@ public class TokenTester {
 		Assertions.assertEquals(principal.getUsername(), unpackedTokenData.getUsername());
 		if (isStoredUser) {
 			@SuppressWarnings("unchecked")
-			UAAPrincipal<UserDataCreator.TestExtededData> deserializedUser =
-				(UAAPrincipal<UserDataCreator.TestExtededData>) unpackedTokenData.getPrincipal();
+			UAAPrincipal<UserDataCreator.TestExtendedData> deserializedUser =
+				(UAAPrincipal<UserDataCreator.TestExtendedData>) unpackedTokenData.getPrincipal();
 			assertPrincipal(principal, deserializedUser);
 			Assertions.assertEquals(UAAPrincipal.class, deserializedUser.getClass());
 		}
@@ -123,7 +123,7 @@ public class TokenTester {
 		int waitInSecondTimeBeforeCheck,
 		boolean isTokenBlackList,
 		boolean isExpectedTokenValid) throws InterruptedException {
-		UAAPrincipal<UserDataCreator.TestExtededData> user = UserDataCreator.createUser("test1", "password");
+		UAAPrincipal<UserDataCreator.TestExtendedData> user = UserDataCreator.createUser("test1", "password");
 		JwtTokenData tokenData = jwtTokenGenerator.generateToken(user);
 
 		if (waitInSecondTimeBeforeCheck > 0) {
@@ -137,11 +137,11 @@ public class TokenTester {
 		Assertions.assertEquals(jwtTokenVerifier.isTokenValid(tokenData.getToken()), isExpectedTokenValid);
 	}
 
-	public static void assertPrincipal(UAAPrincipal<UserDataCreator.TestExtededData> user, UAAPrincipal<UserDataCreator.TestExtededData> deserializedUser) {
+	public static void assertPrincipal(UAAPrincipal<UserDataCreator.TestExtendedData> user, UAAPrincipal<UserDataCreator.TestExtendedData> deserializedUser) {
 		assertPrincipal(user, deserializedUser, true, true);
 	}
 
-	public static void assertPrincipal(UAAPrincipal<UserDataCreator.TestExtededData> user, UAAPrincipal<UserDataCreator.TestExtededData> deserializedUser,
+	public static void assertPrincipal(UAAPrincipal<UserDataCreator.TestExtendedData> user, UAAPrincipal<UserDataCreator.TestExtendedData> deserializedUser,
 		boolean password, boolean isCompareWithDefaultPassword) {
 		Assertions.assertEquals(user.getUsername(), deserializedUser.getUsername());
 		if (password) {
@@ -156,7 +156,7 @@ public class TokenTester {
 		Assertions.assertTrue(authorities.stream().anyMatch(auth -> auth.getAuthority().equals("role1")));
 		Assertions.assertTrue(authorities.stream().anyMatch(auth -> auth.getAuthority().equals("role2")));
 
-		UserDataCreator.TestExtededData extendedUserData = deserializedUser.getExtendedPrincipalData();
+		UserDataCreator.TestExtendedData extendedUserData = deserializedUser.getExtendedPrincipalData();
 		if (user.getExtendedPrincipalData() != null && extendedUserData != null) {
 			Assertions.assertEquals(user.getExtendedPrincipalData().getDataOne(), extendedUserData.getDataOne());
 			Assertions.assertEquals(user.getExtendedPrincipalData().getDataTwo(), extendedUserData.getDataTwo());
@@ -167,7 +167,7 @@ public class TokenTester {
 	}
 
 	public static void checkCreationTimestampForNewToken(JwtTokenGenerator jwtTokenGenerator) throws InterruptedException {
-		UAAPrincipal<UserDataCreator.TestExtededData> user = UserDataCreator.createUser("test1", "password");
+		UAAPrincipal<UserDataCreator.TestExtendedData> user = UserDataCreator.createUser("test1", "password");
 		JwtTokenData tokenData = jwtTokenGenerator.generateToken(user);
 		Instant initialTokenCreationTimestamp = tokenData.getIssuedTime();
 		// we need to sleep in order to avoid serialization rounding by JWT lib

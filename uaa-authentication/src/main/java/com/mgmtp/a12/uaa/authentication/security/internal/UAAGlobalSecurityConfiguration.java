@@ -52,7 +52,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
@@ -87,7 +87,7 @@ public class UAAGlobalSecurityConfiguration {
 			List<String> unsecuredUrls = authenticationProperties.getUnsecured().getUrls();
 			LOGGER.info("Unsecured URLs [{}]. No UAA infrastructure applied.", StringUtils.join(unsecuredUrls, ","));
 			if (!CollectionUtils.isEmpty(unsecuredUrls)) {
-				unsecuredUrls.forEach(unsecuredUrl -> web.ignoring().requestMatchers(new AntPathRequestMatcher(unsecuredUrl)));
+				unsecuredUrls.forEach(unsecuredUrl -> web.ignoring().requestMatchers(PathPatternRequestMatcher.withDefaults().matcher(unsecuredUrl)));
 			}
 		};
 	}
@@ -128,13 +128,14 @@ public class UAAGlobalSecurityConfiguration {
 		LOGGER.info("PermitAll URLs [{}]. UAA infrastructure still applied but bypassed.", StringUtils.join(permitAllUrls, ","));
 		http.authorizeHttpRequests(
 			(authorizedHttpRequest) -> {
-				permitAllUrls.forEach(permitAllUrl -> authorizedHttpRequest.requestMatchers(new AntPathRequestMatcher(permitAllUrl)).permitAll());
+				permitAllUrls.forEach(
+					permitAllUrl -> authorizedHttpRequest.requestMatchers(PathPatternRequestMatcher.withDefaults().matcher(permitAllUrl)).permitAll());
 				authorizedHttpRequest.anyRequest().authenticated();
 			});
 
 		securedContexts.forEach(
 			(securedContext) -> http.securityMatchers(customizer -> {
-				customizer.requestMatchers(new AntPathRequestMatcher(securedContext));
+				customizer.requestMatchers(PathPatternRequestMatcher.withDefaults().matcher(securedContext));
 			}));
 		http
 			.exceptionHandling(handling -> handling.accessDeniedHandler(uaaAccessDeniedHandler())

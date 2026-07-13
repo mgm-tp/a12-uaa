@@ -29,7 +29,7 @@
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
-import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging/lib/factory.js";
+import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging";
 
 import { AuthenticationType } from "./index.js";
 
@@ -41,10 +41,6 @@ export interface TokenSelfConfigure {
 	 * The header value which the token has to be attached there and send to resource server.
 	 */
 	readonly authorizationHeaderName?: string;
-	/**
-	 * The header which contains value of expiration time of the token.
-	 */
-	readonly generatedTokenExpirationHeaderName?: string;
 	/**
 	 * The header which contains token generated.
 	 */
@@ -246,7 +242,6 @@ export function isSelfConfigure(
 	if ("tokens" in obj) {
 		const tokenDefaultValue: TokenSelfConfigure = {
 			authorizationHeaderName: "",
-			generatedTokenExpirationHeaderName: "",
 			generatedTokenHeaderName: "",
 			tokenType: "",
 			allowCredentials: false

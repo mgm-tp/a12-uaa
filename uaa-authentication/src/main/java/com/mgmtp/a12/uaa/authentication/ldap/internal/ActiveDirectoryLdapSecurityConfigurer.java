@@ -74,7 +74,7 @@ public class ActiveDirectoryLdapSecurityConfigurer extends UAASecurityConfigurer
 	private RedirectSupport loginRedirectSupport;
 
 	@Override
-	public void configure(HttpSecurity builder) throws Exception {
+	public void configure(HttpSecurity builder) {
 		if (authenticationProperties.getJwt().getTokenEndpoints().isEnabled()) {
 			builder
 				.addFilterBefore(createAdAuthenticationFilter(getAuthenticationManager(builder)), UsernamePasswordAuthenticationFilter.class);
@@ -96,7 +96,7 @@ public class ActiveDirectoryLdapSecurityConfigurer extends UAASecurityConfigurer
 		return Optional.of(delegatedLdapAuthenticationProvider);
 	}
 
-	private UAAAuthenticationFilter createAdAuthenticationFilter(AuthenticationManager authenticationManager) throws Exception {
+	private UAAAuthenticationFilter createAdAuthenticationFilter(AuthenticationManager authenticationManager) {
 		UAAAuthenticationFilter filter =
 			new UAAAuthenticationFilter(authenticationProperties.getContextPath(), loginRedirectSupport, authenticationManager, standardJsonHandler,
 				AuthenticationType.ACTIVE_DIRECTORY_LDAP);

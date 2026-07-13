@@ -1,18 +1,18 @@
 {
   "applicationBaseUrl" : "application_base_url",
-  "uaaBaseUrl" : "uaa_base_url",
   "authorizationDataStore" : "authorization_data_store",
   "excludedDelegatedContexts" : [ "context1", "context2" ],
   "saml" : {
     "loginRelativeUrl" : "login_url",
-    "logoutRelativeUrl" : "user/logout",
     "logoutMethod" : "POST",
-    "tokenType" : "UAABEARER",
+    "logoutRelativeUrl" : "user/logout",
     "ssoConfiguration" : {
-      "usernameXpath" : "username_xpath",
+      "loginButtonXpath" : "login_button_xpath",
       "passwordXpath" : "password_xpath",
-      "loginButtonXpath" : "login_button_xpath"
-    }
+      "usernameXpath" : "username_xpath"
+    },
+    "tokenType" : "UAABEARER"
   },
-  "tokens" : [ ]
+  "tokens" : [ ],
+  "uaaBaseUrl" : "uaa_base_url"
 }

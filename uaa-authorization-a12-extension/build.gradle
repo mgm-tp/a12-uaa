@@ -7,14 +7,14 @@ tasks.withType(JavaCompile) {
     options.compilerArgs.add("-parameters")
 }
 
+tasks.withType(Test) {
+    useJUnitPlatform()
+}
+
 dependencies {
     api project(':uaa-authorization')
 
 	api libs.kernelMdFacade
-	api libs.kernelCorefacade
-	api libs.kernelMdDocumentService
-	api libs.kernelMdModel
-	api libs.kernelCoreParser
     api libs.springContext
     api libs.validationApi
     api libs.annotationApi

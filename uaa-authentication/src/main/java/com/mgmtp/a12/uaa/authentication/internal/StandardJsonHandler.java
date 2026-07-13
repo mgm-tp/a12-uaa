@@ -31,16 +31,14 @@
  */
 package com.mgmtp.a12.uaa.authentication.internal;
 
-import java.io.IOException;
-
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.module.SimpleModule;
 
 /**
  * Supports standard serialization and deserialization for any object
@@ -55,15 +53,15 @@ public class StandardJsonHandler implements JsonHandler {
 			.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, true).build();
 	}
 
-	public String convertToJson(Object value) throws JsonProcessingException {
+	public String convertToJson(Object value) throws JacksonException {
 		return objectMapper.writeValueAsString(value);
 	}
 
-	public <T> T convertFromJson(String content, Class<T> valueType) throws IOException {
+	public <T> T convertFromJson(String content, Class<T> valueType) throws JacksonException {
 		return objectMapper.readValue(content, valueType);
 	}
 
-	public JsonNode readTree(String jsonDocument) throws IOException {
+	public JsonNode readTree(String jsonDocument) throws JacksonException {
 		return objectMapper.readTree(jsonDocument);
 	}
 }

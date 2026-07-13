@@ -31,7 +31,7 @@
  */
 import { actionCreatorFactory } from "typescript-fsa";
 import { AnyAction } from "redux";
-import type { Locale } from "@com.mgmtp.a12.utils/utils-localization/lib/main/localization/Locale.js";
+import type { Locale } from "@com.mgmtp.a12.utils/utils-localization";
 import { Selector } from "@com.mgmtp.a12.client/client-core";
 
 export namespace Localization {

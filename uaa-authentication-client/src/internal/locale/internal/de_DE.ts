@@ -29,7 +29,7 @@
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
-import { LocalizationTree } from "@com.mgmtp.a12.utils/utils-localization/lib/main/index.js";
+import { LocalizationTree } from "@com.mgmtp.a12.utils/utils-localization";
 
 export const de_DE: LocalizationTree = {
 	locale: {

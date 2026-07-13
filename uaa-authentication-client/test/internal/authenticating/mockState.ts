@@ -41,7 +41,7 @@ import {
 } from "../../../src/internal/interfaces/authentication.js";
 
 export const accessTokenMock = "here is access_token";
-export const accessTokenExpirationMock = "10000000";
+export const tokenRenewInSecondsMock = "300";
 export const accessRightsMock: AccessRight[] = [
 	{
 		name: "Access right 1",

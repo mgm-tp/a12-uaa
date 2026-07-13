@@ -32,11 +32,14 @@
 package com.mgmtp.a12.uaa.client.rest.internal;
 
 import java.io.IOException;
+import java.net.URI;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.mock.http.client.MockClientHttpRequest;
 import org.springframework.mock.http.client.MockClientHttpResponse;
 
 import com.mgmtp.a12.uaa.client.rest.UAARestClientException;
@@ -46,23 +49,35 @@ public class UAAResponseErrorHandlerTest {
 	private UAAResponseErrorHandler uaaResponseErrorHandler = new UAAResponseErrorHandler();
 
 	@Test
-	void hasErrorTestForbidden() throws IOException {
+	void handleErrorTestForbidden() throws IOException {
+		MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, URI.create("http://localhost:8080/test"));
 		ClientHttpResponse response = new MockClientHttpResponse(new byte[] {}, HttpStatus.FORBIDDEN);
 
-		boolean hasError = uaaResponseErrorHandler.hasError(response);
+		UAARestClientException uaaRestClientException = Assertions.assertThrows(UAARestClientException.class, () ->
+			uaaResponseErrorHandler.handleError(request, response));
 
-		Assertions.assertTrue(hasError);
+		Assertions.assertEquals(HttpStatus.FORBIDDEN, uaaRestClientException.getStatus());
 	}
 
 	@Test
-	void handleErrorTestUnauthorized() {
+	void handleErrorTestUnauthorized() throws IOException {
+		MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, URI.create("http://localhost:8080/test"));
 		ClientHttpResponse response = new MockClientHttpResponse(new byte[] {}, HttpStatus.UNAUTHORIZED);
 
 		UAARestClientException uaaRestClientException = Assertions.assertThrows(UAARestClientException.class, () ->
-			uaaResponseErrorHandler.handleError(response));
+			uaaResponseErrorHandler.handleError(request, response));
 
 		Assertions.assertEquals(HttpStatus.UNAUTHORIZED, uaaRestClientException.getStatus());
 		Assertions.assertEquals(HttpStatus.UNAUTHORIZED.getReasonPhrase(), uaaRestClientException.getMessage());
+	}
+
+	@Test
+	void handleErrorTestOk() throws IOException {
+		MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, URI.create("http://localhost:8080/test"));
+		ClientHttpResponse response = new MockClientHttpResponse(new byte[] {}, HttpStatus.OK);
+
+		// Should not throw for OK status
+		Assertions.assertDoesNotThrow(() -> uaaResponseErrorHandler.handleError(request, response));
 	}
 
 }

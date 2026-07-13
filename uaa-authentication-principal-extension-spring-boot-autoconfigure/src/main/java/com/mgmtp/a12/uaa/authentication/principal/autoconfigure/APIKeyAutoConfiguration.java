@@ -39,9 +39,9 @@ import org.springframework.context.annotation.Bean;
 
 import com.mgmtp.a12.uaa.authentication.AuthenticationType;
 import com.mgmtp.a12.uaa.authentication.ConditionalOnAuthentication;
+import com.mgmtp.a12.uaa.authentication.apikey.APIKeyConverter;
 import com.mgmtp.a12.uaa.authentication.autoconfigure.AuthenticationAutoConfiguration;
-import com.mgmtp.a12.uaa.authentication.certificate.CertificateConverter;
-import com.mgmtp.a12.uaa.authentication.principal.certificate.internal.CertificatePrincipalConverter;
+import com.mgmtp.a12.uaa.authentication.principal.apikey.internal.APIKeyPrincipalConverter;
 
 @ConditionalOnAuthentication(AuthenticationType.API_KEY)
 @AutoConfigureBefore(AuthenticationAutoConfiguration.class)
@@ -51,9 +51,9 @@ public class APIKeyAutoConfiguration {
 	private AuthenticationPrincipalExtensionProperties authenticationUserProperties;
 
 	@Bean
-	@ConditionalOnMissingBean(CertificateConverter.class)
-	public CertificateConverter uaaAPIKeyConverter() {
-		return new CertificatePrincipalConverter(authenticationUserProperties.getApiKeyConfig().getUsernameField(),
+	@ConditionalOnMissingBean(APIKeyConverter.class)
+	public APIKeyConverter uaaAPIKeyConverter() {
+		return new APIKeyPrincipalConverter(authenticationUserProperties.getApiKeyConfig().getUsernameField(),
 			authenticationUserProperties.getApiKeyConfig().getUserRoleField());
 	}
 

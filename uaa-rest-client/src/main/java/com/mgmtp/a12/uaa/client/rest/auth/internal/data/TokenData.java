@@ -40,9 +40,6 @@ public class TokenData {
 
 	@JsonProperty("access_token")
 	private String accessToken;
-	@Deprecated(since = "8.2.2", forRemoval = true)
-	@JsonProperty("access_token_expiration")
-	private String accessTokenExpiration;
 	@JsonProperty("token_renew_in_seconds")
 	private String tokenRenewInSeconds;
 
@@ -55,16 +52,6 @@ public class TokenData {
 
 	public void setAccessToken(String accessToken) {
 		this.accessToken = accessToken;
-	}
-
-	@Deprecated(since = "8.2.2", forRemoval = true)
-	public String getAccessTokenExpiration() {
-		return accessTokenExpiration;
-	}
-
-	@Deprecated(since = "8.2.2", forRemoval = true)
-	public void setAccessTokenExpiration(String accessTokenExpiration) {
-		this.accessTokenExpiration = accessTokenExpiration;
 	}
 
 	public String getTokenRenewInSeconds() {

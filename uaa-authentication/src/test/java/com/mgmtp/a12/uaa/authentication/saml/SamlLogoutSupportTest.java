@@ -40,7 +40,7 @@ import com.mgmtp.a12.uaa.authentication.internal.TokenType;
 import com.mgmtp.a12.uaa.authentication.jwt.internal.JwtTokenGenerator;
 import com.mgmtp.a12.uaa.authentication.principal.UAAPrincipal;
 import com.mgmtp.a12.uaa.authentication.utils.UserDataCreator;
-import com.mgmtp.a12.uaa.authentication.utils.UserDataCreator.TestExtededData;
+import com.mgmtp.a12.uaa.authentication.utils.UserDataCreator.TestExtendedData;
 
 public class SamlLogoutSupportTest {
 
@@ -56,7 +56,7 @@ public class SamlLogoutSupportTest {
 		Saml2LogoutRequest request = createRequest(relayState);
 
 		MockHttpServletRequest httpRequest = new MockHttpServletRequest();
-		UAAPrincipal<TestExtededData> user = UserDataCreator.createUser("test", "N/A");
+		UAAPrincipal<TestExtendedData> user = UserDataCreator.createUser("test", "N/A");
 		httpRequest.addHeader("Authorization", TokenType.UAABEARER.name() + " " + jwtTokenGenerator.generateToken(user).getToken());
 		MockHttpServletResponse httpResponse = new MockHttpServletResponse();
 

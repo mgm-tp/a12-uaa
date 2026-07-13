@@ -7,6 +7,10 @@ tasks.withType(JavaCompile) {
     options.compilerArgs.add("-parameters")
 }
 
+tasks.withType(Test) {
+    useJUnitPlatform()
+}
+
 dependencies {
 	api project(':uaa-authentication-principal-extension')
 	api project(':uaa-authentication-spring-boot-autoconfigure')
@@ -14,6 +18,7 @@ dependencies {
 	api libs.springBootAutoconfigure
 	annotationProcessor libs.springBootConfigProcessor
 	api libs.springBootStarterValidation
+
 }
 
 description = 'UAA:: Authentication:: Principal Extension:: Spring Boot AutoConfiguration'

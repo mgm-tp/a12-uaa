@@ -32,7 +32,6 @@
 package com.mgmtp.a12.uaa.authorization.schema.internal.validator;
 
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -43,24 +42,24 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 import com.mgmtp.a12.uaa.authorization.schema.internal.ExpressionType;
-import com.networknt.schema.BaseJsonValidator;
-import com.networknt.schema.ErrorMessageType;
+import com.mgmtp.a12.uaa.authorization.schema.internal.collector.GlobalRefsCollector;
+import com.networknt.schema.Error;
 import com.networknt.schema.ExecutionContext;
-import com.networknt.schema.JsonNodePath;
-import com.networknt.schema.JsonSchema;
-import com.networknt.schema.Keyword;
+import com.networknt.schema.Schema;
+import com.networknt.schema.SchemaContext;
 import com.networknt.schema.SchemaLocation;
-import com.networknt.schema.ValidationContext;
-import com.networknt.schema.ValidationMessage;
+import com.networknt.schema.keyword.BaseKeywordValidator;
+import com.networknt.schema.keyword.Keyword;
+import com.networknt.schema.path.NodePath;
 
-public class UaaRefInValidator extends BaseJsonValidator {
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.StringNode;
+
+public class UaaRefInValidator extends BaseKeywordValidator {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UaaRefInValidator.class);
 
-	private static final ErrorMessageType ERROR_MESSAGE_TYPE = () -> "UAA_1003";
 	private static final String UAA_LOGIC_PATTERN_REFERENCE = "[\\(\\)]+|(\\|\\|)+|(\\&\\&)+|(\\!)+";
 
 	private static final String IDENTITY_PROPERTY = "name";
@@ -69,69 +68,67 @@ public class UaaRefInValidator extends BaseJsonValidator {
 	private final ExpressionType expressionType;
 	private final String collectorId;
 
-	public UaaRefInValidator(SchemaLocation schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema, Keyword keyword,
-		ValidationContext validationContext, boolean suppressSubSchemaRetrieval) {
-		super(schemaLocation, evaluationPath, schemaNode, parentSchema, ERROR_MESSAGE_TYPE, keyword, validationContext,
-			suppressSubSchemaRetrieval);
-		expressionType = getExpressionType(parentSchema.getSchemaNode().get(EXPRESSION_TYPE));
-		collectorId = schemaNode.asText();
+	public UaaRefInValidator(Keyword keyword, JsonNode schemaNode, SchemaLocation schemaLocation, Schema parentSchema, SchemaContext schemaContext) {
+		super(keyword, schemaNode, schemaLocation, parentSchema, schemaContext);
+		this.expressionType = getExpressionType(parentSchema.getSchemaNode().get(EXPRESSION_TYPE));
+		this.collectorId = schemaNode.asString();
 	}
 
 	@Override
-	public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
-
+	public void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, NodePath instanceLocation) {
 		LOGGER.debug("validate( {}, {}, {})", node, rootNode, instanceLocation);
-		Set<ValidationMessage> errors = new LinkedHashSet<>();
-		Set<JsonNode> existingRefs =
-			getExistingRefNodes(executionContext).stream().map(refNode -> refNode.get(IDENTITY_PROPERTY)).collect(Collectors.toSet());
+
+		Set<JsonNode> existingRefs = getExistingRefNodes(executionContext).stream()
+			.map(refNode -> refNode.get(IDENTITY_PROPERTY))
+			.filter(Objects::nonNull)
+			.collect(Collectors.toSet());
+
 		if (existingRefs.isEmpty()) {
-			errors.add(
-				message()
-					.type(getKeyword())
-					.message("{0}: The reference [{1}] does not exist in Authorization Definition files")
-					.arguments(node.toString())
-					.instanceLocation(instanceLocation)
-					.instanceNode(node)
-					.build());
-			return errors;
+			Error error = error()
+				.keyword(getKeyword())
+				.message("{0}: The reference [{1}] does not exist in Authorization Definition files")
+				.arguments(instanceLocation, node.toString())
+				.instanceLocation(instanceLocation)
+				.instanceNode(node)
+				.build();
+			executionContext.addError(error);
+			return;
 		}
 
 		getPureRefNames(node).forEach(pureRef -> {
 			if (!existingRefs.contains(pureRef)) {
-				errors.add(
-					//buildValidationMessage(at, pureRef.toString())
-					message()
-						.type(getKeyword())
-						.message("{0}: The reference [{1}] does not exist in Authorization Definition files")
-						.arguments(pureRef.toString())
-						.instanceLocation(instanceLocation)
-						.instanceNode(node)
-						.build());
+				Error error = error()
+					.keyword(getKeyword())
+					.message("{0}: The reference [{1}] does not exist in Authorization Definition files")
+					.arguments(instanceLocation, pureRef.toString())
+					.instanceLocation(instanceLocation)
+					.instanceNode(node)
+					.build();
+				executionContext.addError(error);
 			}
 		});
-
-		return errors;
 	}
 
 	private Set<JsonNode> getExistingRefNodes(ExecutionContext executionContext) {
-		@SuppressWarnings("unchecked")
-		Set<JsonNode> collectedData = ((Set<JsonNode>) executionContext.getCollectorContext().get(collectorId));
-		return Optional.ofNullable(collectedData).orElse(Collections.emptySet());
+		GlobalRefsCollector collector = executionContext.getCollectorContext().get(collectorId);
+		return Optional.ofNullable(collector)
+			.map(GlobalRefsCollector::collect)
+			.orElse(Collections.emptySet());
 	}
 
 	private Set<JsonNode> getPureRefNames(JsonNode node) {
-		if (ExpressionType.UAA_EXPRESSION == expressionType && node.isTextual()) {
-			return Stream.of(node.textValue().split(UAA_LOGIC_PATTERN_REFERENCE))
+		if (ExpressionType.UAA_EXPRESSION == expressionType && node.isString()) {
+			return Stream.of(node.asString().split(UAA_LOGIC_PATTERN_REFERENCE))
 				.filter(StringUtils::isNoneBlank)
-				.map(token -> TextNode.valueOf(token.trim()))
+				.map(token -> StringNode.valueOf(token.trim()))
 				.collect(Collectors.toSet());
 		}
-		return Set.of(node.isTextual() ? TextNode.valueOf(node.asText().trim()) : node);
+		return Set.of(node.isString() ? StringNode.valueOf(node.asString().trim()) : node);
 	}
 
 	private static ExpressionType getExpressionType(JsonNode node) {
-		if (Objects.nonNull(node) && node.isTextual()) {
-			return ExpressionType.fromValue(node.textValue());
+		if (Objects.nonNull(node) && node.isString()) {
+			return ExpressionType.fromValue(node.asString());
 		}
 		return ExpressionType.NONE;
 	}

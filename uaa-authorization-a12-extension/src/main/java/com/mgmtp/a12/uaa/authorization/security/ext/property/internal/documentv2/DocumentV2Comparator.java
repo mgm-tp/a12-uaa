@@ -55,12 +55,11 @@ import com.mgmtp.a12.kernel.md.document.apiV2.utils.DocumentV2Utils;
 import com.mgmtp.a12.kernel.md.model.api.IDocumentModel;
 import com.mgmtp.a12.kernel.md.model.api.services.IDocumentModelResolver;
 import com.mgmtp.a12.kernel.md.model.api.visitor.DocumentModelWalker;
-import com.mgmtp.a12.uaa.authorization.security.ext.property.internal.BaseDocumentComparator;
 import com.mgmtp.a12.uaa.authorization.security.ext.property.internal.DocumentPropertyChange;
 import com.mgmtp.a12.uaa.authorization.security.ext.property.internal.IntrospectionVisitor;
 
 @Component
-public class DocumentV2Comparator extends BaseDocumentComparator implements CustomPropertyComparator<DocumentV2, DocumentV2Changes> {
+public class DocumentV2Comparator implements CustomPropertyComparator<DocumentV2, DocumentV2Changes> {
 
 	private static final String SLASH_SEPARATOR = "/";
 	private static final String COLLECTION = "[]";

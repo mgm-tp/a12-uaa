@@ -29,11 +29,10 @@
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
-import { select } from "typed-redux-saga";
-import { SagaIterator } from "redux-saga";
-import { AnyAction } from "typescript-fsa";
+import { SagaGenerator, select } from "typed-redux-saga";
+import type { Action as ReduxAction } from "redux";
 
-import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging/lib/factory.js";
+import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging";
 import {
 	ConnectorLocator,
 	RestServerConnector
@@ -62,7 +61,7 @@ const logger = LoggerFactory.getLogger("UAA/Saga");
 /**
  *
  */
-function* userLoggingOutSaga(): SagaIterator {
+function* userLoggingOutSaga(): SagaGenerator<void> {
 	const type = yield* select(authenticationType);
 	if (type === AuthenticationType.OAUTH2) {
 		return;
@@ -152,7 +151,7 @@ function logoutSamlRedirect(configuration: UaaSamlConfiguration) {
  */
 const commonClientSaga: UaaSagaDescriptor[] = [
 	{
-		canHandle: (action: AnyAction) => UaaActions.loggingOut.match(action),
+		canHandle: (action: ReduxAction) => UaaActions.loggingOut.match(action),
 		handle: () => userLoggingOutSaga()
 	}
 ];

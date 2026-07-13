@@ -29,7 +29,7 @@
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
-import { LocalizationTreeMap } from "@com.mgmtp.a12.utils/utils-localization/lib/main/index.js";
+import { LocalizationTreeMap } from "@com.mgmtp.a12.utils/utils-localization";
 
 export const localeJsonResource: LocalizationTreeMap = {
   vi_VN: {

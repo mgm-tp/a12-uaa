@@ -31,8 +31,6 @@
  */
 package com.mgmtp.a12.uaa.authentication.backend;
 
-import java.util.concurrent.ExecutionException;
-
 import jakarta.inject.Inject;
 
 import org.springframework.stereotype.Component;
@@ -47,11 +45,11 @@ public class AnnotatedAsynchronousTestJobRunner {
 	private BackendAuthenticationService backendAuthenticationService;
 
 	@Authenticated(username = "xyz")
-	public void executeJob() throws InterruptedException, ExecutionException {
+	public void executeJob() {
 		testService.executeFunction();
 	}
 
-	public void executeJobWithAPI() throws InterruptedException, ExecutionException {
+	public void executeJobWithAPI() {
 
 		backendAuthenticationService.executeWithBackendAuthentication("xyz", () -> {
 			testService.executeFunction();

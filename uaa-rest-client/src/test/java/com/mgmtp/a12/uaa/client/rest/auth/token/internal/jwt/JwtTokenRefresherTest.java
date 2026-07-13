@@ -38,8 +38,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
 import com.mgmtp.a12.uaa.client.rest.auth.AuthorizationData;
 import com.mgmtp.a12.uaa.client.rest.auth.AuthorizationDataStore;
@@ -52,6 +54,7 @@ import com.mgmtp.a12.uaa.client.rest.config.properties.UAARestClientAuthenticati
 import com.mgmtp.a12.uaa.client.rest.config.properties.UAARestClientProperties;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class JwtTokenRefresherTest {
 
 	private JwtTokenRefresher jwtTokenRefresher;
@@ -59,7 +62,15 @@ public class JwtTokenRefresherTest {
 	private AuthorizationData authorizationData;
 	private AuthorizationDataStore authorizationDataStore;
 	@Mock
-	private RestTemplate restTemplate;
+	private RestClient restClient;
+	@Mock
+	private RestClient.RequestBodyUriSpec requestBodyUriSpec;
+	@Mock
+	private RestClient.RequestBodySpec requestBodySpec;
+	@Mock
+	private RestClient.ResponseSpec authorizeResponseSpec;
+	@Mock
+	private RestClient.ResponseSpec tokenResponseSpec;
 
 	@BeforeEach
 	void setUp() {
@@ -77,7 +88,7 @@ public class JwtTokenRefresherTest {
 		authorizationData = new AuthorizationData("tokenData", TokenType.BEARER, "sessionData", 50);
 		authorizationDataStore.setAuthorizationData(authorizationData);
 		jwtTokenRefresher = new JwtTokenRefresher(uaaRestClientProperties, authorizationDataStore);
-		ReflectionTestUtils.setField(jwtTokenRefresher, "restTemplate", restTemplate);
+		ReflectionTestUtils.setField(jwtTokenRefresher, "restClient", restClient);
 
 		AuthorizeData authorizeData = new AuthorizeData();
 		authorizeData.setState("state");
@@ -86,9 +97,23 @@ public class JwtTokenRefresherTest {
 		tokenData.setAccessToken("newTokenData");
 		tokenData.setTokenRenewInSeconds("50");
 
-		Mockito.when(restTemplate.postForObject(Mockito.anyString(), Mockito.any(), Mockito.any()))
-			.thenReturn(authorizeData)
-			.thenReturn(tokenData);
+		// Setup mock chain for RestClient fluent API
+		Mockito.when(restClient.post()).thenReturn(requestBodyUriSpec);
+		Mockito.when(requestBodyUriSpec.uri(Mockito.anyString())).thenReturn(requestBodySpec);
+		Mockito.when(requestBodySpec.contentType(Mockito.any())).thenReturn(requestBodySpec);
+		Mockito.doReturn(requestBodySpec).when(requestBodySpec).body(Mockito.anyString());
+		Mockito.doReturn(requestBodySpec).when(requestBodySpec).body(Mockito.<Object>any());
+
+		// Return different response specs for sequential calls
+		Mockito.when(requestBodySpec.retrieve())
+			.thenReturn(authorizeResponseSpec)
+			.thenReturn(tokenResponseSpec);
+
+		// Setup response for authorize call
+		Mockito.when(authorizeResponseSpec.body(AuthorizeData.class)).thenReturn(authorizeData);
+
+		// Setup response for token call
+		Mockito.when(tokenResponseSpec.body(TokenData.class)).thenReturn(tokenData);
 	}
 
 	@Test

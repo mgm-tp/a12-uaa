@@ -69,10 +69,6 @@ public class CacheClientHttpResponse implements ClientHttpResponse {
 		return cachedClientData.getStatusCode();
 	}
 
-	@Override
-	public int getRawStatusCode() throws IOException {
-		return cachedClientData.getStatusCode().value();
-	}
 
 	@Override
 	public String getStatusText() throws IOException {

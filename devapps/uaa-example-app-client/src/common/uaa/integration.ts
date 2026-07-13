@@ -102,7 +102,6 @@ export const shareToken = async () => {
   UaaSecureStorage.getInstance().initShareSecuredData(
     [
       "access_token",
-      "access_token_expiration",
       "authenticationType",
       `oidc.user:${DEVAPPS_CONFIGURATION.idpUrl}/realms/${DEVAPPS_CONFIGURATION.idpRealm}:${DEVAPPS_CONFIGURATION.idpClientId}`,
     ],

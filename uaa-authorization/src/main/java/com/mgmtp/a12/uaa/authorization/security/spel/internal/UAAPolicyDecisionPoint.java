@@ -97,7 +97,7 @@ public class UAAPolicyDecisionPoint implements PolicyDecisionPoint {
 		this.propertyChangesChecker = propertyChangesChecker;
 		this.policyProcessorResolver = new PolicyProcessorResolver(policyProcessorFactories, standardEvaluationContext);
 		this.repositoryPolicyProcessor =
-			new SpelRepositoryPolicyProcessor(standardEvaluationContext, policyProcessorResolver, authorizationDefinitionRepository);
+			new SpelRepositoryPolicyProcessor(standardEvaluationContext);
 		AuthorizationContext authorizationContext = AuthorizationContextHolder.getContext();
 		authorizationContext.setExecutionEnvironment(standardEvaluationContext);
 	}

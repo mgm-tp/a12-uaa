@@ -1,6 +1,6 @@
 {
 	"name": "@com.mgmtp.a12.uaa/uaa-authentication-client-codemod",
-	"version": "9.3.2-SNAPSHOT",
+	"version": "10.0.0-SNAPSHOT",
 	"description": "Codemod for Uaa Authentication Client",
 	"author": "mgm technology partners",
 	"license": "(EUPL-1.2 OR LicenseRef-commercial)",
@@ -21,10 +21,10 @@
 	},
 	"devDependencies": {
 		"@cyclonedx/cyclonedx-npm": "^4.1.1",
-		"@types/node": "22.13.5",
+		"@types/node": "^24.10.1",
 		"rimraf": "^6.1.2",
-		"typedoc": "0.28.18",
-		"typescript": "5.8.2",
+		"typedoc": "^0.28.18",
+		"typescript": "^6.0.2",
 		"vitest": "3.2.4"
 	},
 	"files": [

@@ -31,52 +31,67 @@
  */
 package com.mgmtp.a12.uaa.authentication.internal;
 
-import java.io.IOException;
 import java.util.List;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 
-import org.springframework.security.jackson2.CoreJackson2Module;
+import org.springframework.security.jackson.SecurityJacksonModules;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.mgmtp.a12.uaa.authentication.AuthenticationType;
 import com.mgmtp.a12.uaa.authentication.ConditionalOnAuthentication;
-import com.mgmtp.a12.uaa.authentication.principal.internal.serialization.UAAJacksonModule;
+import com.mgmtp.a12.uaa.authentication.principal.UAAJacksonModule;
 
-/**
- * Supports custom serialization and deserialization for principal or token object related to UAA, Spring Security
- */
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
+
 @Component
-@ConditionalOnAuthentication({ AuthenticationType.LOCAL, AuthenticationType.ACTIVE_DIRECTORY_LDAP, AuthenticationType.SAML,
-	AuthenticationType.UAA_ACCESS_TOKEN })
+@ConditionalOnAuthentication({
+	AuthenticationType.LOCAL,
+	AuthenticationType.ACTIVE_DIRECTORY_LDAP,
+	AuthenticationType.SAML,
+	AuthenticationType.UAA_ACCESS_TOKEN
+})
 public class UAASpringJsonHandler implements JsonHandler {
 
 	private ObjectMapper objectMapper;
+
 	@Inject
 	private List<UAAJacksonModule> uaaJacksonModules;
 
 	@PostConstruct
 	public void initialize() {
+		ClassLoader loader = getClass().getClassLoader();
+
+		BasicPolymorphicTypeValidator.Builder builder =
+			BasicPolymorphicTypeValidator.builder();
+
+		uaaJacksonModules.forEach(module ->
+			module.configurePolymorphicTypeValidator(builder)
+		);
+
 		objectMapper = JsonMapper.builder()
-			.addModule(new CoreJackson2Module())
-			.addModules(uaaJacksonModules).build();
+			.addModules(SecurityJacksonModules.getModules(loader, builder))
+			.addModules(uaaJacksonModules)
+			.build();
 	}
 
-	public String convertToJson(Object value) throws JsonProcessingException {
+	@Override
+	public String convertToJson(Object value) throws JacksonException {
 		return objectMapper.writeValueAsString(value);
 	}
 
-	public <T> T convertFromJson(String content, Class<T> valueType) throws IOException {
+	@Override
+	public <T> T convertFromJson(String content, Class<T> valueType) throws JacksonException {
 		return objectMapper.readValue(content, valueType);
 	}
 
-	public JsonNode readTree(String jsonDocument) throws IOException {
+	@Override
+	public JsonNode readTree(String jsonDocument) throws JacksonException {
 		return objectMapper.readTree(jsonDocument);
 	}
-
 }

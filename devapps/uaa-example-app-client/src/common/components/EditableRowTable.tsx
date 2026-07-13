@@ -40,10 +40,10 @@ import {
   Pagination,
   Select,
   TextAreaStateless,
-  TextLineStateless,
+  TextField,
   WarningTooltip,
 } from "@com.mgmtp.a12.widgets/widgets-core";
-import { generateUid } from "@com.mgmtp.a12.widgets/widgets-core/lib/common/index.js";
+import { generateUid } from "@com.mgmtp.a12.widgets/widgets-core";
 import {
   BaseColumnType,
   DefaultTableComponentRenderers,
@@ -52,7 +52,7 @@ import {
   TableContextProvider,
   TableRenderPropsType,
   useTableContext,
-} from "@com.mgmtp.a12.widgets/widgets-core/lib/table/new-api/index.js";
+} from "@com.mgmtp.a12.widgets/widgets-core";
 
 import { Key } from "ts-keycode-enum";
 
@@ -60,13 +60,7 @@ import {
   ConnectorLocator,
   RestRequestPayload,
   RestServerConnector,
-} from "@com.mgmtp.a12.utils/utils-connector/lib/main/index.js";
-
-const ACCEPT_JSON_HEADER = ["Accept", "application/json"];
-const CONTENT_TYPE_JSON_HEADER = [
-  "Content-Type",
-  "application/json;charset=utf8",
-];
+} from "@com.mgmtp.a12.utils/utils-connector";
 
 type CompanyType = {
   id: string;
@@ -96,8 +90,7 @@ const makeCancelable = (promise: Promise<unknown>) => {
 function fetchAllCompanies() {
   let request: RestRequestPayload = {
     method: "GET",
-    relativeUrl: "loadAllCompanies",
-    customHeaders: [ACCEPT_JSON_HEADER],
+    relativeUrl: "loadAllCompanies"
   };
   const baseUrl = (
     ConnectorLocator.getInstance().getServerConnector() as RestServerConnector
@@ -118,8 +111,7 @@ export function UpdateCompany(company: CompanyType) {
   let request: RestRequestPayload = {
     method: "POST",
     relativeUrl: "updateCompany",
-    body: JSON.stringify(company),
-    customHeaders: [ACCEPT_JSON_HEADER, CONTENT_TYPE_JSON_HEADER],
+    body: JSON.stringify(company)
   };
   const baseUrl = (
     ConnectorLocator.getInstance().getServerConnector() as RestServerConnector
@@ -440,7 +432,7 @@ const CustomBodyContent: React.ComponentType<
       );
     default:
       return (
-        <TextLineStateless
+        <TextField
           id={generateUid()}
           value={cellValue}
           disabled={isDisabled}

@@ -156,6 +156,7 @@ public class Saml2LogoutRequestAuthenticatorFilterTest {
 	public void checkWrongUrl() throws Exception {
 		MockHttpServletRequest request = new MockHttpServletRequest();
 		request.setServletPath("/wrong");
+		request.setRequestURI("/wrong");
 		MockHttpServletResponse response = new MockHttpServletResponse();
 		saml2LogoutRequestAuthenticatorFilter.doFilter(request, response, filterChain);
 
@@ -168,6 +169,7 @@ public class Saml2LogoutRequestAuthenticatorFilterTest {
 	public void checkMissingParameter() throws Exception {
 		MockHttpServletRequest request = new MockHttpServletRequest();
 		request.setServletPath("/logout/saml2/slo");
+		request.setRequestURI("/logout/saml2/slo");
 		MockHttpServletResponse response = new MockHttpServletResponse();
 		saml2LogoutRequestAuthenticatorFilter.doFilter(request, response, filterChain);
 
@@ -180,6 +182,7 @@ public class Saml2LogoutRequestAuthenticatorFilterTest {
 	public void checkProcessing() throws Exception {
 		MockHttpServletRequest request = new MockHttpServletRequest();
 		request.setServletPath("/logout/saml2/slo");
+		request.setRequestURI("/logout/saml2/slo");
 		request.setMethod("POST");
 		MockHttpServletResponse response = new MockHttpServletResponse();
 
@@ -202,6 +205,7 @@ public class Saml2LogoutRequestAuthenticatorFilterTest {
 	public void checkWrongBinding() throws Exception {
 		MockHttpServletRequest request = new MockHttpServletRequest();
 		request.setServletPath("/logout/saml2/slo");
+		request.setRequestURI("/logout/saml2/slo");
 		request.setMethod("GET");
 		MockHttpServletResponse response = new MockHttpServletResponse();
 
@@ -221,6 +225,7 @@ public class Saml2LogoutRequestAuthenticatorFilterTest {
 
 		MockHttpServletRequest request = new MockHttpServletRequest();
 		request.setServletPath("/logout/saml2/slo");
+		request.setRequestURI("/logout/saml2/slo");
 		request.setMethod("GET");
 		MockHttpServletResponse response = new MockHttpServletResponse();
 

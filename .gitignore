@@ -27,3 +27,12 @@ node_modules/
 !uaa-regression-tests/bruno/*/package-lock.json
 tsconfig.tsbuildinfo
 silent_renew.js
+/AGENTS.md
+/.claude/
+/.repomixignore
+/CLAUDE.md
+/install-kit.sh
+/release-manifest.json
+/plans/
+/.opencode/
+/docs/

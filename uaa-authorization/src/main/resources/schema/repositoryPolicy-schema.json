@@ -12,19 +12,8 @@
   ],
   "identityProperty": "name",
   "required": [
-    "name"
-  ],
-  "anyOf": [
-    {
-      "required": [
-        "templates"
-      ]
-    },
-    {
-      "required": [
-        "template-refs"
-      ]
-    }
+    "name",
+    "templates"
   ],
   "properties": {
     "name": {
@@ -69,12 +58,6 @@
             "type": "object"
           }
         ]
-      }
-    },
-    "template-refs": {
-      "type": "array",
-      "items": {
-        "type": "string"
       }
     }
   },
