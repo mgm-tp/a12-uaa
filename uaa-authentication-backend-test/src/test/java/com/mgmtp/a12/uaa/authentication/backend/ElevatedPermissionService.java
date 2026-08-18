@@ -74,6 +74,13 @@ public class ElevatedPermissionService {
 		return permissionResult;
 	}
 
+	public boolean checkPermissionAfterBackendSwapInJava() {
+		return backendAuthenticationService.executeWithBackendAuthentication("elevated", () -> {
+			PermissionCheckResult<Permission> checkPermissions = authorizationService.checkPermissions(null, "Elevated Scope");
+			return checkPermissions.isPassed();
+		});
+	}
+
 	private StandardEvaluationContext getExecutionEnvironment() {
 		AuthorizationContext authorizationContext = AuthorizationContextHolder.getContext();
 		StandardEvaluationContext executionEnvironment = authorizationContext.getExecutionEnvironment();

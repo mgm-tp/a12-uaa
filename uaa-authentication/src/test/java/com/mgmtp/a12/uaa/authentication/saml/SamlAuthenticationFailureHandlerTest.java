@@ -34,10 +34,7 @@ package com.mgmtp.a12.uaa.authentication.saml;
 import java.io.IOException;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -49,9 +46,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.AuthenticationServiceException;
 
 import com.mgmtp.a12.uaa.authentication.internal.RedirectSupport;
-import com.mgmtp.a12.uaa.authentication.jwt.internal.CookieUtil;
 import com.mgmtp.a12.uaa.authentication.saml.internal.SamlAuthenticationFailureHandler;
-import com.mgmtp.a12.uaa.authentication.saml.internal.UAASamlAuthenticationRequestFilter;
 
 @ExtendWith(MockitoExtension.class)
 public class SamlAuthenticationFailureHandlerTest {
@@ -66,15 +61,8 @@ public class SamlAuthenticationFailureHandlerTest {
 	public void testSendRedirectSupport() throws ServletException, IOException {
 		MockHttpServletRequest httpRequest = new MockHttpServletRequest();
 		MockHttpServletResponse httpResponse = new MockHttpServletResponse();
-		Cookie cookieSamlRequestId =
-			CookieUtil.createCookie(UAASamlAuthenticationRequestFilter.COOKIE_SAML_REQUEST_ID, "TEST_VALUE", null, httpRequest, false, true,
-				10);
-		httpRequest.setCookies(cookieSamlRequestId);
 		samlAuthenticationFailureHandler.onAuthenticationFailure(httpRequest, httpResponse, new AuthenticationServiceException("AuthenticationException"));
 		Mockito.verify(samlLoginRedirectSupport, Mockito.atLeastOnce()).performFailureRedirect(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
-		MatcherAssert.assertThat(httpResponse.getCookie(UAASamlAuthenticationRequestFilter.COOKIE_SAML_REQUEST_ID), Matchers.notNullValue());
-		MatcherAssert.assertThat(httpResponse.getCookie(UAASamlAuthenticationRequestFilter.COOKIE_SAML_REQUEST_ID).getMaxAge(),
-			Matchers.is(Integer.valueOf(0)));
 	}
 
 }

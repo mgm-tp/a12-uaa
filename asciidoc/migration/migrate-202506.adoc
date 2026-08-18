@@ -132,10 +132,6 @@ As the result, the client self-configuration no longer contains that attribute.
 
 * The function `withGeneratedTokenExpirationHeaderName()` of class `TokenConfiguration.Builder` is unusable.
 
-* The attribute `loginTime` and its getter of class `JwtTokenData` are replaced by `issuedTime` and its corresponding getter and setter.
-
-* The function `withLoginTime` of class `JwtTokenData.Builder` is replaced by `withIssuedTime()`.
-
 * The attribute `expirationTime` and its setter of class `JwtTokenData` are unusable,
 the getter `getExpirationTime()` is now computed by attributes `issuedTime` and `expirationSeconds`.
 

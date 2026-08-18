@@ -70,8 +70,6 @@ public class UAAAuthnRequestConsumer implements Consumer<AuthnRequestContext> {
 			RequestedAuthnContext requestedAuthnContext = authContextDataConverter.buildRequestContext(generator);
 			authnRequest.setRequestedAuthnContext(requestedAuthnContext);
 		});
-		UAAThreadLocalAuthnRequestDataStore.setAuthnRequestData(authnRequest);
-
 	}
 
 }

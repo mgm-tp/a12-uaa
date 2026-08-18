@@ -34,7 +34,6 @@ package com.mgmtp.a12.uaa.authorization.schema.internal.validator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -42,85 +41,105 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.mgmtp.a12.uaa.authorization.schema.internal.SchemaValidator;
-import com.networknt.schema.BaseJsonValidator;
-import com.networknt.schema.ErrorMessageType;
+import com.networknt.schema.CollectorContext;
 import com.networknt.schema.ExecutionContext;
-import com.networknt.schema.JsonNodePath;
-import com.networknt.schema.JsonSchema;
-import com.networknt.schema.Keyword;
+import com.networknt.schema.Schema;
+import com.networknt.schema.SchemaContext;
 import com.networknt.schema.SchemaLocation;
-import com.networknt.schema.ValidationContext;
-import com.networknt.schema.ValidationMessage;
+import com.networknt.schema.keyword.BaseKeywordValidator;
+import com.networknt.schema.keyword.Keyword;
+import com.networknt.schema.path.NodePath;
 
-public class IdentityPropertyValidator extends BaseJsonValidator {
+public class IdentityPropertyValidator extends BaseKeywordValidator {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(IdentityPropertyValidator.class);
-
-	private static ErrorMessageType ERROR_MESSAGE_TYPE = new ErrorMessageType() {
-		@Override
-		public String getErrorCode() {
-			return "UAA_1002";
-		}
-	};
 
 	private static final String GLOBAL_DUPLICATED_IDENTITY_ERROR =
 		"{0}: The identity [{1}] with value [{2}] in the [{3}] file is a duplicate of the one in the [{4}] file";
 
-	private final JsonNode identityField;
-	private final Map<String, Set<JsonNode>> identityMap = new LinkedHashMap<>();
+	private static final String IDENTITY_MAP_COLLECTOR_KEY = "identityPropertyValidator.identityMap";
 
-	public IdentityPropertyValidator(SchemaLocation schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode,
-		JsonSchema parentSchema, Keyword keyword,
-		ValidationContext validationContext, boolean suppressSubSchemaRetrieval) {
-		super(schemaLocation, evaluationPath, schemaNode, parentSchema, ERROR_MESSAGE_TYPE, keyword, validationContext,
-			suppressSubSchemaRetrieval);
+	private final JsonNode identityField;
+	private final String schemaLocationKey;
+
+	public IdentityPropertyValidator(SchemaLocation schemaLocation, JsonNode schemaNode,
+		Schema parentSchema, Keyword keyword, SchemaContext schemaContext) {
+		super(keyword, schemaNode, schemaLocation, parentSchema, schemaContext);
 		identityField = schemaNode;
+		// Use schema location to differentiate identity spaces (e.g., policies vs propertyPermissions)
+		schemaLocationKey = schemaLocation.toString();
 	}
 
 	@Override
-	public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
-		LOGGER.debug("validate( {}, {}, {})", node, rootNode, instanceLocation);
-		Set<ValidationMessage> errors = new LinkedHashSet<>();
+	public void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, NodePath instanceLocation) {
+		LOGGER.debug("validate({}, {}, {})", node, rootNode, instanceLocation);
+
 		if (identityField.isTextual() && node.isObject()) {
+			Map<String, Map<String, Set<JsonNode>>> identityMapBySchema = getOrCreateIdentityMap(executionContext);
+			Map<String, Set<JsonNode>> identityMap = identityMapBySchema.computeIfAbsent(schemaLocationKey, k -> new LinkedHashMap<>());
 			String currentFileName = getFileName(rootNode);
-			Set<JsonNode> localIdentityValues = identityMap.computeIfAbsent(currentFileName, fname -> new LinkedHashSet<>());
-			String field = identityField.textValue();
+			Set<JsonNode> localIdentityValues =
+				identityMap.computeIfAbsent(currentFileName, fname -> new LinkedHashSet<>());
+
+			String field = identityField.asText();
 			JsonNode identity = node.get(field);
-			if (Objects.isNull(identity) || identity.isNull()) {
-				ValidationMessage error = message()
-					.type(getKeyword())
-					.schemaLocation(schemaLocation)
-					.message("{0}: The identity property [{1}] cannot be null")
-					.arguments(field)
-					.instanceLocation(instanceLocation).instanceNode(node).build();
-				errors.add(error);
-			}
-			if (!localIdentityValues.add(identity)) {
-				ValidationMessage error = message()
-					.type(getKeyword())
-					.schemaLocation(schemaLocation)
-					.message("{0}: The identity property [{1}] cannot be null")
-					.arguments(field, identity.toString())
-					.instanceLocation(instanceLocation).instanceNode(node).build();
-				errors.add(error);
-			}
-			identityMap.entrySet().stream().filter(entry -> !entry.getKey().contains(currentFileName) && entry.getValue()
-				.contains(identity)).map(Map.Entry::getKey).findFirst()
-				.ifPresent(existingIdentityInFileName -> errors.add(
-					message()
-						.type("UAA.Global.DuplicatingIdentity")
-						//.format(new MessageFormat(GLOBAL_DUPLICATED_IDENTITY_ERROR))
-						.message(GLOBAL_DUPLICATED_IDENTITY_ERROR)
-						.arguments(field, identity.toString(), currentFileName, existingIdentityInFileName)
+
+			if (identity == null || identity.isNull()) {
+				executionContext.addError(
+					error()
+						.message("{0}: The identity property [{1}] cannot be null")
+						.arguments(instanceLocation, field)
 						.instanceLocation(instanceLocation)
 						.instanceNode(node)
-						.build()));
+						.evaluationPath(executionContext.getEvaluationPath())
+						.build()
+				);
+				return;
+			}
 
+			if (!localIdentityValues.add(identity)) {
+				executionContext.addError(
+					error()
+						.message("{0}: The identity property [{1}] cannot be null")
+						.arguments(instanceLocation, field)
+						.instanceLocation(instanceLocation)
+						.instanceNode(node)
+						.evaluationPath(executionContext.getEvaluationPath())
+						.build()
+				);
+			}
+
+			identityMap.entrySet().stream()
+				.filter(entry -> !entry.getKey().contains(currentFileName) && entry.getValue().contains(identity))
+				.map(Map.Entry::getKey)
+				.findFirst()
+				.ifPresent(existingIdentityInFileName ->
+					executionContext.addError(
+						error()
+							.messageKey("UAA.Global.DuplicatingIdentity")
+							.message(GLOBAL_DUPLICATED_IDENTITY_ERROR)
+							.arguments(instanceLocation, field, identity.toString(), currentFileName, existingIdentityInFileName)
+							.instanceLocation(instanceLocation)
+							.instanceNode(node)
+							.evaluationPath(executionContext.getEvaluationPath())
+							.build()
+					)
+				);
 		}
-		return errors;
 	}
 
 	protected String getFileName(JsonNode rootNode) {
 		return rootNode.get(SchemaValidator.FILENAME_FIELD).asText();
+	}
+
+	@SuppressWarnings("unchecked")
+	private Map<String, Map<String, Set<JsonNode>>> getOrCreateIdentityMap(ExecutionContext executionContext) {
+		CollectorContext collectorContext = executionContext.getCollectorContext();
+		Map<String, Map<String, Set<JsonNode>>> identityMap = collectorContext.get(IDENTITY_MAP_COLLECTOR_KEY);
+		if (identityMap == null) {
+			identityMap = new LinkedHashMap<>();
+			collectorContext.put(IDENTITY_MAP_COLLECTOR_KEY, identityMap);
+		}
+		return identityMap;
 	}
 }

@@ -74,6 +74,7 @@ public class JwtTokenVerifier {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JwtTokenVerifier.class);
 	private static final String CLAIM_USER_DETAILS = "userDetails";
 	private static final String CLAIM_AUTHORITIES = "authorities";
+	private static final String CLAIM_AUTH_TIME = "auth_time";
 	private Integer userLifetimeSeconds;
 	private RSASSAVerifier verifier;
 	private DirectDecrypter decrypter;
@@ -103,9 +104,26 @@ public class JwtTokenVerifier {
 			.withAuthorities(getAuthorities(claims))
 			.withPrincipal(getPrincipal(claims))
 			.withIssuedTime(claims.getIssueTime().toInstant())
+			.withLoginTime(extractLoginTime(claims))
 			.withExpirationSeconds(jwtProperties.getExpirationSeconds())
 			.withTokenRenewThresholdInSeconds(jwtProperties.getTokenRenewThresholdInSeconds())
 			.build();
+	}
+
+	/**
+	 * Reads the preserved original authentication time from the token. Falls back to the standard issue time for tokens
+	 * issued before the {@code auth_time} claim existed, so that the {@code user-lifetime-seconds} cap remains enforced.
+	 */
+	private Instant extractLoginTime(JWTClaimsSet claims) {
+		try {
+			Long authTimeMillis = claims.getLongClaim(CLAIM_AUTH_TIME);
+			if (authTimeMillis != null) {
+				return Instant.ofEpochMilli(authTimeMillis);
+			}
+		} catch (Exception e) {
+			LOGGER.warn("Unable to read the authentication time claim, falling back to the issue time." + e);
+		}
+		return claims.getIssueTime().toInstant();
 	}
 
 	private UserDetails getPrincipal(JWTClaimsSet claims) {
@@ -145,7 +163,7 @@ public class JwtTokenVerifier {
 
 	private Boolean isTokenLifetimeExpired(JWTClaimsSet tokenClaims) {
 		try {
-			Instant loginTime = tokenClaims.getIssueTime().toInstant();
+			Instant loginTime = extractLoginTime(tokenClaims);
 			return Optional.ofNullable(userLifetimeSeconds).map(lifetime -> {
 				Instant expirationTime = loginTime.plus(Duration.ofSeconds(lifetime));
 				if (Instant.now().isAfter(expirationTime)) {

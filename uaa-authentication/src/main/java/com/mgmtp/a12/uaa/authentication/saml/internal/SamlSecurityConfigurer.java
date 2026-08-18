@@ -203,10 +203,7 @@ public class SamlSecurityConfigurer extends UAASecurityConfigurer<SamlSecurityCo
 				});
 			}).addFilterBefore(metadataFilter, Saml2WebSsoAuthenticationFilter.class)
 			.addFilterBefore(
-				new UAASamlAuthenticationRequestFilter(authenticationProperties.getContextPath(),
-					loginRedirectSupport, authenticationProperties.getCookie().getHttpOnly().isEnabled(),
-					authenticationProperties.getCookie().getSecured().isEnabled(),
-					authenticationProperties.getCookie().getLifetimeSeconds()),
+				new UAASamlAuthenticationRequestFilter(authenticationProperties.getContextPath(), loginRedirectSupport),
 				Saml2WebSsoAuthenticationRequestFilter.class)
 			.addFilterBefore(new SameSiteFilter(authenticationProperties.getCookie().getSameSite()),
 				UAASamlAuthenticationRequestFilter.class);

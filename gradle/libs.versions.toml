@@ -1,11 +1,11 @@
 [versions]
-jackson = "2.20.1"
+jackson = "2.22.0"
 jacksonAnnotation = "2.20"
 spring = "6.2.15"
-springSecurity = "6.5.7"
+springSecurity = "6.5.11"
 #force json-smart version since it used range version. Will be deleted in the future
 jsonSmart = "2.4.10"
-springBoot = "3.5.9"
+springBoot = "3.5.15"
 opensamlSecurityExt = "4.1.2"
 springLdapCore = "3.3.2"
 servletApi = "6.0.0"
@@ -15,11 +15,11 @@ validationApi = "3.0.2"
 inject = "2.0.1"
 commonsLang = "3.14.0"
 commonsCollection = "4.4"
-beanUtils = "1.9.4"
+beanUtils = "1.11.0"
 hibernateValidator = "8.0.1.Final"
 zjsonPatch = "0.4.16"
 jmh = "1.37"
-influxDB = "2.24"
+influxDB = "2.25"
 csvVersion = "1.10.0"
 junit = "5.10.2"
 junitPlatform = "1.10.2"
@@ -30,19 +30,19 @@ slf = "2.0.13"
 xmlUnit = "2.9.1"
 javers = "7.7.0"
 aspects = "1.9.21.1"
-a12Kernel = "30.8.1"
+a12Kernel = "30.8.3"
 cacheAPI = "1.1.1"
 ehcache = "3.10.8"
 h2 = "2.2.224"
 jmockData = "4.3.0"
 postgre = "42.7.3"
-httpclient5 = "5.4.1"
+httpclient5 = "5.4.3"
 commonsLogging = "1.3.1"
-a12ServerConnector = "8.2.1"
+a12ServerConnector = "8.2.3"
 htmlUnit = "4.0.0"
 nimbus = "9.37.4"
 persistenceApi = "3.1.0"
-jsonSchemaValidator = "1.4.0"
+jsonSchemaValidator = "2.0.1"
 reflections = "0.10.2"
 
 # Plugins version
@@ -138,6 +138,7 @@ serverConnector = { module = "com.mgmtp.a12.utils:utils-rest-server-connector", 
 serverConnectorAutoconfig = { module = "com.mgmtp.a12.utils:utils-rest-server-connector-spring-boot-autoconfigure", version.ref = "a12ServerConnector" }
 htmlUnit = { module = "org.htmlunit:htmlunit", version.ref = "htmlUnit" }
 jsonSchemaValidator = { module = 'com.networknt:json-schema-validator', version.ref = 'jsonSchemaValidator' }
+jsonSchemaValidatorRev = { module = 'com.networknt:json-schema-validator', version.ref = 'jsonSchemaValidatorRev' }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 reflections = { module = "org.reflections:reflections", version.ref = "reflections" }
 

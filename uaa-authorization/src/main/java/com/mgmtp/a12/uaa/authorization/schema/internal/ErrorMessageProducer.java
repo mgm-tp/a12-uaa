@@ -34,22 +34,21 @@ package com.mgmtp.a12.uaa.authorization.schema.internal;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.mgmtp.a12.uaa.authorization.schema.internal.location.LocationDetails;
 import com.mgmtp.a12.uaa.authorization.schema.internal.location.LocationProvider;
-import com.networknt.schema.ValidationMessage;
-import com.networknt.schema.ValidatorTypeCode;
+import com.networknt.schema.Error;
+import com.networknt.schema.keyword.KeywordType;
 
 public class ErrorMessageProducer {
 	private static final String ERROR_PATTERN = "File: %s, Line: %s, Column: %s. Error: %s.";
-	private final Set<ValidationMessage> messages;
+	private final List<Error> messages;
 	private final String fileName;
 
-	public ErrorMessageProducer(Set<ValidationMessage> messages, JsonNode rootNode) {
+	public ErrorMessageProducer(List<Error> messages, JsonNode rootNode) {
 		this.messages = messages;
 		this.fileName = rootNode.get(SchemaValidator.FILENAME_FIELD).asText();
 	}
@@ -64,7 +63,7 @@ public class ErrorMessageProducer {
 		return result;
 	}
 
-	private LocationDetails getLocationDetails(ValidationMessage message) {
+	private LocationDetails getLocationDetails(Error message) {
 		JsonNode node = message.getInstanceNode();
 		if (node instanceof LocationProvider provider) {
 			return provider.getLocationDetails();
@@ -72,21 +71,21 @@ public class ErrorMessageProducer {
 		return new LocationDetails(null, null);
 	}
 
-	private String createReadableMessage(ValidationMessage error) {
+	private String createReadableMessage(Error error) {
 		try {
-			ValidatorTypeCode type = ValidatorTypeCode.fromValue(error.getType());
+			KeywordType type = KeywordType.fromValue(error.getKeyword());
 			switch (type) {
-				case ADDITIONAL_PROPERTIES -> {
-					return new MessageFormat("Property [{0}] is not allowed")
-						.format(error.getArguments());
-				}
-				case REQUIRED -> {
-					return new MessageFormat("Missing required property [{0}]")
-						.format(error.getArguments());
-				}
-				default -> {
-					return getDefaultMessage(error.getMessage());
-				}
+			case ADDITIONAL_PROPERTIES -> {
+				return new MessageFormat("Property [{0}] is not allowed")
+					.format(error.getArguments());
+			}
+			case REQUIRED -> {
+				return new MessageFormat("Missing required property [{0}]")
+					.format(error.getArguments());
+			}
+			default -> {
+				return getDefaultMessage(error.getMessage());
+			}
 			}
 		} catch (IllegalArgumentException ex) {
 			return getDefaultMessage(error.getMessage());

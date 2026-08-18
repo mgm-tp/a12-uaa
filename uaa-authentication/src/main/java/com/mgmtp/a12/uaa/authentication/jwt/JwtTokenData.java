@@ -46,7 +46,7 @@ public class JwtTokenData {
 	private Collection<? extends GrantedAuthority> authorities;
 	private UserDetails principal;
 	private Instant issuedTime;
-	@Deprecated(since = "8.2.2", forRemoval = true)
+	/** Time of the first login. Preserved across token renewals so {@code user-lifetime-seconds} is measured from it. */
 	private Instant loginTime;
 	@Deprecated(since = "8.2.2", forRemoval = true)
 	private Instant expirationTime;
@@ -78,7 +78,9 @@ public class JwtTokenData {
 		return principal;
 	}
 
-	@Deprecated(since = "8.2.2", forRemoval = true)
+	/**
+	 * Time of the first login. Unlike {@link #getIssuedTime()} this value is preserved across token renewals.
+	 */
 	public Instant getLoginTime() {
 		return loginTime;
 	}
@@ -121,7 +123,6 @@ public class JwtTokenData {
 		private Collection<? extends GrantedAuthority> authorities;
 		private UserDetails principal;
 		private Instant issuedTime;
-		@Deprecated(since = "8.2.2", forRemoval = true)
 		private Instant loginTime;
 		@Deprecated(since = "8.2.2", forRemoval = true)
 		private Instant expirationTime;
@@ -163,7 +164,6 @@ public class JwtTokenData {
 			return this;
 		}
 
-		@Deprecated(since = "8.2.2", forRemoval = true)
 		public Builder withLoginTime(Instant loginTime) {
 			this.loginTime = loginTime;
 			return this;

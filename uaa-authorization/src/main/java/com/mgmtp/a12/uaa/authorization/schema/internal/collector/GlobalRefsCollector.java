@@ -36,19 +36,20 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.networknt.schema.Collector;
 
-public class GlobalRefsCollector implements Collector<Set<JsonNode>> {
+/**
+ * Collects global references. The Collector interface was removed in json-schema-validator 2.0.0,
+ * so this is now a plain class.
+ */
+public class GlobalRefsCollector {
 
 	private final Set<JsonNode> refs = new LinkedHashSet<>();
 
 	@SuppressWarnings("unchecked")
-	@Override
 	public void combine(Object object) {
 		refs.addAll((Collection<? extends JsonNode>) object);
 	}
 
-	@Override
 	public Set<JsonNode> collect() {
 		return refs;
 	}

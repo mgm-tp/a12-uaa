@@ -36,7 +36,6 @@ import java.time.Instant;
 import java.util.Collections;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -62,7 +61,6 @@ import com.mgmtp.a12.uaa.authentication.jwt.internal.JwtTokenGenerator;
 import com.mgmtp.a12.uaa.authentication.principal.UAAPrincipal;
 import com.mgmtp.a12.uaa.authentication.principal.internal.PrincipalConverterService;
 import com.mgmtp.a12.uaa.authentication.principal.internal.UAAExternalUserDetailsImpl;
-import com.mgmtp.a12.uaa.authentication.saml.internal.UAASamlAuthenticationRequestFilter;
 import com.mgmtp.a12.uaa.authentication.utils.UserDataCreator;
 
 @ExtendWith(MockitoExtension.class)
@@ -113,7 +111,6 @@ public class UAAAuthenticationHandlerFromHeaderTest {
 		MockHttpServletRequest httpRequest = new MockHttpServletRequest();
 		MockHttpServletResponse httpResponse = new MockHttpServletResponse();
 
-		httpRequest.setCookies(new Cookie(UAASamlAuthenticationRequestFilter.COOKIE_SAML_REQUEST_ID, "saml_request_id"));
 		Assertions.assertEquals(httpResponse.getCookies().length, 0);
 		Assertions.assertNull(httpResponse.getHeader(TOKEN_KEY_JWT_HEADER));
 		uAAAuthenticationHandler.onAuthenticationSuccess(httpRequest, httpResponse, authReq);

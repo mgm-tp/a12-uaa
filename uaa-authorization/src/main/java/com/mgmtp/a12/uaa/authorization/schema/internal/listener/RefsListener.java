@@ -32,43 +32,43 @@
 package com.mgmtp.a12.uaa.authorization.schema.internal.listener;
 
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.mgmtp.a12.uaa.authorization.schema.internal.collector.GlobalRefsCollector;
 import com.networknt.schema.CollectorContext;
-import com.networknt.schema.ValidationMessage;
-import com.networknt.schema.walk.JsonSchemaWalkListener;
+import com.networknt.schema.Error;
 import com.networknt.schema.walk.WalkEvent;
 import com.networknt.schema.walk.WalkFlow;
+import com.networknt.schema.walk.WalkListener;
 
-public class RefsListener implements JsonSchemaWalkListener {
+public class RefsListener implements WalkListener {
 
 	@Override
 	public WalkFlow onWalkStart(WalkEvent walkEvent) {
 
 		String instancePath = walkEvent.getInstanceLocation().toString();
 		CollectorContext collectorContext = walkEvent.getExecutionContext().getCollectorContext();
-		Object collector = collectorContext.getCollectorMap()
-		.getOrDefault(instancePath, null);
+		Object collector = collectorContext.get(instancePath);
 		if (collector != null) {
-			combine(collectorContext, instancePath, (ArrayNode) walkEvent.getInstanceNode());
+			combine((GlobalRefsCollector) collector, (ArrayNode) walkEvent.getInstanceNode());
 		}
 		return WalkFlow.SKIP;
 	}
 
-	@Override
-	public void onWalkEnd(WalkEvent walkEvent, Set<ValidationMessage> validationMessages) {
+	@Override public void onWalkEnd(WalkEvent walkEvent, List<Error> errors) {
 		// Empty body
 	}
 
-	private void combine(CollectorContext collectorContext, String id, ArrayNode arrayNode) {
+	private void combine(GlobalRefsCollector collector, ArrayNode arrayNode) {
 		if (Objects.nonNull(arrayNode)) {
 			Set<JsonNode> result = new LinkedHashSet<>();
 			arrayNode.forEach(result::add);
 
-			collectorContext.combineWithCollector(id, result);
+			collector.combine(result);
 		}
 	}
 }

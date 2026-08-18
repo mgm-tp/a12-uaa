@@ -23,7 +23,7 @@
     "@com.mgmtp.a12.client/client-core": "16.2.1",
     "@com.mgmtp.a12.uaa/uaa-authentication-a12-client": "*",
     "@com.mgmtp.a12.uaa/uaa-authentication-client": "*",
-    "@com.mgmtp.a12.utils/utils-connector": "^8.2.1",
+    "@com.mgmtp.a12.utils/utils-connector": "^8.2.3",
     "@com.mgmtp.a12.utils/utils-localization": "^7.2.0",
     "@com.mgmtp.a12.utils/utils-localization-react": "^7.2.0",
     "@com.mgmtp.a12.utils/utils-logging": "^6.2.0",

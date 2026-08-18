@@ -34,7 +34,7 @@
     "redux": "^4.0.5"
   },
   "dependencies": {
-    "@com.mgmtp.a12.uaa/uaa-authentication-client": "9.3.2"
+    "@com.mgmtp.a12.uaa/uaa-authentication-client": "9.3.3"
   },
   "devDependencies": {
     "@com.mgmtp.a12.base/base-model-api": "29.3.0",

@@ -70,7 +70,8 @@ export function buildLoginRequest(
 		body: JSON.stringify(loginRequest),
 		customHeaders: [ACCEPT_JSON_HEADER, CONTENT_TYPE_JSON_HEADER],
 		extendedData: {
-			unAuthorizeRequest: true
+			unAuthorizeRequest: true,
+			sensitiveFields: ["password"]
 		}
 	};
 }

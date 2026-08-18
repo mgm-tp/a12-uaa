@@ -7,6 +7,10 @@ tasks.withType(JavaCompile) {
     options.compilerArgs.add("-parameters")
 }
 
+tasks.withType(Test) {
+    useJUnitPlatform()
+}
+
 dependencies {
 	api project(':uaa-authentication')
 	api libs.springBootAutoconfigure

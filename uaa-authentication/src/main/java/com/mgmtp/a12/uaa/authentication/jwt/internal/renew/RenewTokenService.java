@@ -188,7 +188,8 @@ public class RenewTokenService {
 	private JwtTokenData generateNewToken(String existingToken, String code) {
 		JwtTokenData jwtTokenData = jwtTokenVerifier.unpackToken(existingToken);
 		UserDetails userDetails = principalCreator.createPrincipal(jwtTokenData);
-		JwtTokenData newTokenData = jwtTokenGenerator.generateToken(userDetails);
+		// preserve the original login time so user-lifetime-seconds keeps being measured from the first login
+		JwtTokenData newTokenData = jwtTokenGenerator.generateToken(userDetails, jwtTokenData.getLoginTime());
 		renewTokenStorage.removeTokenHint(code);
 		LOGGER.debug("Token expiration renewed: [{}] -> [{}]", jwtTokenData.getExpirationTime().toEpochMilli(),
 			newTokenData.getExpirationTime().toEpochMilli());

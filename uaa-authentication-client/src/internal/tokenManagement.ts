@@ -234,7 +234,7 @@ export class TokenManagement {
 					logger.info("Request for new token was successful.");
 					this.retryTime = 0;
 				} else {
-					return new Error();
+					throw new Error();
 				}
 				this.finishTasks();
 				return isSuccess;
@@ -264,6 +264,7 @@ export class TokenManagement {
 				logger.error("Request Authorize was failed", err);
 
 				if (this.retryTime === MAX_RETRY_TIME) {
+					this.isRenewRunning = false;
 					reduxStore.dispatch(UaaActions.silentRenewError());
 					return;
 				}
@@ -303,7 +304,6 @@ export class TokenManagement {
 		}
 		if (phase === "stop") {
 			OidcClient.userManager.uaaInternalUserManager.stopSilentRenew();
-			this.isRenewRunning = false;
 			return;
 		}
 		const typeFromSessionStorage = sessionStorage.getItem(
@@ -334,6 +334,7 @@ export class TokenManagement {
 	stopService = (): void => {
 		this.oidcSilentRenewTask("stop");
 		clearTimeout(this.tokenRenewalTask as ReturnType<typeof setTimeout>);
+		this.isRenewRunning = false;
 	};
 
 	getTokenConfiguration = (

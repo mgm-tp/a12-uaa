@@ -47,7 +47,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.expression.BeanFactoryResolver;
 import org.springframework.expression.BeanResolver;
 import org.springframework.expression.PropertyAccessor;
+import org.springframework.expression.TypedValue;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.core.Authentication;
@@ -135,11 +137,17 @@ public class AuthorizationService {
 
 	private <T> T executeInContext(String scope, Object resource, Map<String, Object> variables, Supplier<T> function) {
 		AuthorizationContext authorizationContext = AuthorizationContextHolder.getContext();
+		StandardEvaluationContext envBeforeSupplier = authorizationContext.getExecutionEnvironment();
 		authorizationContext.pushContext(new AuthorizationContextData(scope, resource, variables));
 		try {
 			return function.get();
 		} finally {
 			authorizationContext.popContext();
+			StandardEvaluationContext currentEnv = authorizationContext.getExecutionEnvironment();
+			while (currentEnv != envBeforeSupplier && currentEnv != null) {
+				authorizationContext.popExecutionEnvironment();
+				currentEnv = authorizationContext.getExecutionEnvironment();
+			}
 		}
 	}
 
@@ -179,12 +187,22 @@ public class AuthorizationService {
 
 	private StandardEvaluationContext resolveExecutionEnvironment(Map<String, Object> variables) {
 		AuthorizationContext authorizationContext = AuthorizationContextHolder.getContext();
-		StandardEvaluationContext executionEnvironment =
-			Optional.ofNullable(authorizationContext.getExecutionEnvironment()).orElseGet(() -> createNewExecutionEnvironment());
-		Optional.ofNullable(variables).map(v -> v.entrySet()).orElse(Collections.emptySet()).stream()
+		Authentication currentAuthentication = SecurityContextHolder.getContext().getAuthentication();
+		StandardEvaluationContext executionEnvironment = Optional.ofNullable(authorizationContext.getExecutionEnvironment())
+			.filter(env -> matchesAuthentication(env, currentAuthentication))
+			.orElseGet(this::createNewExecutionEnvironment);
+		Optional.ofNullable(variables).map(Map::entrySet).orElse(Collections.emptySet())
 			.forEach(variable -> executionEnvironment.setVariable(variable.getKey(), variable.getValue()));
 
 		return executionEnvironment;
+	}
+
+	private boolean matchesAuthentication(StandardEvaluationContext env, Authentication currentAuthentication) {
+		Object root = Optional.of(env.getRootObject()).map(TypedValue::getValue).orElse(null);
+		if (root instanceof SecurityExpressionRoot securityExpressionRoot) {
+			return securityExpressionRoot.getAuthentication() == currentAuthentication;
+		}
+		return false;
 	}
 
 	private StandardEvaluationContext createNewExecutionEnvironment() {

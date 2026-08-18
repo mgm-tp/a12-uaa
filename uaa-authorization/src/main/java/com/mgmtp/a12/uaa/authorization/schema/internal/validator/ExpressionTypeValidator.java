@@ -31,9 +31,7 @@
  */
 package com.mgmtp.a12.uaa.authorization.schema.internal.validator;
 
-import java.util.LinkedHashSet;
 import java.util.Objects;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,32 +42,27 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.mgmtp.a12.uaa.authorization.exception.ExpressionCheckerException;
 import com.mgmtp.a12.uaa.authorization.schema.internal.ExpressionType;
 import com.mgmtp.a12.uaa.authorization.security.uaaexpression.internal.UAAExpressionParser;
-import com.networknt.schema.BaseJsonValidator;
-import com.networknt.schema.ErrorMessageType;
+import com.networknt.schema.Error;
 import com.networknt.schema.ExecutionContext;
-import com.networknt.schema.JsonNodePath;
-import com.networknt.schema.JsonSchema;
-import com.networknt.schema.JsonSchemaException;
-import com.networknt.schema.Keyword;
+import com.networknt.schema.Schema;
+import com.networknt.schema.SchemaContext;
+import com.networknt.schema.SchemaException;
 import com.networknt.schema.SchemaLocation;
-import com.networknt.schema.ValidationContext;
-import com.networknt.schema.ValidationMessage;
+import com.networknt.schema.keyword.BaseKeywordValidator;
+import com.networknt.schema.keyword.Keyword;
+import com.networknt.schema.path.NodePath;
 
-public class ExpressionTypeValidator extends BaseJsonValidator {
+public class ExpressionTypeValidator extends BaseKeywordValidator {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExpressionTypeValidator.class);
-
-	private static final ErrorMessageType ERROR_MESSAGE_TYPE = () -> "UAA_1001";
 
 	private static final ExpressionParser springExpressionParser = new SpelExpressionParser();
 
 	private final ExpressionType expressionType;
 
-	public ExpressionTypeValidator(SchemaLocation schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode,
-		JsonSchema parentSchema, Keyword keyword,
-		ValidationContext validationContext, boolean suppressSubSchemaRetrieval) {
-		super(schemaLocation, evaluationPath, schemaNode, parentSchema, ERROR_MESSAGE_TYPE, keyword, validationContext,
-			suppressSubSchemaRetrieval);
+	public ExpressionTypeValidator(SchemaLocation schemaLocation, JsonNode schemaNode,
+		Schema parentSchema, Keyword keyword, SchemaContext schemaContext) {
+		super(keyword, schemaNode, schemaLocation, parentSchema, schemaContext);
 
 		expressionType = getExpressionType(schemaNode, schemaLocation);
 	}
@@ -77,51 +70,50 @@ public class ExpressionTypeValidator extends BaseJsonValidator {
 	private ExpressionType getExpressionType(JsonNode schemaNode, SchemaLocation schemaLocation) {
 		try {
 			if (Objects.nonNull(schemaNode) && schemaNode.isTextual()) {
-				return ExpressionType.fromValue(schemaNode.textValue());
+				return ExpressionType.fromValue(schemaNode.asText());
 			}
 		} catch (IllegalArgumentException ex) {
-			
-			throw new JsonSchemaException(
-				message()
-				.type("internal.cannotResolve")
-				.schemaLocation(schemaLocation)
-				.message("{0}: {1} is not supported")
-				.arguments(schemaLocation, schemaNode.toString())
-				.schemaLocation(schemaLocation)
-				.build()
-				.toString()
-				);
+
+			throw new SchemaException(
+				error()
+					.messageKey("internal.cannotResolve")
+					.message("{0}: {1} is not supported")
+					.arguments(schemaLocation, schemaNode.toString())
+					.build()
+					.toString()
+			);
 		}
 		return ExpressionType.NONE;
 	}
 
 	@Override
-	public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+	public void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, NodePath instanceLocation) {
+		LOGGER.debug("validate({}, {}, {})", node, rootNode, instanceLocation);
 
-		LOGGER.debug("validate( {}, {}, {})", node, rootNode, instanceLocation);
-		Set<ValidationMessage> errors = new LinkedHashSet<>();
+		String expression = node.asText();
+
 		try {
-			check(node.asText(), expressionType);
+			check(expression, expressionType);
 		} catch (ExpressionCheckerException ex) {
-			ValidationMessage error = message()
-				.type(getKeyword())
-				.schemaLocation(schemaLocation)
+			Error error = error()
 				.message("{0}: [{1}] is a wrong expression syntax, Compile error: {2}")
-				.arguments(node.toString(), ex.getMessage())
-				.instanceLocation(instanceLocation).instanceNode(node).build();
-			errors.add(error);
-			LOGGER.debug(error.getMessage(), ex);
+				.arguments(instanceLocation, expression, ex.getMessage())
+				.instanceLocation(instanceLocation)
+				.instanceNode(node)
+				.evaluationPath(executionContext.getEvaluationPath())
+				.build();
 
+			executionContext.addError(error);
+			LOGGER.debug("Validation error: {}", error, ex);
 		}
-		return errors;
-
 	}
 
 	private void check(String expression, ExpressionType expressionType) {
 		switch (expressionType) {
-			case UAA_EXPRESSION -> uaaLogicExpressionCheck(expression.trim());
-			case SPRING_EXPRESSION_LANGUAGE -> springExpressionCheck(expression.trim());
-			default -> {}
+		case UAA_EXPRESSION -> uaaLogicExpressionCheck(expression.trim());
+		case SPRING_EXPRESSION_LANGUAGE -> springExpressionCheck(expression.trim());
+		default -> {
+		}
 		}
 	}
 

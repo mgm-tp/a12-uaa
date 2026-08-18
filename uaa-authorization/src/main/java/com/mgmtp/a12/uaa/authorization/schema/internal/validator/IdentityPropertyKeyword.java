@@ -32,13 +32,11 @@
 package com.mgmtp.a12.uaa.authorization.schema.internal.validator;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.networknt.schema.AbstractKeyword;
-import com.networknt.schema.JsonNodePath;
-import com.networknt.schema.JsonSchema;
-import com.networknt.schema.JsonSchemaException;
-import com.networknt.schema.JsonValidator;
+import com.networknt.schema.Schema;
+import com.networknt.schema.SchemaContext;
 import com.networknt.schema.SchemaLocation;
-import com.networknt.schema.ValidationContext;
+import com.networknt.schema.keyword.AbstractKeyword;
+import com.networknt.schema.keyword.KeywordValidator;
 
 public class IdentityPropertyKeyword extends AbstractKeyword {
 
@@ -47,9 +45,7 @@ public class IdentityPropertyKeyword extends AbstractKeyword {
 	}
 
 	@Override
-	public JsonValidator newValidator(SchemaLocation schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema,
-		ValidationContext validationContext) throws JsonSchemaException, Exception {
-		return new IdentityPropertyValidator(schemaLocation, evaluationPath, schemaNode, parentSchema, this, validationContext, false);
+	public KeywordValidator newValidator(SchemaLocation schemaLocation, JsonNode schemaNode, Schema parentSchema, SchemaContext schemaContext) {
+		return new IdentityPropertyValidator(schemaLocation, schemaNode, parentSchema, this, schemaContext);
 	}
-
 }

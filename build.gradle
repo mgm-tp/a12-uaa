@@ -19,8 +19,7 @@ tasks.named('aggregateJavadoc') {
 tasks.register('aggregateTypedoc', Copy) {
 	group = 'documentation'
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-	from project.subprojects.collect { it.tasks.matching { Task task -> task.name == 'typedoc' && task.enabled } }
+	from project.project(':uaa-authentication-client').tasks.matching { Task task -> task.name == 'typedoc' && task.enabled }
 	into "${project.getBuildDir()}/docs/assets/typedoc"
-	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 

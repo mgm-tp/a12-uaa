@@ -68,6 +68,15 @@ public class ExecutionEnvironmentTest {
 		Assertions.assertTrue(multiplePermissions);
 	}
 
+	@Test
+	@WithMockUser(username = "test")
+	public void checkBackendSwapInsideAnnotation() throws Exception {
+		Assertions.assertNull(getExecutionEnvironment());
+		boolean elevatedPassed = wrappingService.executeBackendSwapInsideAnnotation();
+		Assertions.assertNull(getExecutionEnvironment());
+		Assertions.assertTrue(elevatedPassed, "Elevated Scope must pass after BackendAuthenticationService swap");
+	}
+
 	private StandardEvaluationContext getExecutionEnvironment() {
 		AuthorizationContext authorizationContext = AuthorizationContextHolder.getContext();
 		StandardEvaluationContext executionEnvironment = authorizationContext.getExecutionEnvironment();

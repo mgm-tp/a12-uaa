@@ -46,7 +46,6 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 import com.mgmtp.a12.uaa.authentication.internal.RedirectSupport;
 import com.mgmtp.a12.uaa.authentication.internal.RedirectType;
 import com.mgmtp.a12.uaa.authentication.internal.RedirectType.Type;
-import com.mgmtp.a12.uaa.authentication.jwt.internal.CookieUtil;
 
 public class SamlAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
@@ -61,7 +60,6 @@ public class SamlAuthenticationFailureHandler extends SimpleUrlAuthenticationFai
 		throws IOException, ServletException {
 
 		LOGGER.error("Authentication failed: [{}]", exception.getMessage());
-		CookieUtil.removeCookie(UAASamlAuthenticationRequestFilter.COOKIE_SAML_REQUEST_ID, request, response);
 		if (!loginRedirectSupport.performFailureRedirect(getRedirectStrategy(), request, response, null)) {
 			super.onAuthenticationFailure(request, response, exception);
 		}
