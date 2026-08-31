@@ -36,8 +36,6 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 
-import jakarta.servlet.http.Cookie;
-
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,7 +53,9 @@ import org.opensaml.saml.saml2.core.AuthnStatement;
 import org.opensaml.saml.saml2.core.Response;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.saml2.provider.service.authentication.AbstractSaml2AuthenticationRequest;
 import org.springframework.security.saml2.provider.service.authentication.OpenSaml5AuthenticationProvider.ResponseToken;
+import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticationToken;
 
 import com.mgmtp.a12.uaa.authentication.AuthenticationProperties;
 import com.mgmtp.a12.uaa.authentication.AuthenticationProperties.RedirectHolder;
@@ -80,6 +80,10 @@ public class SamlAuthenticationSuccessHandlerTest {
 
 	@Mock
 	private ResponseToken responseToken;
+	@Mock
+	private Saml2AuthenticationToken saml2AuthenticationToken;
+	@Mock
+	private AbstractSaml2AuthenticationRequest saml2AuthenticationRequest;
 	@Mock
 	private Response response;
 	@Mock
@@ -133,6 +137,9 @@ public class SamlAuthenticationSuccessHandlerTest {
 		Mockito.when(authenticationProperties.getLogout().getRedirect().getSuccess().getUrl()).thenReturn(REDIRECT_URL_ABSOLUTE);
 		Mockito.when(authenticationProperties.getSaml()).thenReturn(samlProperties);
 		Mockito.when(responseToken.getResponse()).thenReturn(response);
+		Mockito.when(responseToken.getToken()).thenReturn(saml2AuthenticationToken);
+		Mockito.when(saml2AuthenticationToken.getAuthenticationRequest()).thenReturn(saml2AuthenticationRequest);
+		Mockito.when(saml2AuthenticationRequest.getId()).thenReturn("saml_request_id");
 		Mockito.when(response.getInResponseTo()).thenReturn("saml_request_id");
 		Mockito.when(authnStatement.getSessionIndex()).thenReturn("session-01");
 		Mockito.when(assertion.getAuthnStatements()).thenReturn(Arrays.asList(authnStatement));
@@ -145,7 +152,6 @@ public class SamlAuthenticationSuccessHandlerTest {
 
 		MockHttpServletRequest httpRequest = new MockHttpServletRequest();
 		MockHttpServletResponse httpResponse = new MockHttpServletResponse();
-		httpRequest.setCookies(new Cookie(UAASamlAuthenticationRequestFilter.COOKIE_SAML_REQUEST_ID, "saml_request_id"));
 		samlAuthenticationSuccessHandler.onAuthenticationSuccess(httpRequest, httpResponse, authReq);
 		assertSuccessOutputHandler(httpResponse);
 
@@ -156,7 +162,6 @@ public class SamlAuthenticationSuccessHandlerTest {
 	public void authenticationSuccessWithoutSuccessCookieAndAbsoluteUrl() throws Exception {
 		MockHttpServletRequest httpRequest = new MockHttpServletRequest();
 		MockHttpServletResponse httpResponse = new MockHttpServletResponse();
-		httpRequest.setCookies(new Cookie(UAASamlAuthenticationRequestFilter.COOKIE_SAML_REQUEST_ID, "saml_request_id"));
 		samlAuthenticationSuccessHandler.onAuthenticationSuccess(httpRequest, httpResponse, authReq);
 		assertSuccessOutputHandler(httpResponse);
 
@@ -167,7 +172,6 @@ public class SamlAuthenticationSuccessHandlerTest {
 		MockHttpServletRequest httpRequest = new MockHttpServletRequest();
 		MockHttpServletResponse httpResponse = new MockHttpServletResponse();
 		Mockito.when(redirectSupport.performSuccessRedirect(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(Boolean.TRUE);
-		httpRequest.setCookies(new Cookie(UAASamlAuthenticationRequestFilter.COOKIE_SAML_REQUEST_ID, "saml_request_id"));
 		samlAuthenticationSuccessHandler.onAuthenticationSuccess(httpRequest, httpResponse, authReq);
 		assertSuccessOutputHandler(httpResponse);
 
@@ -178,16 +182,16 @@ public class SamlAuthenticationSuccessHandlerTest {
 		MockHttpServletRequest httpRequest = new MockHttpServletRequest();
 		MockHttpServletResponse httpResponse = new MockHttpServletResponse();
 		Mockito.when(redirectSupport.performSuccessRedirect(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(Boolean.TRUE);
-		httpRequest.setCookies(new Cookie(UAASamlAuthenticationRequestFilter.COOKIE_SAML_REQUEST_ID, "saml_request_id"));
 		samlAuthenticationSuccessHandler.onAuthenticationSuccess(httpRequest, httpResponse, authReq);
 		assertSuccessOutputHandler(httpResponse);
 
 	}
 
 	@Test
-	public void authenticationWithEmptyRequestIdCookie() throws IOException {
+	public void authenticationWithMissingAuthenticationRequest() throws IOException {
 		MockHttpServletRequest httpRequest = new MockHttpServletRequest();
 		MockHttpServletResponse httpResponse = new MockHttpServletResponse();
+		Mockito.when(saml2AuthenticationToken.getAuthenticationRequest()).thenReturn(null);
 		samlAuthenticationSuccessHandler.onAuthenticationSuccess(httpRequest, httpResponse, authReq);
 		Mockito.verify(redirectSupport, Mockito.atLeastOnce()).performFailureRedirect(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
 	}
@@ -196,7 +200,6 @@ public class SamlAuthenticationSuccessHandlerTest {
 	public void authenticationHandlerWithEmptyInResponseToSupport() throws IOException {
 		MockHttpServletRequest httpRequest = new MockHttpServletRequest();
 		MockHttpServletResponse httpResponse = new MockHttpServletResponse();
-		httpRequest.setCookies(new Cookie(UAASamlAuthenticationRequestFilter.COOKIE_SAML_REQUEST_ID, "saml_request_id"));
 		Mockito.when(response.getInResponseTo()).thenReturn("");
 		samlAuthenticationSuccessHandler.onAuthenticationSuccess(httpRequest, httpResponse, authReq);
 		Mockito.verify(redirectSupport, Mockito.atLeastOnce()).performFailureRedirect(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
@@ -206,7 +209,6 @@ public class SamlAuthenticationSuccessHandlerTest {
 	public void uaaAuthenticationHandlerWithRequestAndInResponseToDoesNotMatchSupport() throws IOException {
 		MockHttpServletRequest httpRequest = new MockHttpServletRequest();
 		MockHttpServletResponse httpResponse = new MockHttpServletResponse();
-		httpRequest.setCookies(new Cookie(UAASamlAuthenticationRequestFilter.COOKIE_SAML_REQUEST_ID, "saml_request_id"));
 		Mockito.when(response.getInResponseTo()).thenReturn("wrong_request_id");
 		samlAuthenticationSuccessHandler.onAuthenticationSuccess(httpRequest, httpResponse, authReq);
 		Mockito.verify(redirectSupport, Mockito.atLeastOnce()).performFailureRedirect(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
@@ -215,9 +217,6 @@ public class SamlAuthenticationSuccessHandlerTest {
 	private void assertSuccessOutputHandler(MockHttpServletResponse httpResponse) throws IOException {
 		MatcherAssert.assertThat(httpResponse.getCookie(RedirectSupport.COOKIE_SUCCESS), Matchers.nullValue());
 		MatcherAssert.assertThat(httpResponse.getCookie(RedirectSupport.COOKIE_FAILURE), Matchers.nullValue());
-		MatcherAssert.assertThat(httpResponse.getCookie(UAASamlAuthenticationRequestFilter.COOKIE_SAML_REQUEST_ID), Matchers.notNullValue());
-		MatcherAssert.assertThat(httpResponse.getCookie(UAASamlAuthenticationRequestFilter.COOKIE_SAML_REQUEST_ID).getMaxAge(),
-			Matchers.is(Integer.valueOf(0)));
 		Mockito.verify(redirectSupport, Mockito.never()).performFailureRedirect(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
 		Mockito.verify(authorizationCodeStorage, Mockito.atLeastOnce()).storeAuthorizationCode(Mockito.any(), Mockito.any());
 	}

@@ -31,6 +31,9 @@
  */
 package com.mgmtp.a12.uaa.authentication.jwt.internal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -39,9 +42,12 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.mgmtp.a12.uaa.authentication.jwt.JwtTokenData;
+import com.mgmtp.a12.uaa.authentication.jwt.internal.JwtTokenVerifier.TokenValidationResult;
 import com.mgmtp.a12.uaa.authentication.principal.PrincipalCreator;
 
 public class JwtAuthenticationProvider implements AuthenticationProvider {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(JwtAuthenticationProvider.class);
 
 	private PrincipalCreator<? extends UserDetails> jwtTokenPrincipalCreator;
 
@@ -56,8 +62,9 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		JwtAuthenticationToken jwtToken = (JwtAuthenticationToken) authentication;
 
-		Boolean tokenValid = jwtTokenVerifier.isTokenValid(jwtToken.getAccessToken());
-		if (Boolean.FALSE.equals(tokenValid)) {
+		TokenValidationResult tokenValidation = jwtTokenVerifier.validateToken(jwtToken.getAccessToken());
+		tokenValidation.doErrorLog(LOGGER, Level.WARN, "JWT authentication rejected an invalid token");
+		if (!tokenValidation.valid()) {
 			throw new BadCredentialsException("Invalid JWT token: " + jwtToken.getAccessToken());
 		}
 

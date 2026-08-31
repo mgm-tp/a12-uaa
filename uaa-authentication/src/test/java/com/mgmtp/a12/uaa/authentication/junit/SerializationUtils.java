@@ -65,8 +65,8 @@ public class SerializationUtils {
 	public static void assertSerializationFromString(final String expected, Object objectToSerialize) throws IOException {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		MAPPER.writer().with(printer).writeValue(outputStream, objectToSerialize);
-		String actual = outputStream.toString();
-		Assertions.assertEquals(expected, actual);
+		String actual = outputStream.toString(StandardCharsets.UTF_8);
+		Assertions.assertEquals(expected.replace("\r\n", "\n"), actual.replace("\r\n", "\n"));
 	}
 
 	static private ObjectMapper createConfiguredObjectMapper() {

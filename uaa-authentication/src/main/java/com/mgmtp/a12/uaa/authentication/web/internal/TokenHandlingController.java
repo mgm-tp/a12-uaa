@@ -40,6 +40,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -63,6 +66,9 @@ import com.mgmtp.a12.uaa.authentication.security.login.internal.UAAAuthenticatio
 @ResponseBody
 @RequestMapping("#{T(org.apache.commons.lang3.StringUtils).removeEnd('${mgmtp.a12.uaa.authentication.context-path:/}', '/')}/uaa-authentication")
 public class TokenHandlingController {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(TokenHandlingController.class);
+
 	private static final String STATE_KEY = "state";
 	private static final String CODE_KEY = "code";
 	private static final String AUTHORIZATION_CODE = "authorizationCode";
@@ -82,13 +88,9 @@ public class TokenHandlingController {
 
 	@PostMapping(value = "tokenValid", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Boolean> isTokenValid(@RequestBody String token) {
-		boolean tokenValid = false;
-		try {
-			tokenValid = jwtTokenVerifier.isTokenValid(token);
-		} catch (Exception e) {
-			// nothing to do
-		}
-		return ResponseEntity.status(HttpStatus.OK).body(tokenValid);
+		JwtTokenVerifier.TokenValidationResult tokenValidation = jwtTokenVerifier.validateToken(token);
+		tokenValidation.doErrorLog(LOGGER, Level.DEBUG, "Token is invalid");
+		return ResponseEntity.status(HttpStatus.OK).body(tokenValidation.valid());
 	}
 
 	@PostMapping(value = "exchangeAuthorizationCodeToToken/authorize", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -232,16 +232,10 @@ public class SamlSecurityConfigurer extends UAASecurityConfigurer<SamlSecurityCo
 			})
 			.addFilterBefore(metadataFilter, Saml2WebSsoAuthenticationFilter.class)
 			.addFilterBefore(
-				new UAASamlAuthenticationRequestFilter(authenticationProperties.getContextPath(), loginRedirectSupport,
-					authenticationProperties.getCookie().getHttpOnly().isEnabled(), authenticationProperties.getCookie().getSecured().isEnabled(),
-					authenticationProperties.getCookie().getLifetimeSeconds()),
-				Saml2WebSsoAuthenticationRequestFilter.class
-			)
-			.addFilterBefore(
-				new SameSiteFilter(authenticationProperties.getCookie().getSameSite()),
-				UAASamlAuthenticationRequestFilter.class
-			);
-
+				new UAASamlAuthenticationRequestFilter(authenticationProperties.getContextPath(), loginRedirectSupport),
+				Saml2WebSsoAuthenticationRequestFilter.class)
+			.addFilterBefore(new SameSiteFilter(authenticationProperties.getCookie().getSameSite()),
+				UAASamlAuthenticationRequestFilter.class);
 		LOGGER.info("SAML: Using SamlGrantedAuthorityConverter: [{}]",
 			ClassNameUtils.resolveShortClassName(samlGrantedAuthorityConverter));
 		LOGGER.info("SAML: Using SamlAssertionExtractor: [{}]",

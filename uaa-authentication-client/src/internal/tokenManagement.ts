@@ -240,7 +240,7 @@ export class TokenManagement {
 						this.tokenExpirationTask as ReturnType<typeof setTimeout>
 					);
 				} else {
-					return new Error();
+					throw new Error();
 				}
 				this.finishTasks();
 				return isSuccess;
@@ -332,7 +332,6 @@ export class TokenManagement {
 		}
 		if (phase === "stop") {
 			OidcClient.userManager.uaaInternalUserManager.stopSilentRenew();
-			this.isRenewRunning = false;
 			return;
 		}
 		const typeFromSessionStorage = sessionStorage.getItem(
@@ -365,6 +364,7 @@ export class TokenManagement {
 		this.oidcSilentRenewTask("stop");
 		clearTimeout(this.tokenExpirationTask as ReturnType<typeof setTimeout>);
 		clearTimeout(this.tokenRenewalTask as ReturnType<typeof setTimeout>);
+		this.isRenewRunning = false;
 	};
 
 	getTokenConfiguration = (

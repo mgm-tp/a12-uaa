@@ -65,7 +65,8 @@ export function buildLoginRequest(
 		relativeUrl: relativeUrl ?? `user/${type.toLowerCase()}/login`,
 		body: JSON.stringify(loginRequest),
 		extendedData: {
-			unAuthorizeRequest: true
+			unAuthorizeRequest: true,
+			sensitiveFields: ["password"]
 		}
 	};
 }

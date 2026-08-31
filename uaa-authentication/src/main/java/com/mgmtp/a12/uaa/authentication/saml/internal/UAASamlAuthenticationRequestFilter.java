@@ -35,60 +35,34 @@ import java.io.IOException;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
-import org.opensaml.saml.saml2.core.AuthnRequest;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher.MatchResult;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.mgmtp.a12.uaa.authentication.internal.RedirectSupport;
-import com.mgmtp.a12.uaa.authentication.jwt.internal.CookieUtil;
 
 public class UAASamlAuthenticationRequestFilter extends OncePerRequestFilter {
-
-	public static final String COOKIE_SAML_REQUEST_ID = "saml-request-id";
 
 	private RequestMatcher authenticateMatcher;
 
 	private RedirectSupport loginRedirectSupport;
 
-	private boolean httpOnly;
-	private boolean secured;
-	private int cookieLifetimeSeconds;
-
-	public UAASamlAuthenticationRequestFilter(String context, RedirectSupport loginRedirectSupport, boolean httpOnly, boolean secured,
-		int cookieLifetimeSeconds) {
+	public UAASamlAuthenticationRequestFilter(String context, RedirectSupport loginRedirectSupport) {
 		this.authenticateMatcher = PathPatternRequestMatcher.withDefaults().matcher(context + "/saml2/authenticate/*");
 		this.loginRedirectSupport = loginRedirectSupport;
-		this.httpOnly = httpOnly;
-		this.secured = secured;
-		this.cookieLifetimeSeconds = cookieLifetimeSeconds;
 	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 		MatchResult matcher = authenticateMatcher.matcher(request);
-		if (!matcher.isMatch()) {
-			filterChain.doFilter(request, response);
-			return;
+		if (matcher.isMatch()) {
+			loginRedirectSupport.addCookies(request, response);
 		}
-		loginRedirectSupport.addCookies(request, response);
-
 		filterChain.doFilter(request, response);
-
-		// Store saml request id for verify with response later
-		AuthnRequest authnRequestData = UAAThreadLocalAuthnRequestDataStore.getAuthnRequestData();
-		if (authnRequestData != null && StringUtils.isNotEmpty(authnRequestData.getID())) {
-			Cookie successCookie =
-				CookieUtil.createCookie(COOKIE_SAML_REQUEST_ID, authnRequestData.getID(), null, request, httpOnly, secured, cookieLifetimeSeconds);
-			response.addCookie(successCookie);
-			UAAThreadLocalAuthnRequestDataStore.cleanUpAuthnRequestDataStore();
-		}
 	}
 
 }

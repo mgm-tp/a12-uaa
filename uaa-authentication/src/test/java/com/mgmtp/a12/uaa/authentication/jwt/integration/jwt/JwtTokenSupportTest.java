@@ -43,6 +43,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.mgmtp.a12.uaa.authentication.AuthenticationProperties;
 import com.mgmtp.a12.uaa.authentication.internal.UAASpringJsonHandler;
+import com.mgmtp.a12.uaa.authentication.jwt.JwtTokenData;
 import com.mgmtp.a12.uaa.authentication.jwt.JwtTokenStorage;
 import com.mgmtp.a12.uaa.authentication.jwt.encryption.internal.BypassingEncoder;
 import com.mgmtp.a12.uaa.authentication.jwt.encryption.internal.HuffmanEncoder;
@@ -52,6 +53,7 @@ import com.mgmtp.a12.uaa.authentication.jwt.internal.JwtTokenVerifier;
 import com.mgmtp.a12.uaa.authentication.jwt.internal.SimpleJwtTokenStorage;
 import com.mgmtp.a12.uaa.authentication.principal.internal.serialization.UAAUserJacksonModule;
 import com.mgmtp.a12.uaa.authentication.utils.TokenTester;
+import com.mgmtp.a12.uaa.authentication.utils.UserDataCreator;
 
 @ExtendWith(SpringExtension.class)
 public class JwtTokenSupportTest {
@@ -112,22 +114,22 @@ public class JwtTokenSupportTest {
 		TokenTester.checkTokenData(huffmanEncoderJwtTokenGenerator100True, huffmanEncoderJwtTokenVerifier500True, true);
 		TokenTester.checkCreationTimestampForNewToken(huffmanEncoderJwtTokenGenerator100True);
 		// Special character at beginning
-		boolean isTokenValid = huffmanEncoderJwtTokenVerifier500True.isTokenValid(
+		boolean isTokenValid = huffmanEncoderJwtTokenVerifier500True.validateToken(
 			"eyJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiZGlyIn0.." +
-				"@3rPMd5krCHUQ_R7I.$Y98f0jwQBHV8B-yKS9WNrF8cg15DNs4cQVvaxJXXklbFcNzC2JTwdpvl_dsvvvTcYw.=5oGmLN2LisgV3NeHoj_hng");
+				"@3rPMd5krCHUQ_R7I.$Y98f0jwQBHV8B-yKS9WNrF8cg15DNs4cQVvaxJXXklbFcNzC2JTwdpvl_dsvvvTcYw.=5oGmLN2LisgV3NeHoj_hng").valid();
 		Assertions.assertFalse(isTokenValid);
 		// Special character at middle
-		isTokenValid = huffmanEncoderJwtTokenVerifier500True.isTokenValid(
+		isTokenValid = huffmanEncoderJwtTokenVerifier500True.validateToken(
 			"eyJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiZGlyIn0.." +
-				"3r$.PMd5krCHUQ_R7I.Y9@8f0jwQBHV8B-yKS9WNrF8cg15DNs4cQVvaxJXXklbFcNzC2JTwdpvl_dsvvvTcYw.5=oGmLN2LisgV3NeHoj_hng");
+				"3r$.PMd5krCHUQ_R7I.Y9@8f0jwQBHV8B-yKS9WNrF8cg15DNs4cQVvaxJXXklbFcNzC2JTwdpvl_dsvvvTcYw.5=oGmLN2LisgV3NeHoj_hng").valid();
 		Assertions.assertFalse(isTokenValid);
 		// Special character at last
-		isTokenValid = huffmanEncoderJwtTokenVerifier500True.isTokenValid(
+		isTokenValid = huffmanEncoderJwtTokenVerifier500True.validateToken(
 			"eyJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiZGlyIn0.." +
-				"3rPMd5krCHUQ_R7I.Y98f0jwQBHV8B-yKS9WNrF8cg15DNs4cQVvaxJXXklbFcNzC2JTwdpvl_dsvvvTcYw.5oGmLN2LisgV3NeHoj_hng=");
+				"3rPMd5krCHUQ_R7I.Y98f0jwQBHV8B-yKS9WNrF8cg15DNs4cQVvaxJXXklbFcNzC2JTwdpvl_dsvvvTcYw.5oGmLN2LisgV3NeHoj_hng=").valid();
 		Assertions.assertFalse(isTokenValid);
 		// null is token
-		isTokenValid = huffmanEncoderJwtTokenVerifier500True.isTokenValid(null);
+		isTokenValid = huffmanEncoderJwtTokenVerifier500True.validateToken(null).valid();
 		Assertions.assertFalse(isTokenValid);
 	}
 
@@ -163,6 +165,42 @@ public class JwtTokenSupportTest {
 	public void tokenIsValid() throws InterruptedException {
 		TokenTester.checkTokenValid(bypassingEncoderJwtTokenGenerator100False, bypassingEncoderJwtTokenVerifier500False,
 			jwtTokenStorage, 2, false, true);
+	}
+
+	@Test
+	public void validateTokenReportsValidResultForFreshToken() {
+		JwtTokenData tokenData = bypassingEncoderJwtTokenGenerator100False.generateToken(
+			UserDataCreator.createUser("test1", "password"));
+		JwtTokenVerifier.TokenValidationResult result = bypassingEncoderJwtTokenVerifier500False.validateToken(tokenData.getToken());
+		Assertions.assertTrue(result.valid());
+		Assertions.assertNull(result.cause());
+	}
+
+	@Test
+	public void validateTokenFlagsMalformedToken() {
+		JwtTokenVerifier.TokenValidationResult result = bypassingEncoderJwtTokenVerifier500False.validateToken(
+			"eyJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiZGlyIn0..@notBase64Url.payload.tag");
+		Assertions.assertFalse(result.valid());
+		Assertions.assertTrue(result.malformed());
+	}
+
+	@Test
+	public void validateTokenReportsParsingFailureWithCause() {
+		JwtTokenVerifier.TokenValidationResult result = bypassingEncoderJwtTokenVerifier500False.validateToken("not-a-real-jwt");
+		Assertions.assertFalse(result.valid());
+		Assertions.assertTrue(result.parsingFailed());
+		Assertions.assertNotNull(result.cause());
+	}
+
+	@Test
+	public void validateTokenReportsExpiredToken() throws InterruptedException {
+		JwtTokenData tokenData = bypassingEncoderJwtTokenGenerator1False.generateToken(
+			UserDataCreator.createUser("test1", "password"));
+		Thread.sleep(2000);
+		JwtTokenVerifier.TokenValidationResult result = bypassingEncoderJwtTokenVerifier500False.validateToken(tokenData.getToken());
+		Assertions.assertFalse(result.valid());
+		Assertions.assertTrue(result.expired());
+		Assertions.assertNull(result.cause());
 	}
 
 	@Test

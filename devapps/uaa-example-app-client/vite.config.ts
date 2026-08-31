@@ -43,7 +43,7 @@ const uaaResourcesPath = Path.join(
   "@com.mgmtp.a12.uaa",
   "uaa-authentication-client",
   "resources",
-);
+).replace(/\\/g, "/");
 
 const allDeps = Object.keys(packageJson.dependencies);
 
@@ -81,9 +81,9 @@ export default defineConfig({
     react(),
     viteStaticCopy({
       targets: [
-        { src: Path.join(uaaResourcesPath, "*"), dest: "." },
+        { src: `${uaaResourcesPath}/*`, dest: "." },
       ],
-    }),
+    })
   ],
   server: {
     host: "0.0.0.0",

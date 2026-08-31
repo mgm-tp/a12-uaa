@@ -40,13 +40,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
+import org.slf4j.spi.LoggingEventBuilder;
 import org.springframework.core.io.Resource;
 import org.springframework.security.converter.RsaKeyConverters;
 import org.springframework.security.core.GrantedAuthority;
@@ -122,7 +123,7 @@ public class JwtTokenVerifier {
 				return Instant.ofEpochMilli(authTimeMillis);
 			}
 		} catch (Exception e) {
-			LOGGER.warn("Unable to read the authentication time claim, falling back to the issue time." + e);
+			LOGGER.warn("Unable to read the authentication time claim, falling back to the issue time.", e);
 		}
 		return claims.getIssueTime().toInstant();
 	}
@@ -149,17 +150,9 @@ public class JwtTokenVerifier {
 	}
 
 	public Boolean isTokenExpired(JWTClaimsSet tokenClaims) {
-		try {
-			Instant expiration = tokenClaims.getExpirationTime().toInstant();
-			if (expiration.isBefore(Instant.now())) {
-				LOGGER.warn("Token is expired.");
-				return true;
-			}
-			return false;
-		} catch (Exception e) {
-			LOGGER.warn("Token parsing failed." + e);
-			return true;
-		}
+		return Optional.ofNullable(tokenClaims.getExpirationTime())
+			.map(expiration -> expiration.toInstant().isBefore(Instant.now()))
+			.orElse(true);
 	}
 
 	private Boolean isTokenLifetimeExpired(JWTClaimsSet tokenClaims) {
@@ -167,39 +160,25 @@ public class JwtTokenVerifier {
 			Instant loginTime = extractLoginTime(tokenClaims);
 			return Optional.ofNullable(userLifetimeSeconds).map(lifetime -> {
 				Instant expirationTime = loginTime.plus(Duration.ofSeconds(lifetime));
-				if (Instant.now().isAfter(expirationTime)) {
-					LOGGER.warn("Token lifetime is expired.");
-					return true;
-				}
-				return false;
+				return Instant.now().isAfter(expirationTime);
 			}).orElse(false);
 		} catch (Exception e) {
-			LOGGER.warn("Token parsing failed." + e);
 			return true;
 		}
 	}
 
-	public Boolean isTokenValid(String token) {
+	public TokenValidationResult validateToken(String token) {
+		if (token == null || !TOKEN_BASE64_URL_PATTERN.matcher(token).matches()) {
+			return new TokenValidationResult(true, false, false, false, false, null);
+		}
 		try {
-			Matcher matcher = TOKEN_BASE64_URL_PATTERN.matcher(token);
-			if (!matcher.matches()) {
-				LOGGER.warn("UAABearer token is malformed (not a base64).");
-				return false;
-			}
-
 			JWTClaimsSet tokenClaims = extractClaims(token);
 			boolean isTokenLifetimeExpired = isTokenLifetimeExpired(tokenClaims);
 			boolean isTokenExpired = isTokenExpired(tokenClaims);
 			boolean isTokenLoggedOut = jwtTokenStorage.loadToken(token).isPresent();
-			if (!isTokenLifetimeExpired && !isTokenExpired && !isTokenLoggedOut) {
-				return true;
-			}
-			LOGGER.warn("Token is invalid with result checked [tokenLifetimeExpired: %s, tokenExpired: %s, tokenLoggedOut: %s]".formatted(
-				isTokenLifetimeExpired, isTokenExpired, isTokenLoggedOut));
-			return false;
+			return new TokenValidationResult(false, isTokenLifetimeExpired, isTokenExpired, isTokenLoggedOut, false, null);
 		} catch (Exception e) {
-			LOGGER.error("Token parsing failed." + e);
-			return false;
+			return new TokenValidationResult(false, false, false, false, true, e);
 		}
 	}
 
@@ -237,6 +216,31 @@ public class JwtTokenVerifier {
 			return uaaSpringJsonHandler.convertFromJson(json, type);
 		} catch (JacksonException e) {
 			throw new RuntimeException("Unable to deserialize UserDetails from the token", e);
+		}
+	}
+
+	public record TokenValidationResult(boolean malformed, boolean lifetimeExpired, boolean expired, boolean loggedOut,
+		boolean parsingFailed, Throwable cause) {
+
+		public boolean valid() {
+			return !malformed && !lifetimeExpired && !expired && !loggedOut && !parsingFailed;
+		}
+
+		public void doErrorLog(Logger LOGGER, Level level, String preMessage) {
+			if (!valid()) {
+				String message = "%s %s".formatted(preMessage, describe());
+				LoggingEventBuilder builder = LOGGER.atLevel(level);
+				if (cause != null) {
+					builder.setCause(cause).log(message);
+				} else {
+					builder.log(message);
+				}
+			}
+		}
+
+		public String describe() {
+			return "[lifetimeExpired: %s, expired: %s, loggedOut: %s, malformed: %s, parsingFailed: %s]"
+				.formatted(lifetimeExpired, expired, loggedOut, malformed, parsingFailed);
 		}
 	}
 

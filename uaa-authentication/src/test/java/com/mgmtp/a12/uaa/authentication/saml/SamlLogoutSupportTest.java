@@ -72,7 +72,12 @@ public class SamlLogoutSupportTest {
 					t.singleSignOnServiceLocation("SSO_Location");
 				})
 				.build();
-		return Saml2LogoutRequest.withRelyingPartyRegistration(relyingPartyRegistration).id("test").location("testLocation").relayState(relaySaate).build();
+		return Saml2LogoutRequest.withRelyingPartyRegistration(relyingPartyRegistration)
+			.id("test")
+			.samlRequest("ABC")
+			.location("testLocation")
+			.relayState(relaySaate)
+			.build();
 	}
 
 	LogoutRequestData findData(String relayState) {

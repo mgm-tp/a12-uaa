@@ -17,12 +17,20 @@ THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPR
 ////
 === 2026.06
 
+==== 10.0.1
+
+No breaking changes in 10.0.1.
+
+==== 10.0.0
+
+No breaking changes in 10.0.0.
+
 ==== Java Migration
 
 ===== Dependency Updates
 
-* Upgraded to Spring Boot 4.0.1
-* Upgraded to Spring Framework 7.0.2
+* Upgraded to Spring Boot 4.0.6
+* Upgraded to Spring Framework 7.0.7
 * Supports Java 25
 * Replaced OkHttp with Apache HttpClient 5 (`org.apache.httpcomponents.client5:httpclient5`)
 
@@ -60,6 +68,12 @@ public class ExamplePrincipalJacksonModule extends UAAJacksonModule {
 }
 ----
 
+*Required:* Yes, if your application puts custom (non-UAA) principal types or domain classes into token payloads. No, if you only use UAA's built-in principal types.
+
+*Migration:* Manual.
+
+*Result:* Custom principal types are registered with the polymorphic type validator and deserialize correctly under Spring Security 7; token parsing no longer fails with `InvalidTypeIdException`.
+
 ===== uaa-rest-client
 
 ====== HttpClient
@@ -71,9 +85,21 @@ public class ExamplePrincipalJacksonModule extends UAAJacksonModule {
 
 * `UAARestClientFactoryBuilder.withHttpClient()` now accepts `HttpClient` instead of `OkHttpClient`
 
+*Required:* Yes, if you call `UAARestClientFactoryBuilder.withHttpClient()` or otherwise supply your own HTTP client. No, if you rely on the default client.
+
+*Migration:* Manual.
+
+*Result:* `withHttpClient()` is passed an Apache `org.apache.hc.client5.http.classic.HttpClient`. With the default client, connection, socket, and connection-request timeouts are now 5 minutes instead of infinite.
+
 ====== RestTemplate to RestClient
 
 * `RestTemplate` usage has been replaced with `RestClient` (Spring Framework 7 preferred API)
+
+*Required:* No, this is an internal change unless you extended or injected the UAA `RestTemplate` directly.
+
+*Migration:* Manual, only if you depended on the previous `RestTemplate` usage.
+
+*Result:* UAA performs its REST calls through Spring Framework 7's `RestClient`.
 
 ==== Removal of deprecated APIs
 
@@ -82,7 +108,7 @@ The following sections describe each removal and the recommended replacement.
 
 [TIP]
 ====
-*Automatic migration (OpenRewrite):* the `UpgradeUaa_10_0` recipe migrates most of these removals automatically.
+*Automatic migration tooling (OpenRewrite):* the `UpgradeUaa_10_0` recipe migrates most of these removals automatically.
 Running it is *optional* (a convenience) - the same changes can be applied by hand.
 
 It applies one change category:
@@ -92,7 +118,7 @@ It applies one change category:
 ** `TokenData.getAccessTokenExpiration()` / `setAccessTokenExpiration(..)` -> `getTokenRenewInSeconds()` / `setTokenRenewInSeconds(..)`
 ** `UAARestClientProperties.getGeneratedTokenExpirationHeaderName()` / setter -> `getGeneratedTokenRenewInSecondsHeaderName()` / setter
 
-*Not covered (migrate manually):* `AuthorizationData.getAuthenticationTokenExpiration()` - its replacement `getTokenRenewInSeconds()` has a different type and meaning (`Integer` renew interval vs. the removed `Instant` expiration), so it is not a mechanical rename; `JwtTokenData.withExpirationTime(..)` -> `withExpirationSeconds(..)` (takes seconds, not an `Instant`); removed/changed constructors (`AuthorizationData`, `UAARestClientFactory`); the `CertificateConverter` -> `APIKeyConverter` / `CertificateConverter` split; the `UAAAuthenticationSuccessHandler.TOKEN_EXPIRATION_KEY` constant; JSON/config property renames; and CORS `exposedHeaders`.
+*Not covered by the recipe (migrate manually):* `AuthorizationData.getAuthenticationTokenExpiration()` - its replacement `getTokenRenewInSeconds()` has a different type and meaning (`Integer` renew interval vs. the removed `Instant` expiration), so it is not a mechanical rename; `JwtTokenData.withExpirationTime(..)` -> `withExpirationSeconds(..)` (takes seconds, not an `Instant`); removed/changed constructors (`AuthorizationData`, `UAARestClientFactory`); the `CertificateConverter` -> `APIKeyConverter` / `CertificateConverter` split; the `UAAAuthenticationSuccessHandler.TOKEN_EXPIRATION_KEY` constant; JSON/config property renames; and CORS `exposedHeaders`.
 ====
 
 ===== uaa-rest-client
@@ -101,14 +127,18 @@ It applies one change category:
 
 The field `accessTokenExpiration` and its getter/setter (`getAccessTokenExpiration()` / `setAccessTokenExpiration()`) have been removed from `com.mgmtp.a12.uaa.client.rest.auth.internal.data.TokenData`.
 
-*Migration:* Use `getTokenRenewInSeconds()` / `setTokenRenewInSeconds()` instead.
+*Required:* Yes, if your code calls `getAccessTokenExpiration()` / `setAccessTokenExpiration()`.
+
+*Migration:* Automatic by OpenRewrite (`UpgradeUaa_10_0`, rename category); can also be done manually.
+
+*Result:* Calls use `getTokenRenewInSeconds()` / `setTokenRenewInSeconds()` instead.
 
 ====== AuthorizationData.authenticationTokenExpiration removed (deprecated since 8.2.2)
 
 The field `authenticationTokenExpiration` (type `Instant`) and its getter `getAuthenticationTokenExpiration()` have been removed from `com.mgmtp.a12.uaa.client.rest.auth.AuthorizationData`.
 The two constructors that accepted an `Instant authenticationTokenExpiration` parameter have also been removed.
 
-*Migration:* Use the constructors that accept `Integer tokenRenewInSeconds` instead:
+Use the constructors that accept `Integer tokenRenewInSeconds` instead:
 
 [source,java]
 ----
@@ -121,25 +151,37 @@ new AuthorizationData(token, tokenType, sessionId, tokenRenewInSeconds);
 new AuthorizationData(token, tokenType, sessionId, uniqueId, tokenRenewInSeconds);
 ----
 
-Use `getTokenRenewInSeconds()` instead of `getAuthenticationTokenExpiration()`.
+*Required:* Yes, if your code constructs `AuthorizationData` with an `Instant` expiration or calls `getAuthenticationTokenExpiration()`.
+
+*Migration:* Manual. Not covered by `UpgradeUaa_10_0` - the replacement has a different type and meaning (`Integer` renew interval vs. the removed `Instant` expiration) and the constructor signatures changed.
+
+*Result:* Construction uses the `Integer tokenRenewInSeconds` constructors and reads the value via `getTokenRenewInSeconds()`.
 
 ====== UAARestClientProperties.generatedTokenExpirationHeaderName removed (deprecated since 8.2.2)
 
 The property `generatedTokenExpirationHeaderName` and its getter/setter have been removed from `com.mgmtp.a12.uaa.client.rest.config.properties.UAARestClientProperties`.
 
-*Migration:* Use `generatedTokenRenewInSecondsHeaderName` (`getGeneratedTokenRenewInSecondsHeaderName()` / `setGeneratedTokenRenewInSecondsHeaderName()`) instead. If you had this property set in your configuration files, rename it accordingly.
+*Required:* Yes, if your code reads/writes the property or sets it in configuration files.
+
+*Migration:* Automatic by OpenRewrite (`UpgradeUaa_10_0`) for the getter/setter rename; the configuration-file key rename must be done manually.
+
+*Result:* Code uses `getGeneratedTokenRenewInSecondsHeaderName()` / `setGeneratedTokenRenewInSecondsHeaderName()`, and configuration files use the `generatedTokenRenewInSecondsHeaderName` key.
 
 ====== TokenConfiguration.generatedTokenExpirationHeaderName removed (deprecated since 8.2.2)
 
 The field `generatedTokenExpirationHeaderName` and its getter/setter have been removed from `com.mgmtp.a12.uaa.client.rest.config.selfconfiguration.TokenConfiguration`.
 
-*Migration:* No action needed if you did not call these methods directly. The self-configuration no longer propagates the expiration header name.
+*Required:* No, unless you called these methods directly.
+
+*Migration:* Manual, only if you called these methods directly.
+
+*Result:* The self-configuration no longer propagates the expiration header name; no remaining references to the removed accessors.
 
 ====== UAARestClientFactory public constructors made private (deprecated since 9.2.0)
 
 The three public constructors of `com.mgmtp.a12.uaa.client.rest.config.UAARestClientFactory` that were deprecated since 9.2.0 have been made private.
 
-*Migration:* Use `UAARestClientFactoryBuilder` to create `UAARestClientFactory` instances:
+Use `UAARestClientFactoryBuilder` to create `UAARestClientFactory` instances:
 
 [source,java]
 ----
@@ -155,6 +197,12 @@ UAARestClientFactoryBuilder.create()
     .build();
 ----
 
+*Required:* Yes, if your code instantiates `UAARestClientFactory` via its constructors.
+
+*Migration:* Manual. Not covered by `UpgradeUaa_10_0` (constructor-to-builder rewrite).
+
+*Result:* Instances are created through `UAARestClientFactoryBuilder`.
+
 ===== uaa-authentication
 
 `CertificateConverter` has been replaced with two dedicated APIs for API key and certificate authentication.
@@ -169,30 +217,52 @@ Starting with this release, the following converters must be used instead:
 
 This change eliminates bean conflicts and clarifies the separation of concerns between the two authentication types.
 
+*Required:* Yes, if you used `CertificateConverter` for `APIKey` authentication.
+
+*Migration:* Manual. Not covered by `UpgradeUaa_10_0` (converter split).
+
+*Result:* `APIKey` authentication uses `APIKeyConverter` and `Certificate` authentication uses `CertificateConverter`, with no bean conflicts when both are configured.
+
 ====== UAAAuthenticationSuccessHandler.TOKEN_EXPIRATION_KEY removed (deprecated since 8.2.2)
 
 The constant `TOKEN_EXPIRATION_KEY` (`"access_token_expiration"`) has been removed from `UAAAuthenticationSuccessHandler`.
 The login response, SAML token exchange, and `/token` endpoint no longer include the `access_token_expiration` header or response body field.
 
-*Migration:* Use the `token_renew_in_seconds` header/field (constant `TOKEN_RENEW_IN_SECONDS`) to determine when to renew the token. This value represents the number of seconds after which the token should be renewed.
+*Required:* Yes, if your code references `TOKEN_EXPIRATION_KEY` or reads the `access_token_expiration` header/field.
+
+*Migration:* Manual. Not covered by `UpgradeUaa_10_0`.
+
+*Result:* Token-renewal timing is read from the `token_renew_in_seconds` header/field (constant `TOKEN_RENEW_IN_SECONDS`), which gives the number of seconds after which the token should be renewed.
 
 ====== TokenConfiguration.generatedTokenExpirationHeaderName removed (deprecated since 8.2.2)
 
 The field, getter/setter, and builder method `withGeneratedTokenExpirationHeaderName()` have been removed from `com.mgmtp.a12.uaa.authentication.config.client.TokenConfiguration`.
 
-*Migration:* Remove any calls to `withGeneratedTokenExpirationHeaderName()` from your `TokenConfiguration.Builder` chains. Token renewal is now exclusively controlled via `token_renew_in_seconds`.
+*Required:* Yes, if your `TokenConfiguration.Builder` chains call `withGeneratedTokenExpirationHeaderName()`.
+
+*Migration:* Manual. Not covered by `UpgradeUaa_10_0`.
+
+*Result:* Calls to `withGeneratedTokenExpirationHeaderName()` are removed; token renewal is controlled exclusively via `token_renew_in_seconds`.
 
 ====== CORS exposed headers updated
 
-The default CORS exposed headers no longer include `access_token_expiration`. If your client-side code reads this header, switch to reading `token_renew_in_seconds` instead. If you have explicitly configured `exposedHeaders`, remove `access_token_expiration` from the list.
+The default CORS exposed headers no longer include `access_token_expiration`.
+
+*Required:* Yes, if your client-side code reads the `access_token_expiration` header or you explicitly configured `exposedHeaders` to include it.
+
+*Migration:* Manual. Not covered by `UpgradeUaa_10_0`.
+
+*Result:* Client code reads `token_renew_in_seconds`, and any explicit `exposedHeaders` configuration no longer lists `access_token_expiration`.
 
 ====== JwtTokenData.loginTime and JwtTokenData.expirationTime removed (deprecated since 8.2.2)
 
 The fields `expirationTime` and the builder methods  `withExpirationTime()` have been removed from `com.mgmtp.a12.uaa.authentication.jwt.JwtTokenData`.
 
-*Migration:*
+*Required:* Yes, if your code calls `withExpirationTime()`.
 
-* Replace `withExpirationTime(instant)` with `withExpirationSeconds(seconds)`. The computed method `getExpirationTime()` (which returns `issuedTime + expirationSeconds`) is still available.
+*Migration:* Manual. Not covered by `UpgradeUaa_10_0` - `withExpirationSeconds(..)` takes seconds, not an `Instant`, so it is not a mechanical rename.
+
+*Result:* `withExpirationTime(instant)` is replaced with `withExpirationSeconds(seconds)`. The computed method `getExpirationTime()` (which returns `issuedTime + expirationSeconds`) is still available.
 
 ===== uaa-authorization
 
@@ -201,15 +271,17 @@ The fields `expirationTime` and the builder methods  `withExpirationTime()` have
 The field `templateRefs` and its getter/setter (`getTemplateRefs()` / `setTemplateRefs()`) have been removed from `com.mgmtp.a12.uaa.authorization.model.RepositoryPolicy`.
 The `"template-refs"` JSON property is no longer deserialized.
 
-*Migration:* Use `templates` (`getTemplates()` / `setTemplates()`) instead. In authorization policy JSON files, rename the `"template-refs"` key to `"templates"`.
+*Required:* Yes, if your code calls `getTemplateRefs()` / `setTemplateRefs()` or your authorization policy JSON uses the `"template-refs"` key.
+
+*Migration:* Manual. Not covered by `UpgradeUaa_10_0` (includes a JSON property rename).
+
+*Result:* Code uses `getTemplates()` / `setTemplates()`, and policy JSON files use the `"templates"` key.
 
 ===== uaa-authentication-principal-extension
 
 ====== ExternalPrincipalImpl.geteMail() /`seteMail() / Builder.withEMail() removed (deprecated since 8.1.0)
 
 The misspelled methods `geteMail()`, `seteMail()`, and `Builder.withEMail()` have been removed from `com.mgmtp.a12.uaa.authentication.principal.ExternalPrincipalImpl`.
-
-*Migration:* Use the correctly spelled methods instead:
 
 [source,java]
 ----
@@ -224,6 +296,12 @@ principal.setEmail(email);
 builder.withEmail(email);
 ----
 
+*Required:* Yes, if your code calls the misspelled `geteMail()` / `seteMail()` / `withEMail()` methods.
+
+*Migration:* Automatic by OpenRewrite (`UpgradeUaa_10_0`, rename category); can also be done manually.
+
+*Result:* Calls use the correctly spelled `getEmail()` / `setEmail()` / `withEmail()` methods.
+
 ==== uaa-authentication-client/uaa-authentication-a12-client
 
 `SagaIterator` from redux-saga has been replaced with `SagaGenerator` from `typed-redux-saga`.
@@ -231,29 +309,43 @@ builder.withEmail(email);
 This improves type safety when using `yield*` with `typed-redux-saga` effects.
 This is a type-only change and should not affect runtime behavior.
 
+*Required:* No, unless your code references the `SagaIterator` type from UAA directly.
+
+*Migration:* Manual, only if you referenced `SagaIterator` directly.
+
+*Result:* Saga typings use `SagaGenerator` from `typed-redux-saga`; runtime behavior is unchanged.
+
 [discrete]
 ===== Minimum React version raised to 19.2.6
 
 The React peer dependencies have been raised from `^19.0.0` to `^19.2.6`: `react` and `react-dom` in `uaa-authentication-client`, and `react` in `uaa-authentication-a12-client`.
 
-*Migration (required):* Raise `react` (and `react-dom`) to `^19.2.6` in your project's `package.json` and reinstall. No source-code changes needed.
+*Required:* Yes.
 
-*Automatic migration tooling:* Not applicable — `uaa-authentication-client-codemod` only rewrites import paths, not `package.json`. Apply this bump manually.
+*Migration:* Manual.
+
+*Result:* `react` (and `react-dom`) are at `^19.2.6` in your project's `package.json` and reinstalled. No source-code changes needed.
 
 [discrete]
 ===== SessionStorageKeys.ACCESS_TOKEN_EXPIRATION and SessionStorageKeys.TOKEN_RENEW_IN_SECONDS removed
 
 The enum members `ACCESS_TOKEN_EXPIRATION` (`"access_token_expiration"`) and `TOKEN_RENEW_IN_SECONDS` (`"token_renew_in_seconds"`) have been removed from `SessionStorageKeys`. These values are no longer stored in session storage.
 
-*Migration:* Remove any references to `SessionStorageKeys.ACCESS_TOKEN_EXPIRATION` and `SessionStorageKeys.TOKEN_RENEW_IN_SECONDS` in your code. Use `SessionStorageKeys.TOKEN_RENEW_TIMESTAMP` for token renewal timing. If you were sharing `"access_token_expiration"` via `UaaSecureStorage`, remove it from the shared data list.
+*Required:* Yes, if your code references `SessionStorageKeys.ACCESS_TOKEN_EXPIRATION` / `SessionStorageKeys.TOKEN_RENEW_IN_SECONDS`, or shares `"access_token_expiration"` via `UaaSecureStorage`.
+
+*Migration:* Manual.
+
+*Result:* References to the removed members are removed; token-renewal timing uses `SessionStorageKeys.TOKEN_RENEW_TIMESTAMP`, and `"access_token_expiration"` is removed from any `UaaSecureStorage` shared-data list.
 
 [discrete]
 ===== TokenConfiguration.generatedTokenExpirationHeaderName removed
 
 The optional property `generatedTokenExpirationHeaderName` has been removed from the `TokenConfiguration` interface.
 
-*Migration:* Remove any usage of `generatedTokenExpirationHeaderName` from your token configuration objects. The `access_token_expiration` response header is no longer read or stored by the client. Token renewal is now exclusively controlled via `token_renew_in_seconds`.
+Note the changed behaviour: when the token lifetime is expired, the `LOGIN_REQUIRE` action is now dispatched. The server now provides `token_expiration_in_seconds` alongside the existing token response fields. The client uses this value to compute a `token_expiration_timestamp` and schedules a task that dispatches `LOGIN_REQUIRE` when the token lifetime expires.
 
-*Breaking behaviour:* When the token lifetime is expired, the `LOGIN_REQUIRE` action is now dispatched.
+*Required:* Yes, if your token configuration objects set `generatedTokenExpirationHeaderName`.
 
-The server now provides `token_expiration_in_seconds` alongside the existing token response fields. The client uses this value to compute a `token_expiration_timestamp` and schedules a task that dispatches `LOGIN_REQUIRE` when the token lifetime expires.
+*Migration:* Manual.
+
+*Result:* Usage of `generatedTokenExpirationHeaderName` is removed; the `access_token_expiration` response header is no longer read or stored, and token renewal is controlled exclusively via `token_renew_in_seconds`. When the token lifetime expires, the client dispatches `LOGIN_REQUIRE`.

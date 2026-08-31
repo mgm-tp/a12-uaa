@@ -38,7 +38,6 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -72,7 +71,6 @@ import com.mgmtp.a12.uaa.authentication.web.internal.TokenHandlingController;
 @ConditionalOnAuthentication({ AuthenticationType.LOCAL, AuthenticationType.ACTIVE_DIRECTORY_LDAP, AuthenticationType.SAML,
 	AuthenticationType.UAA_ACCESS_TOKEN })
 @Configuration
-@EnableCaching
 class JwtTokenConfig {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(JwtTokenConfig.class.getCanonicalName() + ".UAA_Config");

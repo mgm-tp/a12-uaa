@@ -46,6 +46,7 @@ import org.slf4j.LoggerFactory;
 
 import com.mgmtp.a12.uaa.authentication.jwt.RenewTokenStorage;
 import com.mgmtp.a12.uaa.authentication.jwt.internal.JwtTokenVerifier;
+import com.mgmtp.a12.uaa.authentication.jwt.internal.JwtTokenVerifier.TokenValidationResult;
 import com.mgmtp.a12.uaa.authentication.saml.AuthorizationCodeStorage;
 
 public class SamlTokenExchangeService {
@@ -72,12 +73,19 @@ public class SamlTokenExchangeService {
 		Optional<String> jwtToken = samlAuthorizationCodeStorage.loadAccessTokenByAuthorizationCode(authCode);
 		boolean isCodeChallengeValid = isCodeChallengeValid(codeChallenge);
 		boolean isTokenPresent = jwtToken.isPresent();
-		boolean isTokenValid = jwtToken.map(token -> jwtTokenVerifier.isTokenValid(token)).orElse(false);
+		TokenValidationResult tokenValidation = jwtToken.map(jwtTokenVerifier::validateToken).orElse(null);
+		boolean isTokenValid = tokenValidation != null && tokenValidation.valid();
 		boolean isValid = isCodeChallengeValid && isTokenPresent && isTokenValid;
 		renewTokenStorage.removeCodeChallenge(codeChallenge);
 		if (!isValid) {
-			LOGGER.warn("Cannot claim token: [isCodeChallengeValid: %s, isTokenPresent: %s, isTokenValid: %s]"
-				.formatted(isCodeChallengeValid, isTokenPresent, isTokenValid));
+			String message = "Cannot claim token: [isCodeChallengeValid: %s, isTokenPresent: %s, isTokenValid: %s]%s"
+				.formatted(isCodeChallengeValid, isTokenPresent, isTokenValid,
+					tokenValidation == null ? "" : " " + tokenValidation.describe());
+			if (tokenValidation != null && tokenValidation.cause() != null) {
+				LOGGER.warn(message, tokenValidation.cause());
+			} else {
+				LOGGER.warn(message);
+			}
 		}
 		return isValid ? jwtToken : Optional.empty();
 	}

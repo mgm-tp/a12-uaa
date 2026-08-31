@@ -33,6 +33,9 @@ package com.mgmtp.a12.uaa.authentication.jwt;
 
 import jakarta.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.mgmtp.a12.uaa.authentication.jwt.internal.JwtTokenGenerator;
@@ -43,6 +46,8 @@ import com.mgmtp.a12.uaa.authentication.jwt.internal.JwtTokenVerifier;
  *
  */
 public class JwtTokenService {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(JwtTokenService.class);
 
 	@Inject
 	private JwtTokenGenerator jwtTokenGeneratorSupport;
@@ -70,7 +75,9 @@ public class JwtTokenService {
 	 * @return true/false
 	 */
 	public Boolean isTokenValid(String token) {
-		return jwtTokenVerifier.isTokenValid(token);
+		JwtTokenVerifier.TokenValidationResult tokenValidation = jwtTokenVerifier.validateToken(token);
+		tokenValidation.doErrorLog(LOGGER, Level.WARN, "Token is invalid");
+		return tokenValidation.valid();
 	}
 
 	/**

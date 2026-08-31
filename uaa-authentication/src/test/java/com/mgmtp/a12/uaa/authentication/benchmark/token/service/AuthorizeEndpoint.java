@@ -130,7 +130,7 @@ public class AuthorizeEndpoint {
 
 		@Override
 		public boolean isRequestAuthorizeValid(String codeChallenge, String idTokenHint) {
-			return !isCodeChallengeValid(codeChallenge) && jwtTokenVerifier.isTokenValid(idTokenHint) && isTokenRenewalValid(idTokenHint);
+			return !isCodeChallengeValid(codeChallenge) && jwtTokenVerifier.validateToken(idTokenHint).valid() && isTokenRenewalValid(idTokenHint);
 		}
 
 		private Boolean isTokenRenewalValid(String token) {

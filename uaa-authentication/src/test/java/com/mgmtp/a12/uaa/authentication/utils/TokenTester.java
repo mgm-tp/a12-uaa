@@ -134,7 +134,7 @@ public class TokenTester {
 			Optional<String> tokenRtn = jwtTokenStorage.loadToken(tokenData.getToken());
 			Assertions.assertTrue(tokenRtn.isPresent());
 		}
-		Assertions.assertEquals(jwtTokenVerifier.isTokenValid(tokenData.getToken()), isExpectedTokenValid);
+		Assertions.assertEquals(jwtTokenVerifier.validateToken(tokenData.getToken()).valid(), isExpectedTokenValid);
 	}
 
 	public static void assertPrincipal(UAAPrincipal<UserDataCreator.TestExtendedData> user, UAAPrincipal<UserDataCreator.TestExtendedData> deserializedUser) {

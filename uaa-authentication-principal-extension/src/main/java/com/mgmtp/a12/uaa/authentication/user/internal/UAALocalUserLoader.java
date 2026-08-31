@@ -44,6 +44,7 @@ import org.springframework.core.io.Resource;
 import com.mgmtp.a12.uaa.authentication.user.LocalUser;
 import com.mgmtp.a12.uaa.authentication.user.LocalUserLoader;
 
+import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.dataformat.yaml.YAMLFactory;
 
@@ -56,7 +57,10 @@ public class UAALocalUserLoader<T extends LocalUser> implements LocalUserLoader<
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UAALocalUserLoader.class);
 
-	private final ObjectMapper usersDeserializer = new ObjectMapper(new YAMLFactory());
+	private final ObjectMapper usersDeserializer = new ObjectMapper(new YAMLFactory())
+		.rebuild()
+		.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+		.build();
 
 	private Class<T> userType;
 

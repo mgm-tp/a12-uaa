@@ -51,6 +51,7 @@ import com.mgmtp.a12.uaa.authentication.jwt.JwtTokenData;
 import com.mgmtp.a12.uaa.authentication.jwt.RenewTokenStorage;
 import com.mgmtp.a12.uaa.authentication.jwt.internal.JwtTokenGenerator;
 import com.mgmtp.a12.uaa.authentication.jwt.internal.JwtTokenVerifier;
+import com.mgmtp.a12.uaa.authentication.jwt.internal.JwtTokenVerifier.TokenValidationResult;
 import com.mgmtp.a12.uaa.authentication.principal.PrincipalCreator;
 import com.mgmtp.a12.uaa.authentication.saml.SamlJwtTokenData;
 import com.mgmtp.a12.uaa.authentication.saml.SamlJwtTokenStorage;
@@ -86,28 +87,34 @@ public class RenewTokenService {
 		if (loadValueByCode.isPresent() && isAfterNow(Instant.ofEpochMilli(Long.parseLong(loadValueByCode.get())))) {
 			return true;
 		}
-		LOGGER.warn("Code '%s' is invalid".formatted(code));
+		LOGGER.debug("Code '{}' is invalid", code);
 		return false;
 	}
 
 	public boolean isTokenHintValid(String code) {
 		Optional<String> loadTokenHintByCode = renewTokenStorage.loadTokenHintByCode(code);
-		if (loadTokenHintByCode.isPresent() && jwtTokenVerifier.isTokenValid(loadTokenHintByCode.get())) {
+		if (loadTokenHintByCode.isPresent() && jwtTokenVerifier.validateToken(loadTokenHintByCode.get()).valid()) {
 			return true;
 		}
-		LOGGER.warn("TokenHintValid '%s' is invalid".formatted(code));
+		LOGGER.debug("TokenHint for code '{}' is invalid", code);
 		return false;
 	}
 
 	public boolean isRequestAuthorizeValid(String codeChallenge, String idTokenHint) {
 		boolean isNewCodeChallengeValid = !isCodeChallengeValid(codeChallenge);
-		boolean isTokenValid = jwtTokenVerifier.isTokenValid(idTokenHint);
+		TokenValidationResult tokenValidation = jwtTokenVerifier.validateToken(idTokenHint);
+		boolean isTokenValid = tokenValidation.valid();
 		boolean isTokenRenewalTimeValid = isTokenRenewalValid(idTokenHint);
 		if (isNewCodeChallengeValid && isTokenValid && isTokenRenewalTimeValid) {
 			return true;
 		}
-		LOGGER.warn("Authorization for token renewal failed with the result [newCodeChallengeValid: %s, tokenValid: %s, renewalTimeValid: %s]"
-			.formatted(isNewCodeChallengeValid, isTokenValid, isTokenRenewalTimeValid));
+		String message = "Authorization for token renewal failed with the result [newCodeChallengeValid: %s, tokenValid: %s, renewalTimeValid: %s] %s"
+			.formatted(isNewCodeChallengeValid, isTokenValid, isTokenRenewalTimeValid, tokenValidation.describe());
+		if (tokenValidation.cause() != null) {
+			LOGGER.warn(message, tokenValidation.cause());
+		} else {
+			LOGGER.warn(message);
+		}
 		return false;
 	}
 
@@ -130,8 +137,8 @@ public class RenewTokenService {
 		if (isCodeChallengeValid && isCodeValid && isTokenHintValid) {
 			return true;
 		}
-		LOGGER.warn("Exchange token failed with the result [codeChallengeValid: %s, codeValid: %s, tokenHintValid: %s]"
-			.formatted(isCodeChallengeValid, isCodeValid, isTokenHintValid));
+		LOGGER.warn("Exchange token failed with the result [codeChallengeValid: {}, codeValid: {}, tokenHintValid: {}]",
+			isCodeChallengeValid, isCodeValid, isTokenHintValid);
 		return false;
 	}
 
@@ -150,7 +157,7 @@ public class RenewTokenService {
 			byte[] digest = md.digest();
 			codeChallenge = Base64.encodeBase64URLSafeString(digest);
 		} catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
-			LOGGER.warn("Code challenge generating failed.");
+			LOGGER.warn("Code challenge generating failed.", e);
 		}
 		return codeChallenge;
 	}
@@ -177,7 +184,7 @@ public class RenewTokenService {
 		if (isBeforeNow(expiration)) {
 			return true;
 		}
-		LOGGER.warn("The renewal is only processed in %s seconds before the token is expired".formatted(getTokenRenewThresholdInSeconds()));
+		LOGGER.debug("The renewal is only processed in {} seconds before the token is expired", getTokenRenewThresholdInSeconds());
 		return false;
 	}
 

@@ -19,7 +19,10 @@ THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPR
 
 CAUTION: Please have a look at link:/docs/overall/migration_guide/index.html[Migration to latest A12] chapter for an explanation of general steps on how to upgrade before starting with the component migration.
 
-NOTE: UAA provides https://docs.openrewrite.org[OpenRewrite recipes] for automatic migration of breaking changes.
-Please read link:/docs/overall/migration_guide/index.html#_usage_of_openrewrite_for_backend_components[how to apply OpenRewrite recipes] in A12 backend components.
+NOTE: For *backend* (Java) components, UAA provides https://docs.openrewrite.org[OpenRewrite recipes] for automatic migration of breaking changes.
+Please read link:/docs/overall/migration_guide/index.html#_usage_of_openrewrite_for_backend_components[how to apply OpenRewrite recipes].
+
+NOTE: For the *TypeScript clients* (`uaa-authentication-client` / `uaa-authentication-a12-client`), `uaa-authentication-client-codemod` is the automatic migration tool.
+Please read link:/docs/overall/migration_guide/index.html#_usage_of_hypermod_for_frontend_components[how to apply Hypermod for Frontend Components].
 
 include::migrate-202606.adoc[]

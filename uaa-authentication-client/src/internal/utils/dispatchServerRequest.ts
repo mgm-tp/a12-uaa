@@ -29,6 +29,7 @@
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
+
 import {
 	ConnectorLocator,
 	RestRequestPayload,
@@ -38,6 +39,8 @@ import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging";
 
 const logger = LoggerFactory.getLogger("UAA/Serverrequest");
 
+const REDACTED_VALUE = "***";
+
 export interface ErrorPayload {
 	readonly operationType: "loading" | "saving";
 	readonly error: unknown;
@@ -46,13 +49,75 @@ export interface ErrorPayload {
 type TypeGuard<T, U extends T> = (obj: T) => obj is U;
 
 /**
+ * Returns a copy of the body where the values of the given field names are
+ * replaced with a placeholder, leaving the rest of the body intact. Supports
+ * JSON-string bodies and `URLSearchParams` bodies; any other body type is
+ * returned unchanged.
+ *
+ * @param body
+ * @param sensitiveFields
+ */
+function redactBody(
+	body: unknown,
+	sensitiveFields: readonly string[]
+): unknown {
+	if (body instanceof URLSearchParams) {
+		const redacted = new URLSearchParams(body);
+		for (const field of sensitiveFields) {
+			if (redacted.has(field)) {
+				redacted.set(field, REDACTED_VALUE);
+			}
+		}
+		return redacted;
+	}
+	if (typeof body === "string") {
+		try {
+			const parsed: unknown = JSON.parse(body);
+			if (parsed && typeof parsed === "object") {
+				let changed = false;
+				const record = parsed as Record<string, unknown>;
+				for (const field of sensitiveFields) {
+					if (field in record) {
+						record[field] = REDACTED_VALUE;
+						changed = true;
+					}
+				}
+				return changed ? JSON.stringify(record) : body;
+			}
+		} catch {
+			// Body is not JSON, nothing to redact field-wise.
+		}
+	}
+	return body;
+}
+
+/**
+ * Returns a copy of the request that is safe to log. Credential attributes
+ * declared via `extendedData.sensitiveFields` (e.g. `password`) have their
+ * value masked in the logged body, while the request actually sent to the
+ * server stays untouched.
+ *
+ * @param request
+ */
+function toLoggableRequest(request: RestRequestPayload): RestRequestPayload {
+	const extendedData = request.extendedData as
+		| { readonly sensitiveFields?: readonly string[] }
+		| undefined;
+	const sensitiveFields = extendedData?.sensitiveFields;
+	if (!sensitiveFields?.length || request.body === undefined) {
+		return request;
+	}
+	return { ...request, body: redactBody(request.body, sensitiveFields) };
+}
+
+/**
  * @param request
  * @internal
  */
 export async function fetchServerRequest(
 	request: RestRequestPayload
 ): Promise<Response> {
-	logger.log("Request", request);
+	logger.log("Request", toLoggableRequest(request));
 	let modifiedRequest: RestRequestPayload = request;
 	const baseUrl = (
 		ConnectorLocator.getInstance().getServerConnector() as RestServerConnector

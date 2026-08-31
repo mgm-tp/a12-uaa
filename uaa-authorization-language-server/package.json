@@ -21,9 +21,9 @@
   },
   "main": "/main/uaa-authorization-language-server",
   "dependencies": {
-    "@com.mgmtp.a12.base/base-model-api": "^30.0.1",
-    "@com.mgmtp.a12.kernel/kernel-core-runtime-api-ts": "31.1.0",
-    "@com.mgmtp.a12.kernel/kernel-md-facade": "31.1.0",
+    "@com.mgmtp.a12.base/base-model-api": "30.0.2",
+    "@com.mgmtp.a12.kernel/kernel-core-runtime-api-ts": "31.1.1",
+    "@com.mgmtp.a12.kernel/kernel-md-facade": "31.1.1",
     "@vscode/l10n": "0.0.18",
     "antlr4-c3": "^3.4.1",
     "antlr4ng": "^3.0.7",

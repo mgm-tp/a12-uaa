@@ -36,6 +36,7 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
@@ -49,6 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.saml2.provider.service.authentication.AbstractSaml2AuthenticationRequest;
 import org.springframework.security.saml2.provider.service.authentication.OpenSaml5AuthenticationProvider.ResponseToken;
 import org.springframework.util.CollectionUtils;
 
@@ -96,10 +98,6 @@ public class SamlAuthenticationSuccessHandler extends UAAAuthenticationSuccessHa
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
 		try {
 			LOGGER.debug("User [{}] has been authenticated", authentication.getName());
-			String samlRequestId = CookieUtil.locateCookie(request, UAASamlAuthenticationRequestFilter.COOKIE_SAML_REQUEST_ID)
-				.map(String::new)
-				.orElseThrow(() -> new ServletException(
-					"The cookie with name [%s] could not be found".formatted(UAASamlAuthenticationRequestFilter.COOKIE_SAML_REQUEST_ID)));
 
 			@SuppressWarnings("unchecked")
 			TypedUsernamePasswordAuthenticationToken<ResponseToken> samlUsernamePasswordAuthenticationToken =
@@ -108,11 +106,16 @@ public class SamlAuthenticationSuccessHandler extends UAAAuthenticationSuccessHa
 			if (samlResponse == null || StringUtils.isEmpty(samlResponse.getResponse().getInResponseTo())) {
 				throw new ServletException("The In Response To ID could not be found");
 			}
+
+			String samlRequestId = Optional.ofNullable(samlResponse.getToken().getAuthenticationRequest())
+				.map(AbstractSaml2AuthenticationRequest::getId)
+				.filter(StringUtils::isNotEmpty)
+				.orElseThrow(() -> new ServletException("The SAML authentication request could not be found"));
+
 			if (!samlRequestId.equals(samlResponse.getResponse().getInResponseTo())) {
 				throw new ServletException("The Request and In Response To ID does not match");
 			}
 
-			CookieUtil.removeCookie(UAASamlAuthenticationRequestFilter.COOKIE_SAML_REQUEST_ID, request, response);
 			String authorizationCode = generateAuthorizationCode();
 			String jwtToken = generateJwtToken((UserDetails) authentication.getPrincipal()).getToken();
 			authorizationCodeStorage.storeAuthorizationCode(authorizationCode, jwtToken);
